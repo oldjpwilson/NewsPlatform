@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
 
+    'articles',
+    'categories',
     'core'
 ]
 
@@ -74,3 +76,4 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_AUTHENTICATION_METHOD = "username"
 ACCOUNT_EMAIL_VERIFICATION = "none"  # TODO: Discuss
 AUTH_USER_MODEL = "core.User"
+SITE_ID = 1
