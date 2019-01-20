@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<p><b>NewsPlatform: </b>linking the public to affordable, ad-free news from a continuously growing choice of journalists on a continuously growing change of topics.</p>
+<p>Subscribe to news at $0.50 per channel, per month</p>
+<p>No algorithms | No clickbait | No narratives</p>
+
+
+  <div class="row">
+    <div class="col-8">
+    <h2>Top articles</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Views</th>
+          <th scope="col">Channel</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for article in article_list %}
+        <tr>
+          <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
+          <td>{{ article.view_count }}</td>
+          <td>{{ article.channel.name }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <hr />
+
+    <h2>Top channels</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Channel name</th>
+          <th scope="col">Subscribers</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for channel in channel_list %}
+        <tr>
+          <td>{{ channel.name }}</td>
+          <td>{{ channel.subscribers.count }}</td>
+          <td>{{ channel.description }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+  </div>
+
+  <div class="col-4">
+    <h2>Join NewsPlatform</h2>
+    form here
+  </div>
+
+</div>
+
+
+{% endblock content %}

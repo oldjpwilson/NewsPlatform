@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_save
 from categories.models import Category
+from .managers import ChannelManager
 
 
 class User(AbstractUser):
@@ -42,16 +42,7 @@ class Channel(models.Model):
         max_length=18)  # TODO: max credit card length?
     subscribers = models.ManyToManyField(Profile)
 
+    objects = ChannelManager()
+
     def __str__(self):
         return self.user.email
-
-
-# Signals
-
-def user_signup_receiver(sender, instance, **kwargs):
-    # create the users profile
-    profile = Profile.objects.get_or_create(user=instance)
-    return profile
-
-
-post_save.connect(user_signup_receiver, sender=User)

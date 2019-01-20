@@ -4,3 +4,5 @@ migrations
 **/*.pyc
 src/db.sqlite3
 src/static_in_env
+media_root
+static_root

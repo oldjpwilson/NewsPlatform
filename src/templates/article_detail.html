@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-12">
+    <h2>{{ article.title }}</h2>
+    {{ article.content | safe }}
+    </div>
+  </div>
+
+{% endblock content %}

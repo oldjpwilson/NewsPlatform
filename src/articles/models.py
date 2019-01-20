@@ -1,7 +1,9 @@
 from django.db import models
+from django.urls import reverse
+from tinymce import HTMLField
 from categories.models import Category
 from core.models import Channel
-
+from .managers import ArticleManager
 
 MEDIA_CHOICES = (
     ('Article', 'article'),
@@ -31,6 +33,7 @@ class Article(models.Model):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     description = models.TextField()
+    thumbnail = models.ImageField(blank=True, null=True)
     media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
     published_date = models.DateTimeField(auto_now_add=True)
     last_edit_date = models.DateTimeField(auto_now=True)
@@ -39,10 +42,17 @@ class Article(models.Model):
         Urgency, on_delete=models.SET_NULL, blank=True, null=True)
     duration = models.ForeignKey(
         Duration, on_delete=models.SET_NULL, blank=True, null=True)
-    content = models.TextField()  # tinymce
+    content = HTMLField('Content')  # tinymce
     rating = models.FloatField(default=0)
+    view_count = models.IntegerField(default=0)
+    draft = models.BooleanField()
+
     # comments with disqus
     # location = models.ForeignKey(Location) # TODO: research
+    objects = ArticleManager()
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('articles:detail', kwargs={'id': self.id})
