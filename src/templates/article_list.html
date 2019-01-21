@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-12">
+    <h2>Top articles</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Views</th>
+          <th scope="col">Channel</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for article in article_list %}
+        <tr>
+          <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
+          <td>{{ article.view_count }}</td>
+          <td>{{ article.channel.name }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div> 
+
+
+{% endblock content %}

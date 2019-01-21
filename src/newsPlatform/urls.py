@@ -7,6 +7,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('articles.urls', namespace='articles')),
     re_path(r'^tinymce/', include('tinymce.urls')),
+    re_path(r'^accounts/', include('allauth.urls'))
 ]
 
 if settings.DEBUG:
