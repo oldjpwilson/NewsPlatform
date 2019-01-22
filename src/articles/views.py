@@ -44,6 +44,8 @@ def list_view(request):
 
 def detail_view(request, id):
     article = get_object_or_404(Article, id=id)
+    article.view_count = article.view_count + 1
+    article.save()  # TODO: make this better
     context = {
         'article': article
     }

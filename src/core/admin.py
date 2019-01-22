@@ -34,6 +34,7 @@ class ChannelAdmin(admin.ModelAdmin):
                 'name',
                 'date_joined',
                 'description',
+                'categories',
                 'profile_image',
                 'background_image',
                 'rating',

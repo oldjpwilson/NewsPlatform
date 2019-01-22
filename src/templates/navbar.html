@@ -4,24 +4,28 @@
       <li class="nav-item {% if request.get_full_path == '/' %} active {% endif %}">
         <a class="nav-link" href="{% url 'articles:home' %}">Home</a>
       </li>
+      {% if request.user.is_authenticated %}
       <li class="nav-item {% if request.get_full_path == '/create/' %} active {% endif %}">
         {# TODO: only show for authenticated channels #}
         <a class="nav-link" href="{% url 'articles:create' %}">Create</a>
       </li>
+      {% endif %}
     </ul>
     <ul class="navbar-nav" style="margin-right: 15px;">
-      <li class="nav-item {% if request.get_full_path == '/profile/' %} active {% endif %}">
-        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-      </li>
-      <li class="nav-item {% if request.get_full_path == '/articles/' %} active {% endif %}">
-        <a class="nav-link" href="{% url 'articles:list' %}">Articles</a>
-      </li>
       <li class="nav-item {% if request.get_full_path == '/channels/' %} active {% endif %}">
-        <a class="nav-link" href="/channels">Channels</a>
+        <a class="nav-link" href="{% url 'list-channel' %}">Explore</a>
       </li>
       <li class="nav-item {% if request.get_full_path == '/about/' %} active {% endif %}">
         <a class="nav-link" href="/about">About</a>
       </li>
+      {% if request.user.is_authenticated %}
+      <li class="nav-item {% if request.get_full_path == '/profile/' %} active {% endif %}">
+        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/accounts/logout/">Logout</a>
+      </li>
+      {% endif %}
     </ul>
     <form class="form-inline my-2 my-lg-0">
       <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">

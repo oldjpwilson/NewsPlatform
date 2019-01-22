@@ -1,11 +1,113 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
-  <div class="row">
-    <div class="col-12">
-    <h2>User: {{ profile.user.username }}</h2>
-    </div>
+<div class="row" style="margin: 10px;">
+    <div class="col-9">
+    <h2>Top stories</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Title</th>
+          <th scope="col">Views</th>
+          <th scope="col">Channel</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for article in article_list %}
+        <tr>
+          <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
+          <td>{{ article.view_count }}</td>
+          <td>{{ article.channel.name }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <br style="padding-top: 10px;" />
+
+    <h2>Subscribed channels</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Channel name</th>
+          <th scope="col">Subscribers</th>
+          <th scope="col">Description</th>
+          <th scope="col">Categories</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for channel in channel_list %}
+        <tr>
+          <td>{{ channel.name }}</td>
+          <td>{{ channel.subscribers.count }}</td>
+          <td>{{ channel.description }}</td>
+          <td>{% for cat in channel.categories.all %} <span>{{ cat }}</span>{% endfor %}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4">You have no subscriptions. <a href="/explore">Explore the channels</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <br style="padding-top: 10px;" />
+
+    <h2>Stats and information</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Metric</th>
+          <th scope="col">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Number of subscriptions</td>
+          <td>{{ sub_count }}</td>
+        </tr>
+        <tr>
+          <td>Monthly billing total</td>
+          <td>$5 (WIP)</td>
+        </tr>
+        <tr>
+          <td>Most viewed channel</td>
+          <td>JustDjango (WIP)</td>
+        </tr>
+        <tr>
+          <td>Total article views</td>
+          <td>12 (WIP)</td>
+        </tr>
+      </tbody>
+    </table>
+
   </div>
+
+  <div class="col-3">
+    <div class="card" style="width: 100%;">
+      <div class="card-header">
+        User: {{ request.user.username }}
+      </div>
+      <ul class="list-group list-group-flush">
+        <a href="/profile/update/"><li class="list-group-item">Edit personal info</li></a>
+        {% if request.user.channel %}
+        <a href="{% url 'update-channel' %}" class="list-group-item">Edit channel info</a>
+        {% endif %}
+        <a href="/profile/preferences/"><li class="list-group-item">Edit preferences</li></a>
+        <a href="/profile/billing/"><li class="list-group-item">Billing state info</li></a>
+      </ul>
+    </div>
+
+    <br />
+
+    {% if not request.user.channel %}
+    <a href="{% url 'create-channel' %}" class="btn btn-primary">Become a Journalist!</a>
+    {% endif %}
+  </div>
+
+</div>
+
 
 {% endblock content %}

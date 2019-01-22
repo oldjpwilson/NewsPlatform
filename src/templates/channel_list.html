@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-12">
+    <h2>channels</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for channel in channel_list %}
+        <tr>
+          <td>{{ channel.name }}</td>
+          <td>{{ channel.rating }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </div> 
+
+
+{% endblock content %}

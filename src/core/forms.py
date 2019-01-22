@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from django import forms
-from .models import User
+from .models import User, Channel
 
 
 class LoginForm(forms.Form):
@@ -20,3 +20,14 @@ class LoginForm(forms.Form):
             if not user.check_password(password):
                 raise forms.ValidationError('Incorrect username/password')
         return super(LoginForm, self).clean(*args, **kwargs)
+
+
+class ChannelCreateForm(forms.ModelForm):
+    class Meta:
+        model = Channel
+        fields = ('name',
+                  'description',
+                  'profile_image',
+                  'background_image',
+                  'categories',
+                  'payment_details')

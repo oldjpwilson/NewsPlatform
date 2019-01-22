@@ -31,7 +31,6 @@ class Channel(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE)
     name = models.CharField(max_length=20, unique=True)
-    # TODO: oncreate - date_joined to be same as users
     date_joined = models.DateTimeField()
     description = models.TextField()
     profile_image = models.ImageField()
@@ -45,4 +44,4 @@ class Channel(models.Model):
     objects = ChannelManager()
 
     def __str__(self):
-        return self.user.email
+        return self.user.username

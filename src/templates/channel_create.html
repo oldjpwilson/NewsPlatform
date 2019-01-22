@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+  <div class="row" style="margin: 10px;">
+    <div class="col-4 offset-4">
+    <h2>Start sharing news!</h2>
+    <form method="post" action=".">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button type="submit" class="btn btn-primary">Begin!</button>
+    </form>
+    </div>
+  </div>
+
+{% endblock content %}
