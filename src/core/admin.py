@@ -12,6 +12,7 @@ class ProfileAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (
+                'user',
                 'middle_names',
                 'phone',
                 'date_of_birth',

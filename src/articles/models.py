@@ -56,3 +56,9 @@ class Article(models.Model):
 
     def get_absolute_url(self):
         return reverse('articles:detail', kwargs={'id': self.id})
+
+    def get_update_url(self):
+        return reverse('articles:update', kwargs={'id': self.id})
+
+    def get_delete_url(self):
+        return reverse('articles:delete', kwargs={'id': self.id})

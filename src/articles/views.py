@@ -54,7 +54,6 @@ def create_view(request):
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
-            print(form.instance)
             channel = Channel.objects.get(user__username='admin')
             form.instance.channel = channel
             form.save()
@@ -65,3 +64,25 @@ def create_view(request):
         'form': form
     }
     return render(request, 'article_create.html', context)
+
+
+def update_view(request, id):
+    instance = get_object_or_404(Article, id=id)
+    form = ArticleModelForm(request.POST or None,
+                            request.FILES or None, instance=instance)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('articles:detail', kwargs={
+                'id': form.instance.id
+            }))
+    context = {
+        'form': form
+    }
+    return render(request, 'article_create.html', context)
+
+
+def delete_view(request, id):
+    article = get_object_or_404(Article, id=id)
+    article.delete()
+    return redirect('/')

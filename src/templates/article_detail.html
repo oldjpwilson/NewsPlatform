@@ -6,6 +6,10 @@
     <div class="col-12">
     <h2>{{ article.title }}</h2>
     {{ article.content | safe }}
+    {% if article.channel.user == request.user %}
+    <a class="btn btn-secondary" href="{{ article.get_update_url }}">Update</a>
+    <a class="btn btn-warning" href="{{ article.get_delete_url }}">Delete</a>
+    {% endif %}
     </div>
   </div>
 
