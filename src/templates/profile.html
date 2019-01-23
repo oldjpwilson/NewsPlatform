@@ -91,10 +91,7 @@
         User: {{ request.user.username }}
       </div>
       <ul class="list-group list-group-flush">
-        <a href="/profile/update/"><li class="list-group-item">Edit personal info</li></a>
-        {% if request.user.channel %}
-        <a href="{% url 'update-channel' %}" class="list-group-item">Edit channel info</a>
-        {% endif %}
+        <a href="/profile/update/"><li class="list-group-item">Edit profile</li></a>
         <a href="/profile/preferences/"><li class="list-group-item">Edit preferences</li></a>
         <a href="/profile/billing/"><li class="list-group-item">Billing state info</li></a>
       </ul>
@@ -103,7 +100,9 @@
     <br />
 
     {% if not request.user.channel %}
-    <a href="{% url 'create-channel' %}" class="btn btn-primary">Become a Journalist!</a>
+    <a href="{% url 'channel-create' %}" class="btn btn-primary">Become a Journalist!</a>
+    {% else %}
+    <a href="{% url 'my-channel' %}" class="btn btn-primary">View my channel</a>
     {% endif %}
   </div>
 

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="margin: 10px;">
+    <div class="row">
+        <div style="height: 200px;">
+            <div style="height: 100%;">
+                <img style="width: 100%; height: 100%" src="{{ channel.background_image.url }}" alt="channel-background-image" />
+            </div>
+            <div style="height: 50px; position: absolute; right: 0; top: 0" class="col-6">
+                <img style="height: 100%;" src="{{ channel.profile_image.url }}" alt="channel-profile-image" />
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin: 10px;">
+        <div class="col-8">
+            <div class="col-12">
+                <h2>Articles</h2>
+                <table class="table table-striped">
+                <thead>
+                    <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">View count</th>
+                    <th scope="col">Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for article in articles %}
+                    <tr>
+                    <td>{{ article.title }}</td>
+                    <td>{{ article.published_date }}</td>
+                    <td>{{ article.view_count }}</td>
+                    <td>{{ article.rating }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+            </div>
+            <div class="col-12">
+                <h2>Channel stats</h2>
+                <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Metric</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Subscriber count</td>
+                        <td>{{ channel.subscribers.count }}</td>
+                    </tr>
+                    <tr>
+                        <td>Subscriber change from last month</td>
+                        <td>(WIP)</td>
+                    </tr>
+                    <tr>
+                        <td>Total monthly income</td>
+                        <td>(WIP)</td>
+                    </tr>
+                    <tr>
+                        <td>Total all-time income</td>
+                        <td>(WIP)</td>
+                    </tr>
+                    <tr>
+                        <td>Most viewed article</td>
+                        <td>(WIP)</td>
+                    </tr>
+                    <tr>
+                        <td>Highest rated article</td>
+                        <td>(WIP)</td>
+                    </tr>
+                    <tr>
+                        <td>Channel rating</td>
+                        <td>(WIP)</td>
+                    </tr>
+                </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{ channel.description }}</li>
+                    <li class="list-group-item"><b>First article: </b>(WIP)</li>
+                    <li class="list-group-item"><b>Articles: </b>(WIP)</li>
+                    <li class="list-group-item">
+                        <b>Categories: </b>
+                        {% for c in channel.categories.all %}
+                            <span>{{ c }}</span> |
+                        {% empty %}
+                            No categories selected
+                        {% endfor %}
+                    </li>
+                    <li class="list-group-item"><b>Stripe account: </b>(WIP)</li>
+                </ul>
+                <a href="{% url 'channel-update' %}" class="btn btn-primary">Edit channel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

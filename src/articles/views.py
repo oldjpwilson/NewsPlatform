@@ -34,7 +34,7 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-def list_view(request):
+def article_list(request):
     articles = Article.objects.all()
     context = {
         'article_list': articles
@@ -42,7 +42,7 @@ def list_view(request):
     return render(request, 'article_list.html', context)
 
 
-def detail_view(request, id):
+def article_detail(request, id):
     article = get_object_or_404(Article, id=id)
     article.view_count = article.view_count + 1
     article.save()  # TODO: make this better
@@ -52,7 +52,7 @@ def detail_view(request, id):
     return render(request, 'article_detail.html', context)
 
 
-def create_view(request):
+def article_create(request):
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
@@ -68,7 +68,7 @@ def create_view(request):
     return render(request, 'article_create.html', context)
 
 
-def update_view(request, id):
+def article_update(request, id):
     instance = get_object_or_404(Article, id=id)
     form = ArticleModelForm(request.POST or None,
                             request.FILES or None, instance=instance)
@@ -84,7 +84,7 @@ def update_view(request, id):
     return render(request, 'article_create.html', context)
 
 
-def delete_view(request, id):
+def article_delete(request, id):
     article = get_object_or_404(Article, id=id)
     article.delete()
     return redirect('/')

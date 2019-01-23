@@ -31,15 +31,15 @@ class Channel(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True)
     name = models.CharField(max_length=20, unique=True)
-    date_joined = models.DateTimeField()
+    date_joined = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
     profile_image = models.ImageField()
     background_image = models.ImageField()
-    rating = models.FloatField()
+    rating = models.FloatField(default=0)
     categories = models.ManyToManyField(Category)
     payment_details = models.CharField(
         max_length=18)  # TODO: max credit card length?
-    subscribers = models.ManyToManyField(Profile)
+    subscribers = models.ManyToManyField(Profile, blank=True)
 
     objects = ChannelManager()
 

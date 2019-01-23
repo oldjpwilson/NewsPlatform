@@ -1,5 +1,5 @@
 from django.db.models.signals import post_save
-from .models import User
+from .models import User, Profile
 
 
 def user_signup_receiver(sender, instance, **kwargs):

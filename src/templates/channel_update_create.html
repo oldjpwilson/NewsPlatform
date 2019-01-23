@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+  <div class="row" style="margin: 10px;">
+    <div class="col-4 offset-4">
+    <h2>{{ title }}</h2>
+    <form method="post" action="." enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button type="submit" class="btn btn-primary">
+        {{ button_text }}
+      </button>
+      <a href="{% url 'my-profile' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+    </div>
+  </div>
+
+{% endblock content %}

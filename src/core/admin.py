@@ -32,7 +32,6 @@ class ChannelAdmin(admin.ModelAdmin):
             'fields': (
                 'user',
                 'name',
-                'date_joined',
                 'description',
                 'categories',
                 'profile_image',

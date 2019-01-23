@@ -2,16 +2,49 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
-from core.views import my_profile_view, my_channel_view, channel_list, channel_create, channel_detail, channel_update
+
+from articles.views import (
+    home,
+    article_list,
+    article_detail,
+    article_create,
+    article_update,
+    article_delete
+)
+
+from core.views import (
+    my_profile,
+    my_channel,
+    channel_list,
+    channel_detail,
+    channel_create,
+    channel_update
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('my-profile/', my_profile_view, name='profile'),
-    path('my-channel/', channel_detail, name='channel'),
-    path('profile/channel/update/', channel_update, name='update-channel'),
-    path('explore/', channel_list, name='list-channel'),
-    path('become-a-journalist/', channel_create, name='create-channel'),
-    path('', include('articles.urls', namespace='articles')),
+
+    # home view
+    path('', home, name='home'),
+
+    # article views
+    path('articles/', article_list, name='article-list'),
+    path('articles/<id>/', article_detail, name='article-detail'),
+    path('create/', article_create, name='article-create'),
+    path('articles/<id>/update/', article_update, name='article-update'),
+    path('articles/<id>/delete/', article_delete, name='article-delete'),
+
+    # channel views
+    path('explore/', channel_list, name='channel-list'),
+    path('channels/<name>/', channel_detail, name='channel-detail'),
+    path('become-a-journalist/', channel_create, name='channel-create'),
+    path('my-channel/update/', channel_update, name='channel-update'),
+
+    # user specific views
+    path('my-profile/', my_profile, name='my-profile'),
+    path('my-channel/', my_channel, name='my-channel'),
+
+    # package views
     re_path(r'^tinymce/', include('tinymce.urls')),
     re_path(r'^accounts/', include('allauth.urls'))
 ]
