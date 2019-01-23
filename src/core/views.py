@@ -4,7 +4,7 @@ from articles.models import Article
 from .forms import ChannelCreateForm
 
 
-def profile_view(request):
+def my_profile_view(request):
     if not request.user.is_authenticated:
         return redirect('/')
     profile = get_object_or_404(Profile, user=request.user)
@@ -20,6 +20,16 @@ def profile_view(request):
     return render(request, 'profile.html', context)
 
 
+def my_channel_view(request):
+    if not request.user.is_authenticated:
+        return redirect('/')
+    channel = get_object_or_404(Channel, user=request.user)
+    context = {
+        'channel': channel,
+    }
+    return render(request, 'channel.html', context)
+
+
 def channel_list(request):
     channels = Channel.objects.all()
     context = {
@@ -29,7 +39,8 @@ def channel_list(request):
 
 
 def channel_create(request):
-    if not request.user.is_authenticated and not request.user.channel:
+    print(request.user.channel)
+    if not request.user.is_authenticated and request.user.channel:
         # TODO: add messages framework
         return redirect('/profile/')
 

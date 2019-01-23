@@ -13,7 +13,7 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE)
+        User, on_delete=models.CASCADE, primary_key=True)
     middle_names = models.CharField(max_length=30)  # TODO: necessary?
     # TODO: phone length dependent on country
     phone = models.CharField(max_length=15)
@@ -29,7 +29,7 @@ class Profile(models.Model):
 
 class Channel(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE)
+        User, on_delete=models.CASCADE, primary_key=True)
     name = models.CharField(max_length=20, unique=True)
     date_joined = models.DateTimeField()
     description = models.TextField()

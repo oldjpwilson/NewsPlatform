@@ -74,6 +74,7 @@ MEDIA_ROOT = os.path.join(VENV_PATH, 'media_root')
 
 # Auth settings
 
+LOGIN_REDIRECT_URL = '/explore/'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_AUTHENTICATION_METHOD = "username"
