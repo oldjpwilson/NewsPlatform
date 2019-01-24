@@ -19,4 +19,12 @@ class ArticleModelForm(forms.ModelForm):
 
     class Meta:
         model = Article
-        exclude = ('channel', 'rating', 'view_count')
+        fields = ('title',
+                  'description',
+                  'thumbnail',
+                  'media_type',
+                  'categories',
+                  'urgency',
+                  'duration',
+                  'content',
+                  'draft')

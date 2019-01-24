@@ -15,6 +15,7 @@ class ArticleAdmin(admin.ModelAdmin):
                 'channel',
                 'title',
                 'description',
+                'thumbnail',
                 'media_type',
                 'categories',
                 'urgency',

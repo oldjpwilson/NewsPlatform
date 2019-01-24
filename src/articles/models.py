@@ -33,7 +33,7 @@ class Article(models.Model):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     description = models.TextField()
-    thumbnail = models.ImageField(blank=True, null=True)
+    thumbnail = models.ImageField()  # TODO: do we want this to be filled?
     media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
     published_date = models.DateTimeField(auto_now_add=True)
     last_edit_date = models.DateTimeField(auto_now=True)

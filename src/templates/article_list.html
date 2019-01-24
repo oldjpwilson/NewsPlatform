@@ -2,29 +2,66 @@
 
 {% block content %}
 
-  <div class="row">
-    <div class="col-12">
-    <h2>Top articles</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Views</th>
-          <th scope="col">Channel</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for article in article_list %}
-        <tr>
-          <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
-          <td>{{ article.view_count }}</td>
-          <td>{{ article.channel.name }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </div> 
+  <div class="row" style="margin: 10px;">
 
+    <div class="col-9">
+
+      <h2>My News Feed</h2>
+
+      <div class="row">
+        form here
+      </div>
+    
+      <div class="row">
+        {% for article in article_list %}
+          <div class="col-4">
+            <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
+            <div class="shadow">
+              <div>
+                <img class="img-fluid" src="{{ article.thumbnail.url }}" alt="article-image">
+              </div>
+              <div class="media box" style="margin-bottom: 50px;">
+                <img style="width: 50px;" src="{{ article.channel.profile_image.url }}" class="mr-3" alt="profile-image">
+                <div class="media-body">
+                  <h4 class="mt-0">{{ article.title }}</h4>
+                  <h6>{{ article.channel.name }}</h6>
+                  {{ article.description|truncatechars:80 }}
+                  <br />
+                  <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
+                </div>
+              </div>
+            </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+
+    <div class="col-3" style="margin-top: 50px;">
+      <ul class="list-group">
+        <li class="list-group-item active">Today's popular articles</li>
+        <li class="list-group-item">(WIP)</li>
+        <li class="list-group-item">(WIP)</li>
+        <li class="list-group-item">(WIP)</li>
+        <li class="list-group-item">(WIP)</li>
+      </ul>
+
+      <hr />
+
+      <div class="card" style="width: 18rem;">
+        <div class="card-header">
+          Today's popular categories
+        </div>
+        <a style="font-size: 24px; background-color: #6c757d; color: #fff; white-space: nowrap; box-sizing: border-box;">Politics</a>        
+        <a style="font-size: 24px; background-color: #6c757d; color: #fff">Work</a>        
+        <a style="font-size: 24px; background-color: #6c757d; color: #fff">Economics</a>        
+        <a style="font-size: 24px; background-color: #6c757d; color: #fff">Pollution</a>  
+    
+      </div>
+
+    </div>
+
+  </div>
 
 {% endblock content %}
