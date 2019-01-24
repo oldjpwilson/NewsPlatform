@@ -20,7 +20,7 @@ class ArticleAdmin(admin.ModelAdmin):
                 'urgency',
                 'duration',
                 'content',
-                'rating'
+                'draft'
             )
         }),
     )

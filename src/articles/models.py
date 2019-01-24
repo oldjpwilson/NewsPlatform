@@ -45,7 +45,7 @@ class Article(models.Model):
     content = HTMLField('Content')  # tinymce
     rating = models.FloatField(default=0)
     view_count = models.IntegerField(default=0)
-    draft = models.BooleanField()
+    draft = models.BooleanField(default=False)
 
     # comments with disqus
     # location = models.ForeignKey(Location) # TODO: research
@@ -55,10 +55,10 @@ class Article(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('articles:detail', kwargs={'id': self.id})
+        return reverse('article-detail', kwargs={'id': self.id})
 
     def get_update_url(self):
-        return reverse('articles:update', kwargs={'id': self.id})
+        return reverse('article-update', kwargs={'id': self.id})
 
     def get_delete_url(self):
-        return reverse('articles:delete', kwargs={'id': self.id})
+        return reverse('article-delete', kwargs={'id': self.id})
