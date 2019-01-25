@@ -1,15 +1,48 @@
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.core.mail import send_mail
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
 from core.models import Channel
-from .forms import ArticleModelForm
+from .forms import ArticleModelForm, ContactForm
 from .models import Article
+
+
+def contact(request):
+    form = ContactForm(request.POST or None)
+    if request.method == "POST":
+        if form.is_valid():
+            messages.info(
+                request, 'Thanks for contacting us. We\'ll get back to you as soon as possible!')
+            form_email = form.cleaned_data['email']
+            form_message = form.cleaned_data['message']
+            form_full_name = form.cleaned_data['name']
+            subject = 'Message from Justdjango contact form'
+            from_email = settings.EMAIL_HOST_USER
+            to_email = ['admin@justdjango.com']
+            contact_message = "%s: %s via %s" % (
+                form_full_name,
+                form_message,
+                form_email)
+            send_mail(subject,
+                      contact_message,
+                      from_email,
+                      to_email,
+                      fail_silently=True)
+            return redirect(reverse('article-list'))
+
+    context = {
+        'form': form
+    }
+
+    return render(request, "contact.html", context)
 
 
 def home(request):
     if request.user.is_authenticated:
-        return redirect('/articles/')
+        return redirect(reverse('article-list'))
     articles = Article.objects.get_highest_rated(3)
     channels = Channel.objects.get_highest_rated(3)
 

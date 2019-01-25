@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 
 from articles.views import (
+    contact,
     home,
     article_list,
     article_detail,
@@ -26,9 +27,10 @@ urlpatterns = [
 
     # home view
     path('', home, name='home'),
+    path('contact/', contact, name='contact'),
 
     # article views
-    path('articles/', article_list, name='article-list'),
+    path('news-feed/', article_list, name='article-list'),
     path('articles/<id>/', article_detail, name='article-detail'),
     path('create/', article_create, name='article-create'),
     path('articles/<id>/update/', article_update, name='article-update'),

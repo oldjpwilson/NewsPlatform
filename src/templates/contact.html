@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+  <div class="row" style="margin: 10px;">
+    <div class="col-4 offset-4">
+    <h2>Get in touch</h2>
+    <form method="POST" action=".">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <button type="submit" class="btn btn-primary">Send</button>
+    </form>
+    </div>
+  </div>
+
+{% endblock content %}

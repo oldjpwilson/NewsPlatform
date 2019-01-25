@@ -28,3 +28,12 @@ class ArticleModelForm(forms.ModelForm):
                   'duration',
                   'content',
                   'draft')
+
+
+class ContactForm(forms.Form):
+    email = forms.EmailField(widget=forms.TextInput(
+        attrs={'placeholder': 'Your email'}))
+    name = forms.CharField(max_length=20, widget=forms.TextInput(
+        attrs={'placeholder': 'Your name'}))
+    message = forms.CharField(widget=forms.Textarea(
+        attrs={'placeholder': 'What\'s on your mind'}))
