@@ -18,6 +18,7 @@ from core.views import (
     my_channel,
     profile_update,
     profile_update_account,
+    profile_update_payment_details,
     channel_list,
     channel_detail,
     channel_create,
@@ -48,7 +49,11 @@ urlpatterns = [
     path('my-profile/', my_profile, name='my-profile'),
     path('my-profile/edit-profile/', profile_update, name='edit-my-profile'),
     path('my-profile/edit-account/',
-         profile_update_account, name='edit-my-account'),
+         profile_update_account,
+         name='edit-my-account'),
+    path('my-profile/edit-payment-details',
+         profile_update_payment_details,
+         name='edit-profile-payment-details'),
     path('my-channel/', my_channel, name='my-channel'),
 
     # package views

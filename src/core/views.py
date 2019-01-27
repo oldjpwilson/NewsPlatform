@@ -1,8 +1,10 @@
 from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from .models import Profile, Channel
 from articles.models import Article
-from .forms import ChannelCreateForm, ProfileForm, UserForm
+from .forms import ChannelCreateForm, ProfileForm
 
 
 def my_profile(request):
@@ -22,9 +24,8 @@ def my_profile(request):
     return render(request, 'profile.html', context)
 
 
+@login_required
 def profile_update(request):
-    if not request.user.is_authenticated:
-        return redirect(reverse('home'))
     profile = get_object_or_404(Profile, user=request.user)
     form = ProfileForm(request.POST or None, instance=profile)
     if request.method == 'POST':
@@ -40,20 +41,52 @@ def profile_update(request):
     return render(request, 'profile.html', context)
 
 
+@login_required
 def profile_update_account(request):
-    form = UserForm(request.POST or None)
+    profile = get_object_or_404(Profile, user=request.user)
     if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('my-profile'))
+        form_type = request.POST.get("account_form")
+        if form_type == "account_form":
+            email = request.POST.get("email")
+            old_password = request.POST.get("old_password")
+            new_password = request.POST.get("new_password")
+            confirm_password = request.POST.get("confirm_password")
+
+            username = request.user.username
+            user = authenticate(username=username, password=old_password)
+            if user is not None:
+                if new_password != confirm_password:
+                    messages.info(request, "Your passwords did not match.")
+                    redirect(reverse('my-profile'))
+
+                elif new_password == confirm_password:
+                    user.set_password(confirm_password)
+                    user.save()
+                    messages.success(
+                        request, 'Successfully changed password. Please login to confirm your password change.')
+                    redirect(reverse('my-profile'))
+            else:
+                messages.info(request, "Incorrect Password.")
+                return redirect(reverse('my-profile'))
 
     context = {
         'display': 'edit_account',
-        'form': form
+        'user': request.user,
     }
     return render(request, 'profile.html', context)
 
 
+@login_required
+def profile_update_payment_details(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    context = {
+        'display': 'edit_payment_details',
+        'user': request.user,
+    }
+    return render(request, 'profile.html', context)
+
+
+@login_required
 def my_channel(request):
     if not request.user.is_authenticated:
         return redirect('/')
@@ -107,9 +140,8 @@ def channel_detail(request):
     return render(request, 'channel_detail.html', context)
 
 
+@login_required
 def channel_update(request):
-    if not request.user.is_authenticated:
-        return redirect(reverse('profile'))
     if not request.user.channel:
         messages.info(
             request, 'Error with your channel. Please contact support.')

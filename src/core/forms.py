@@ -22,22 +22,10 @@ class LoginForm(forms.Form):
         return super(LoginForm, self).clean(*args, **kwargs)
 
 
-class UserForm(forms.Form):
-    email = forms.EmailField(required=False, widget=forms.TextInput(attrs={
-        'placeholder': 'Email'
-    }))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Password'
-    }))
-    password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={
-        'placeholder': 'Confirm password'
-    }))
-
-
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        exclude = ('user', 'subscriptions')
+        exclude = ('user', 'subscriptions', 'payment_details')
 
 
 class ChannelCreateForm(forms.ModelForm):
