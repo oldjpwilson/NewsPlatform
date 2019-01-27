@@ -2,6 +2,19 @@
 
 {% block content %}
 
+  <style>
+
+    label {
+      margin-right: 7px;
+      margin-left: 15px;
+    }
+
+    .form-btn {
+      margin-left: 15px;
+    }
+
+  </style>
+
   <div class="row" style="margin: 10px;">
 
     <div class="col-9">
@@ -9,7 +22,12 @@
       <h2>My News Feed</h2>
 
       <div class="row">
-        form here
+        <div style="margin: 10px;">
+          <form method="GET" action=".">
+            {{ form }}
+            <button type="submit" class="form-btn btn btn-primary btn-sm">Filter</button>
+          </form>
+        </div>
       </div>
     
       <div class="row">
@@ -41,10 +59,32 @@
     <div class="col-3" style="margin-top: 50px;">
       <ul class="list-group">
         <li class="list-group-item active">Today's popular articles</li>
-        <li class="list-group-item">(WIP)</li>
-        <li class="list-group-item">(WIP)</li>
-        <li class="list-group-item">(WIP)</li>
-        <li class="list-group-item">(WIP)</li>
+        {% for article in most_viewed %}
+        <a href="{{ article.get_absolute_url }}">
+          <li class="list-group-item">
+            {{ article.title }}
+            <span style="float: right;">{{ article.view_count }} views</span>
+          </li>
+        </a>
+        {% empty %}
+          Not enough articles yet
+        {% endfor %}
+      </ul>
+
+      <hr />
+
+      <ul class="list-group">
+        <li class="list-group-item active">Today's latest articles</li>
+        {% for article in most_recent %}
+        <a href="{{ article.get_absolute_url }}">
+          <li class="list-group-item">
+            {{ article.title }}
+            <span style="float: right;">{{ article.published_date|timesince }} ago</span>
+          </li>
+        </a>
+        {% empty %}
+          Not enough articles yet
+        {% endfor %}
       </ul>
 
       <hr />
@@ -57,12 +97,50 @@
           <a href="#" class="tag badge badge-secondary">#Business</a>
           <a href="#" class="tag badge badge-secondary">#Tricks</a>
           <a href="#" class="tag badge badge-secondary">#Financial</a>
-          <a href="#" class="tag badge badge-secondary">#Economy</a>
         </div>
       </div>
 
     </div>
 
   </div>
+
+  <script>
+
+    // these come from django forms by default
+    const LATEST_ID = 'id_latest';
+    const VIEW_COUNT_ID = 'id_view_count';
+    const RATING_ID = 'id_rating';
+
+    const latest = document.getElementById(LATEST_ID);
+    const view_count = document.getElementById(VIEW_COUNT_ID);
+    const rating = document.getElementById(RATING_ID);
+
+    function switchEnabled(formElement) {
+      const checked = formElement.checked;
+      if (checked) formElement.checked = false;
+        // otherwise do nothing because it's already false
+    }
+
+    /* 
+      listen for changes on the selected field and 
+      make sure only one field can be selected at a time
+    */
+
+    latest.addEventListener('change', e => {
+      switchEnabled(view_count);
+      switchEnabled(rating);
+    });
+
+    view_count.addEventListener('change', e => {
+      switchEnabled(latest);
+      switchEnabled(rating);
+    });
+
+    rating.addEventListener('change', e => {
+      switchEnabled(latest);
+      switchEnabled(view_count);
+    });
+
+  </script>
 
 {% endblock content %}

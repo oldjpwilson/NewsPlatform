@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from .models import Profile, Channel
 from articles.models import Article
-from .forms import ChannelCreateForm
+from .forms import ChannelCreateForm, ProfileForm, UserForm
 
 
 def my_profile(request):
@@ -16,7 +16,40 @@ def my_profile(request):
         'profile': profile,
         'article_list': articles,
         'channel_list': channels,
-        'sub_count': sub_count
+        'sub_count': sub_count,
+        'display': 'stats'
+    }
+    return render(request, 'profile.html', context)
+
+
+def profile_update(request):
+    if not request.user.is_authenticated:
+        return redirect(reverse('home'))
+    profile = get_object_or_404(Profile, user=request.user)
+    form = ProfileForm(request.POST or None, instance=profile)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('my-profile'))
+
+    context = {
+        'display': 'edit_profile',
+        'form': form
+    }
+
+    return render(request, 'profile.html', context)
+
+
+def profile_update_account(request):
+    form = UserForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('my-profile'))
+
+    context = {
+        'display': 'edit_account',
+        'form': form
     }
     return render(request, 'profile.html', context)
 

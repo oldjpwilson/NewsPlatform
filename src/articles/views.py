@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
 from core.models import Channel
-from .forms import ArticleModelForm, ContactForm
+from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article
 
 
@@ -68,9 +68,27 @@ def home(request):
 
 
 def article_list(request):
-    articles = Article.objects.all()
+    queryset = Article.objects.all()
+    most_viewed = Article.objects.get_todays_most_viewed(3)
+    most_recent = Article.objects.get_todays_most_recent(3)
+
+    form = ArticleFilterForm(request.GET or None)
+    if form.is_valid():
+        latest = form.cleaned_data.get('latest')
+        if latest:
+            queryset = queryset.order_by('-published_date')
+        view_count = form.cleaned_data.get('view_count')
+        if view_count:
+            queryset = queryset.order_by('-view_count')
+        rating = form.cleaned_data.get('rating')
+        if rating:
+            queryset = queryset.order_by('-rating')
+
     context = {
-        'article_list': articles
+        'article_list': queryset,
+        'most_viewed': most_viewed,
+        'most_recent': most_recent,
+        'form': form
     }
     return render(request, 'article_list.html', context)
 

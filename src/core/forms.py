@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from django import forms
-from .models import User, Channel
+from .models import User, Channel, Profile
 
 
 class LoginForm(forms.Form):
@@ -20,6 +20,24 @@ class LoginForm(forms.Form):
             if not user.check_password(password):
                 raise forms.ValidationError('Incorrect username/password')
         return super(LoginForm, self).clean(*args, **kwargs)
+
+
+class UserForm(forms.Form):
+    email = forms.EmailField(required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Email'
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'placeholder': 'Password'
+    }))
+    password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={
+        'placeholder': 'Confirm password'
+    }))
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        exclude = ('user', 'subscriptions')
 
 
 class ChannelCreateForm(forms.ModelForm):

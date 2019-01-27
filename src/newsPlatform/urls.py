@@ -16,6 +16,8 @@ from articles.views import (
 from core.views import (
     my_profile,
     my_channel,
+    profile_update,
+    profile_update_account,
     channel_list,
     channel_detail,
     channel_create,
@@ -44,6 +46,9 @@ urlpatterns = [
 
     # user specific views
     path('my-profile/', my_profile, name='my-profile'),
+    path('my-profile/edit-profile/', profile_update, name='edit-my-profile'),
+    path('my-profile/edit-account/',
+         profile_update_account, name='edit-my-account'),
     path('my-channel/', my_channel, name='my-channel'),
 
     # package views

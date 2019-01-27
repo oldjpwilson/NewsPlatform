@@ -30,6 +30,12 @@ class ArticleModelForm(forms.ModelForm):
                   'draft')
 
 
+class ArticleFilterForm(forms.Form):
+    latest = forms.BooleanField(required=False)
+    view_count = forms.BooleanField(required=False)
+    rating = forms.BooleanField(required=False)
+
+
 class ContactForm(forms.Form):
     email = forms.EmailField(widget=forms.TextInput(
         attrs={'placeholder': 'Your email'}))
