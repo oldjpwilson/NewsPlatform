@@ -96,7 +96,8 @@
                     </li>
                     <li class="list-group-item"><b>Stripe account: </b>(WIP)</li>
                 </ul>
-                <a href="{% url 'channel-update' %}" class="btn btn-primary">Edit channel</a>
+                <a href="{% url 'channel-stats' %}" class="btn btn-primary">Edit channel</a>
+                <a href="{% url 'channel-public' channel.name %}" class="btn btn-secondary">View public channel</a>
             </div>
         </div>
     </div>

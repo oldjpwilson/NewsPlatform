@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from .models import Profile, Channel
 from articles.models import Article
-from .forms import ChannelCreateForm, ProfileForm
+from .forms import ChannelCreateForm, ProfileForm, ChannelUpdateForm
 
 
 def my_profile(request):
@@ -99,6 +99,17 @@ def my_channel(request):
     return render(request, 'channel.html', context)
 
 
+@login_required
+def channel_public(request, name):
+    channel = get_object_or_404(Channel, name=name)
+    articles = channel.article_set.all().order_by('-published_date')
+    context = {
+        'channel': channel,
+        'articles': articles
+    }
+    return render(request, 'channel_public.html', context)
+
+
 def channel_list(request):
     channels = Channel.objects.all()
     context = {
@@ -129,34 +140,44 @@ def channel_create(request):
         'title': 'Create your channel'
     }
 
-    return render(request, 'channel_update_create.html', context)
+    return render(request, 'channel_create.html', context)
 
 
-def channel_detail(request):
+@login_required
+def channel_stats(request):
+    if not request.user.channel:
+        return redirect(reverse('profile'))
     channel = get_object_or_404(Channel, user=request.user)
     context = {
-        'channel': channel
+        'name': channel.name,
+        'display': 'stats'
     }
-    return render(request, 'channel_detail.html', context)
+    return render(request, 'channel_update.html', context)
 
 
 @login_required
 def channel_update(request):
     if not request.user.channel:
-        messages.info(
-            request, 'Error with your channel. Please contact support.')
         return redirect(reverse('profile'))
     channel = get_object_or_404(Channel, user=request.user)
-    form = ChannelCreateForm(request.POST or None, instance=channel)
+    form = ChannelUpdateForm(request.POST or None, instance=channel)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return redirect(reverse('my-channel'))
-
+            messages.info(request, 'Your channel details have been saved')
+            return redirect(reverse('edit-my-channel'))
     context = {
         'form': form,
-        'button_text': 'Update',
-        'title': 'Update your channel'
+        'name': channel.name,
+        'display': 'edit_channel_details'
     }
+    return render(request, 'channel_update.html', context)
 
-    return render(request, 'channel_update_create.html', context)
+
+@login_required
+def channel_update_payment_details(request):
+    channel = get_object_or_404(Channel, user=request.user)
+    context = {
+        'display': 'edit_payment_details',
+    }
+    return render(request, 'channel_update.html', context)

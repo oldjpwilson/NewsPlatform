@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 
 from articles.views import (
+    about,
     contact,
     home,
     article_list,
@@ -20,9 +21,12 @@ from core.views import (
     profile_update_account,
     profile_update_payment_details,
     channel_list,
-    channel_detail,
     channel_create,
-    channel_update
+    channel_stats,
+    channel_update,
+    channel_update_payment_details,
+    channel_public,
+
 )
 
 urlpatterns = [
@@ -30,6 +34,7 @@ urlpatterns = [
 
     # home view
     path('', home, name='home'),
+    path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
 
     # article views
@@ -41,11 +46,9 @@ urlpatterns = [
 
     # channel views
     path('explore/', channel_list, name='channel-list'),
-    path('channels/<name>/', channel_detail, name='channel-detail'),
     path('become-a-journalist/', channel_create, name='channel-create'),
-    path('my-channel/update/', channel_update, name='channel-update'),
 
-    # user specific views
+    # profile views
     path('my-profile/', my_profile, name='my-profile'),
     path('my-profile/edit-profile/', profile_update, name='edit-my-profile'),
     path('my-profile/edit-account/',
@@ -54,7 +57,14 @@ urlpatterns = [
     path('my-profile/edit-payment-details',
          profile_update_payment_details,
          name='edit-profile-payment-details'),
+
+    # channel views
     path('my-channel/', my_channel, name='my-channel'),
+    path('my-channel/stats/', channel_stats, name='channel-stats'),
+    path('my-channel/edit-channel/', channel_update, name='edit-my-channel'),
+    path('channel/<name>/', channel_public, name='channel-public'),
+    path('my-channel/edit-payment-details/',
+         channel_update_payment_details, name='edit-channel-payment-details'),
 
     # package views
     re_path(r'^tinymce/', include('tinymce.urls')),

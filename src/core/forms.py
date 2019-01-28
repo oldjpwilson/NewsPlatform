@@ -3,6 +3,13 @@ from django import forms
 from .models import User, Channel, Profile
 
 
+COMMON_CHANNEL_FIELDS = ('name',
+                         'description',
+                         'profile_image',
+                         'background_image',
+                         'categories')
+
+
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(
         attrs={'placeholder': 'Username'}))
@@ -31,9 +38,11 @@ class ProfileForm(forms.ModelForm):
 class ChannelCreateForm(forms.ModelForm):
     class Meta:
         model = Channel
-        fields = ('name',
-                  'description',
-                  'profile_image',
-                  'background_image',
-                  'categories',
-                  'payment_details')
+        fields = COMMON_CHANNEL_FIELDS
+
+
+class ChannelUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Channel
+        # channels cannot update their name?
+        fields = COMMON_CHANNEL_FIELDS[1:]

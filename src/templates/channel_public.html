@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="margin: 10px;">
+    <div class="row">
+        <div style="height: 200px;">
+            <div style="height: 100%;">
+                <img style="width: 100%; height: 100%" src="{{ channel.background_image.url }}" alt="channel-background-image" />
+            </div>
+            {% comment %} <div style="height: 50px; position: absolute; right: 0; top: 0" class="col-6"> {% endcomment %}
+                {% comment %} <img style="height: 100%;" src="{{ channel.profile_image.url }}" alt="channel-profile-image" /> {% endcomment %}
+            {% comment %} </div> {% endcomment %}
+        </div>
+    </div>
+    <div class="row" style="margin: 10px;">
+        <div class="col-8">
+            <div class="row">
+                {% for article in articles %}
+                <div class="col-4">
+                    <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
+                    <div class="shadow">
+                    <div>
+                        <img class="img-fluid" src="{{ article.thumbnail.url }}" alt="article-image">
+                    </div>
+                    <div class="media box" style="margin-bottom: 50px;">
+                        <img style="width: 50px;" src="{{ article.channel.profile_image.url }}" class="mr-3" alt="profile-image">
+                        <div class="media-body">
+                        <h4 class="mt-0">{{ article.title }}</h4>
+                        <h6>{{ article.channel.name }}</h6>
+                        {{ article.description|truncatechars:80 }}
+                        <br />
+                        <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
+                        </div>
+                    </div>
+                    </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        </div>
+        <div class="col-4">
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{ channel.description }}</li>
+                    <li class="list-group-item"><b>Articles: </b>{{ channel.article_set.count }}</li>
+                    <li class="list-group-item"><b>Subscribers: </b>{{ channel.subscribers.count }}</li>
+                    <li class="list-group-item">
+                        <b>Categories: </b>
+                        {% for c in channel.categories.all %}
+                            <span>{{ c }}</span> |
+                        {% empty %}
+                            No categories selected
+                        {% endfor %}
+                    </li>
+                </ul>
+                {% if request.user.channel == channel %}
+                <a href="{% url 'channel-update' %}" class="btn btn-primary">Edit channel</a>
+                {% endif %}
+            </div>
+
+            <br />
+            <a href="#" style="width: 100%;" class="btn btn-warning">Subscribe</a>
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

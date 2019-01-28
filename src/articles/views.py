@@ -10,6 +10,25 @@ from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article
 
 
+def about(request):
+    # handle post request for logging in
+    next = request.GET.get('next')
+    form = LoginForm(request.POST or None)
+    if request.method == 'POST':
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            if next:
+                return redirect(next)
+            return redirect('/')
+    context = {
+        'form': form
+    }
+    return render(request, 'about.html', context)
+
+
 def contact(request):
     form = ContactForm(request.POST or None)
     if request.method == "POST":

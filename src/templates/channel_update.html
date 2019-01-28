@@ -8,20 +8,14 @@
   <div class="col-3">
     <div class="card" style="width: 100%;">
       <div class="card-header">
-        <h4>{{ request.user.username }}</h4>
+        <h4>{{ name }}</h4>
       </div>
       <ul class="list-group list-group-flush">
-        <li class="list-group-item"><a href="{% url 'my-profile' %}">Stats</a></li>
-        <li class="list-group-item"><a href="{% url 'edit-my-profile' %}">Profile</a></li>
-        <li class="list-group-item"><a href="{% url 'edit-my-account' %}">Account</a></li>
-        <li class="list-group-item"><a href="{% url 'edit-profile-payment-details' %}">Credit cards</a></li>
+        <li class="list-group-item"><a href="{% url 'channel-stats' %}">Stats</a></li>
+        <li class="list-group-item"><a href="{% url 'edit-my-channel' %}">Channel details</a></li>
+        <li class="list-group-item"><a href="{% url 'edit-channel-payment-details' %}">Credit cards</a></li>
         <li class="list-group-item"><a href="#">Notifications</a></li>
       </ul>
-      {% if not request.user.channel %}
-      <a href="{% url 'channel-create' %}" class="btn btn-primary">Become a Journalist!</a>
-      {% else %}
-      <a href="{% url 'channel-stats' %}" class="btn btn-primary">Edit channel</a>
-      {% endif %}
     </div>
   </div>
 
@@ -30,7 +24,7 @@
 
     {% if display == 'stats' %}
 
-    {% comment %} <h2>Top stories</h2>
+    <h2>Top stories</h2>
     <table class="table table-striped">
       <thead>
         <tr>
@@ -50,34 +44,6 @@
       </tbody>
     </table>
 
-    <br style="padding-top: 10px;" /> {% endcomment %}
-
-    <h2>Subscribed channels</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Channel name</th>
-          <th scope="col">Subscribers</th>
-          <th scope="col">Description</th>
-          <th scope="col">Categories</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for channel in channel_list %}
-        <tr>
-          <td>{{ channel.name }}</td>
-          <td>{{ channel.subscribers.count }}</td>
-          <td>{{ channel.description }}</td>
-          <td>{% for cat in channel.categories.all %} <span>{{ cat }}</span>{% endfor %}</td>
-        </tr>
-      {% empty %}
-        <tr>
-          <td colspan="4">You have no subscriptions. <a href="/explore">Explore the channels</a></td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-
     <br style="padding-top: 10px;" />
 
     <h2>Stats and information</h2>
@@ -90,31 +56,24 @@
       </thead>
       <tbody>
         <tr>
-          <td>Number of subscriptions</td>
-          <td>{{ sub_count }}</td>
+          <td>Number of article views</td>
+          <td>12000 (WIP)</td>
         </tr>
         <tr>
-          <td>Monthly billing total</td>
+          <td>Monthly channel revenue</td>
           <td>$5 (WIP)</td>
-        </tr>
-        <tr>
-          <td>Most viewed channel</td>
-          <td>JustDjango (WIP)</td>
-        </tr>
-        <tr>
-          <td>Total article views</td>
-          <td>12 (WIP)</td>
         </tr>
       </tbody>
     </table>
 
-    {% elif display == 'edit_profile' %}
+    {% elif display == 'edit_channel_details' %}
 
-    <h2>Update profile details</h2>
+    <h2>Update channel details</h2>
     <form method="POST" action="." enctype="multipart/form-data">
       {% csrf_token %}
       {{ form|crispy }}
       <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{% url 'edit-my-channel' %}" class="btn btn-secondary">Cancel</a>
     </form>
 
     {% elif display == 'edit_account' %}
