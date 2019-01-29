@@ -15,13 +15,15 @@ class ArticleQuerySet(models.QuerySet):
         time_threshold = datetime.now() - timedelta(hours=hours)
         return time_threshold
 
-    def get_todays_most_viewed(self, field, count):
+    def get_todays(self):
         time_threshold = self.get_before_time(24)
-        return self.filter(published_date__gt=time_threshold).order_by(f'-{field}')[0:count]
+        return self.filter(published_date__gt=time_threshold)
+
+    def get_todays_most_viewed(self, field, count):
+        return self.get_todays().order_by(f'-{field}')[0:count]
 
     def get_todays_most_recent(self, field, count):
-        time_threshold = self.get_before_time(24)
-        return self.filter(published_date__gt=time_threshold).order_by(f'-{field}')[0:count]
+        return self.get_todays().order_by(f'-{field}')[0:count]
 
 
 class ArticleManager(models.Manager):
@@ -34,6 +36,9 @@ class ArticleManager(models.Manager):
 
     def get_highest_rated(self, count):
         return self.get_queryset().get_highest(RATING, count)
+
+    def get_todays(self):
+        return self.get_queryset().get_todays()
 
     def get_todays_most_viewed(self, count):
         return self.get_queryset().get_todays_most_viewed(VIEW_COUNT, count)

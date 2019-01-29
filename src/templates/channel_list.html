@@ -2,26 +2,37 @@
 
 {% block content %}
 
-  <div class="row">
-    <div class="col-12">
-    <h2>channels</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Rating</th>
-        </tr>
-      </thead>
-      <tbody>
+  <div class="row" style="margin: 10px;">
+    <div class="col-9">
       {% for channel in channel_list %}
-        <tr>
-          <td>{{ channel.name }}</td>
-          <td>{{ channel.rating }}</td>
-        </tr>
+        <h3>{{ channel.name }}</h3>
+        <div class="row">
+          {% for article in channel.articles.all %}
+            <div class="col-4">
+              <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
+              <div class="shadow">
+                <div>
+                  <img class="img-fluid" src="{{ article.thumbnail.url }}" alt="article-image">
+                </div>
+                <div class="media box" style="margin-bottom: 50px;">
+                  <img style="width: 50px;" src="{{ article.channel.profile_image.url }}" class="mr-3" alt="profile-image">
+                  <div class="media-body">
+                    <h4 class="mt-0">{{ article.title }}</h4>
+                    {{ article.description|truncatechars:80 }}
+                    <br />
+                    <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
+                  </div>
+                </div>
+              </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
       {% endfor %}
-      </tbody>
-    </table>
     </div>
+
+    {% include 'sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}    
+
   </div> 
 
 

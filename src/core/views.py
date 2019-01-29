@@ -2,9 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404, reverse
-from .models import Profile, Channel
 from articles.models import Article
+from categories.views import get_todays_most_popular_categories
 from .forms import ChannelCreateForm, ProfileForm, ChannelUpdateForm
+from .models import Profile, Channel
 
 
 def my_profile(request):
@@ -112,6 +113,12 @@ def channel_public(request, name):
 
 def channel_list(request):
     channels = Channel.objects.all()
+
+    # TODO: make this relevant to channels - not articles
+    most_viewed = Article.objects.get_todays_most_viewed(3)
+    most_recent = Article.objects.get_todays_most_recent(3)
+    most_popular_cats = get_todays_most_popular_categories()
+
     context = {
         'channel_list': channels,
     }

@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from tinymce import HTMLField
 from categories.models import Category
-from core.models import Channel
+from core.models import Channel, User
 from .managers import ArticleManager
 
 MEDIA_CHOICES = (
@@ -30,7 +30,8 @@ class Urgency(models.Model):
 
 
 class Article(models.Model):
-    channel = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    channel = models.ForeignKey(
+        Channel, related_name='articles', on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     description = models.TextField()
     thumbnail = models.ImageField()  # TODO: do we want this to be filled?
@@ -62,3 +63,16 @@ class Article(models.Model):
 
     def get_delete_url(self):
         return reverse('article-delete', kwargs={'id': self.id})
+
+    def get_view_count(self):
+        return ArticleView.objects.filter(article=self).count()
+
+
+class ArticleView(models.Model):
+    article = models.ForeignKey(
+        Article, on_delete=models.SET_NULL, blank=True, null=True)
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username

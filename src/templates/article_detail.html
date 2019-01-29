@@ -2,8 +2,8 @@
 
 {% block content %}
 
-  <div class="row">
-    <div class="col-12">
+  <div class="row" style="margin: 10px;">
+    <div class="col-9">
     <h2>{{ article.title }}</h2>
     {{ article.content | safe }}
     {% if article.channel.user == request.user %}
@@ -11,6 +11,9 @@
     <a class="btn btn-warning" href="{{ article.get_delete_url }}">Delete</a>
     {% endif %}
     </div>
+
+    {% include 'sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
+
   </div>
 
 {% endblock content %}

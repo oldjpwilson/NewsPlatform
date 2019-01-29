@@ -6,8 +6,9 @@ from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
 from core.models import Channel
+from categories.views import get_todays_most_popular_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
-from .models import Article
+from .models import Article, ArticleView
 
 
 def about(request):
@@ -87,9 +88,10 @@ def home(request):
 
 
 def article_list(request):
-    queryset = Article.objects.all()
+    queryset = Article.objects.all()  # TODO: make this the users subscription articles
     most_viewed = Article.objects.get_todays_most_viewed(3)
     most_recent = Article.objects.get_todays_most_recent(3)
+    most_popular_cats = get_todays_most_popular_categories()
 
     form = ArticleFilterForm(request.GET or None)
     if form.is_valid():
@@ -107,17 +109,30 @@ def article_list(request):
         'article_list': queryset,
         'most_viewed': most_viewed,
         'most_recent': most_recent,
+        'cats': most_popular_cats,
         'form': form
     }
     return render(request, 'article_list.html', context)
 
 
 def article_detail(request, id):
+    most_viewed = Article.objects.get_todays_most_viewed(3)
+    most_recent = Article.objects.get_todays_most_recent(3)
+    most_popular_cats = get_todays_most_popular_categories()
+
     article = get_object_or_404(Article, id=id)
-    article.view_count = article.view_count + 1
-    article.save()  # TODO: make this better
+
+    article_view, created = ArticleView.objects.get_or_create(
+        article=article, user=request.user)  # update view count of article
+    if created:
+        article.view_count = article.view_count + 1
+        article.save()
+
     context = {
-        'article': article
+        'article': article,
+        'most_viewed': most_viewed,
+        'most_recent': most_recent,
+        'cats': most_popular_cats
     }
     return render(request, 'article_detail.html', context)
 

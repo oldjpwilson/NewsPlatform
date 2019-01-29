@@ -1,0 +1,45 @@
+<div class="col-3" style="margin-top: 50px;">
+    <ul class="list-group">
+    <li class="list-group-item active">Today's popular articles</li>
+    {% for article in most_viewed %}
+    <a href="{{ article.get_absolute_url }}">
+        <li class="list-group-item">
+        {{ article.title }}
+        <span style="float: right;">{{ article.view_count }} views</span>
+        </li>
+    </a>
+    {% empty %}
+        Not enough articles yet
+    {% endfor %}
+    </ul>
+
+    <hr />
+
+    <ul class="list-group">
+    <li class="list-group-item active">Today's latest articles</li>
+    {% for article in most_recent %}
+    <a href="{{ article.get_absolute_url }}">
+        <li class="list-group-item">
+        {{ article.title }}
+        <span style="float: right;">{{ article.published_date|timesince }} ago</span>
+        </li>
+    </a>
+    {% empty %}
+        Not enough articles yet
+    {% endfor %}
+    </ul>
+
+    <hr />
+
+    <div class="card">
+    <div class="card-header">
+        Today's popular categories
+    </div>
+    <div class="post-tags" style="padding: 3px;">
+        {% for cat in cats %}
+        <a href="#" class="tag badge badge-secondary">#{{ cat.categories__name }} ({{ cat.cat_count }})</a>
+        {% endfor %}
+    </div>
+    </div>
+
+</div>
