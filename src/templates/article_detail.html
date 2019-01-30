@@ -4,16 +4,17 @@
 
   <div class="row" style="margin: 10px;">
     <div class="col-9">
-    <h2>{{ article.title }}</h2>
-    {{ article.content | safe }}
-    {% if article.channel.user == request.user %}
-    <a class="btn btn-secondary" href="{{ article.get_update_url }}">Update</a>
-    <a class="btn btn-warning" href="{{ article.get_delete_url }}">Delete</a>
-    {% endif %}
+      <h2>{{ article.title }}</h2>
+      {{ article.content | safe }}
+      {% if article.channel.user == request.user %}
+        <a class="btn btn-secondary" href="{{ article.get_update_url }}">Update</a>
+        <a class="btn btn-warning" href="{{ article.get_delete_url }}">Delete</a>
+      {% endif %}
+      <hr />
+      {% include "disqus.html" with article_id=article.id article_url=request.build_absolute_uri %}
     </div>
 
-    {% include 'sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
-
+    {% include 'article_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
   </div>
 
 {% endblock content %}

@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from django.db import models
+from django.db.models import Count, Sum
+from core.models import Channel
 
 RATING = 'rating'
 VIEW_COUNT = 'view_count'
@@ -25,6 +27,9 @@ class ArticleQuerySet(models.QuerySet):
     def get_todays_most_recent(self, field, count):
         return self.get_todays().order_by(f'-{field}')[0:count]
 
+    def get_todays_most_viewed_channels(self, count):
+        return self.get_todays().values('channel__name').annotate(Sum('view_count')).order_by()[0:count]
+
 
 class ArticleManager(models.Manager):
 
@@ -45,3 +50,6 @@ class ArticleManager(models.Manager):
 
     def get_todays_most_recent(self, count):
         return self.get_queryset().get_todays_most_recent(RECENT, count)
+
+    def get_todays_most_viewed_channels(self, count):
+        return self.get_queryset().get_todays_most_viewed_channels(count)

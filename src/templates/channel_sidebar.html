@@ -1,15 +1,15 @@
 <div class="col-3" style="margin-top: 50px;">
     <ul class="list-group">
-    <li class="list-group-item active">Today's popular articles</li>
-    {% for article in most_viewed %}
+    <li class="list-group-item active">Today's popular channels</li>
+    {% for channel in most_viewed %}
     <a href="{{ article.get_absolute_url }}">
         <li class="list-group-item">
-        {{ article.title }}
-        <span style="float: right;">{{ article.view_count }} views</span>
+        {{ channel.channel__name }}
+        <span style="float: right;">{{ channel.view_count__sum }} views</span>
         </li>
     </a>
     {% empty %}
-        Not enough articles yet
+        Not enough channels yet
     {% endfor %}
     </ul>
 
@@ -21,7 +21,7 @@
     <a href="{{ article.get_absolute_url }}">
         <li class="list-group-item">
         {{ article.title }}
-        <span style="float: right;">{{ article.published_date|timesince }} ago</span>
+        <span style="float: right;">{{ article.view_count }} views</span>
         </li>
     </a>
     {% empty %}

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from articles.models import Article
-from categories.views import get_todays_most_popular_categories
+from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ProfileForm, ChannelUpdateForm
 from .models import Profile, Channel
 
@@ -92,7 +92,7 @@ def my_channel(request):
     if not request.user.is_authenticated:
         return redirect('/')
     channel = get_object_or_404(Channel, user=request.user)
-    articles = channel.article_set.all()
+    articles = channel.articles.all()
     context = {
         'channel': channel,
         'articles': articles
@@ -100,10 +100,28 @@ def my_channel(request):
     return render(request, 'channel.html', context)
 
 
+def channel_list(request):
+    profile = get_object_or_404(Profile, user=request.user)
+    # channels = profile.subscriptions.all()  # only subscribed channels
+    channels = Channel.objects.all()
+
+    most_viewed = Article.objects.get_todays_most_viewed_channels(3)
+    most_recent = Article.objects.get_todays_most_recent(3)
+    most_popular_cats = get_todays_most_popular_article_categories()
+
+    context = {
+        'channel_list': channels,
+        'most_viewed': most_viewed,
+        'most_recent': most_recent,
+        'cats': most_popular_cats
+    }
+    return render(request, 'channel_list.html', context)
+
+
 @login_required
 def channel_public(request, name):
     channel = get_object_or_404(Channel, name=name)
-    articles = channel.article_set.all().order_by('-published_date')
+    articles = channel.articles.all().order_by('-published_date')  # TODO: paginate
     context = {
         'channel': channel,
         'articles': articles
@@ -111,40 +129,22 @@ def channel_public(request, name):
     return render(request, 'channel_public.html', context)
 
 
-def channel_list(request):
-    channels = Channel.objects.all()
-
-    # TODO: make this relevant to channels - not articles
-    most_viewed = Article.objects.get_todays_most_viewed(3)
-    most_recent = Article.objects.get_todays_most_recent(3)
-    most_popular_cats = get_todays_most_popular_categories()
-
-    context = {
-        'channel_list': channels,
-    }
-    return render(request, 'channel_list.html', context)
-
-
+@login_required
 def channel_create(request):
-    if not request.user.is_authenticated and not request.user.channel:
+    if request.user.channel:
         messages.info(request, 'You already are a journalist!')
         return redirect(reverse('my-profile'))
 
-    next = request.GET.get('next')
     form = ChannelCreateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
             channel = form.instance
             channel.user = request.user
             channel.save()
-            if next:
-                return redirect(next)
             return redirect(reverse('my-profile'))
 
     context = {
         'form': form,
-        'button_text': 'Begin!',
-        'title': 'Create your channel'
     }
 
     return render(request, 'channel_create.html', context)
@@ -188,3 +188,33 @@ def channel_update_payment_details(request):
         'display': 'edit_payment_details',
     }
     return render(request, 'channel_update.html', context)
+
+
+@login_required
+def subscribe(request, name):
+    profile = get_object_or_404(Profile, user=request.user)
+    channel = get_object_or_404(Channel, name=name)
+
+    # TODO: if user has no payment details - redirect
+
+    profile.subscriptions.add(channel)
+    profile.save()
+
+    channel.subscribers.add(profile)
+    channel.save()
+
+    return redirect(channel.get_absolute_url())
+
+
+@login_required
+def unsubscribe(request, name):
+    profile = get_object_or_404(Profile, user=request.user)
+    channel = get_object_or_404(Channel, name=name)
+
+    profile.subscriptions.remove(channel)
+    profile.save()
+
+    channel.subscribers.remove(profile)
+    channel.save()
+
+    return redirect(channel.get_absolute_url())

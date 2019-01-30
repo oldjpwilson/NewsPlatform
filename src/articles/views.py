@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
 from core.models import Channel
-from categories.views import get_todays_most_popular_categories
+from categories.views import get_todays_most_popular_article_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView
 
@@ -91,7 +91,7 @@ def article_list(request):
     queryset = Article.objects.all()  # TODO: make this the users subscription articles
     most_viewed = Article.objects.get_todays_most_viewed(3)
     most_recent = Article.objects.get_todays_most_recent(3)
-    most_popular_cats = get_todays_most_popular_categories()
+    most_popular_cats = get_todays_most_popular_article_categories()
 
     form = ArticleFilterForm(request.GET or None)
     if form.is_valid():
@@ -118,7 +118,7 @@ def article_list(request):
 def article_detail(request, id):
     most_viewed = Article.objects.get_todays_most_viewed(3)
     most_recent = Article.objects.get_todays_most_recent(3)
-    most_popular_cats = get_todays_most_popular_categories()
+    most_popular_cats = get_todays_most_popular_article_categories()
 
     article = get_object_or_404(Article, id=id)
 
@@ -141,10 +141,10 @@ def article_create(request):
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
-            channel = Channel.objects.get(user__username='admin')
+            channel = Channel.objects.get(user=request.user)
             form.instance.channel = channel
             form.save()
-            return redirect(reverse('articles:detail', kwargs={
+            return redirect(reverse('article-detail', kwargs={
                 'id': form.instance.id
             }))
     context = {
@@ -160,7 +160,7 @@ def article_update(request, id):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return redirect(reverse('articles:detail', kwargs={
+            return redirect(reverse('article-detail', kwargs={
                 'id': form.instance.id
             }))
     context = {
@@ -172,4 +172,4 @@ def article_update(request, id):
 def article_delete(request, id):
     article = get_object_or_404(Article, id=id)
     article.delete()
-    return redirect('/')
+    return redirect(reverse('home'))

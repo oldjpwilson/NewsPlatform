@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.urls import reverse
 from categories.models import Category
 from .managers import ChannelManager
 
@@ -26,6 +27,9 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.email
 
+    def get_subscription_count(self):
+        return self.subscriptions.count()
+
 
 class Channel(models.Model):
     user = models.OneToOneField(
@@ -45,3 +49,23 @@ class Channel(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def get_absolute_url(self):
+        return reverse("channel-public", kwargs={
+            'name': self.name
+        })
+
+    def get_latest_articles(self):
+        return self.articles.all().order_by('published_date')[:4]
+
+    @property
+    def subscriber_count(self):
+        return self.subscribers.count()
+
+    @property
+    def article_count(self):
+        return self.articles.count()
+
+    @property
+    def categories_count(self):
+        return self.categories.count()

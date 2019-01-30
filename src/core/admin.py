@@ -5,7 +5,7 @@ from .models import Channel, Profile, User
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', )
+    list_display = ('user', 'get_subscription_count')
     list_display_links = ('user', )
     list_filter = ('user', 'phone', 'payment_details')
     search_fields = ('user', 'email', 'phone')
@@ -23,7 +23,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 class ChannelAdmin(admin.ModelAdmin):
-    list_display = ('user', 'name')
+    list_display = ('user', 'name', 'subscriber_count')
     list_display_links = ('user', )
     list_filter = ('user', 'name', 'date_joined', 'rating')
     search_fields = ('user', 'email', 'phone')

@@ -26,7 +26,8 @@ from core.views import (
     channel_update,
     channel_update_payment_details,
     channel_public,
-
+    subscribe,
+    unsubscribe
 )
 
 urlpatterns = [
@@ -65,6 +66,10 @@ urlpatterns = [
     path('channel/<name>/', channel_public, name='channel-public'),
     path('my-channel/edit-payment-details/',
          channel_update_payment_details, name='edit-channel-payment-details'),
+
+    # action views
+    path('subscribe/<name>/', subscribe, name='subscribe'),
+    path('unsubscribe/<name>/', unsubscribe, name='unsubscribe'),
 
     # package views
     re_path(r'^tinymce/', include('tinymce.urls')),
