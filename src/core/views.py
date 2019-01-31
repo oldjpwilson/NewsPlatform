@@ -101,8 +101,6 @@ def my_channel(request):
 
 
 def channel_list(request):
-    profile = get_object_or_404(Profile, user=request.user)
-    # channels = profile.subscriptions.all()  # only subscribed channels
     channels = Channel.objects.all()
 
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
