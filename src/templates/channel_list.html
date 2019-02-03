@@ -30,7 +30,9 @@
         </div>
       {% endfor %}
 
-    {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}      
+      <div class="row">
+        {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}
+      </div>
 
     </div>
 

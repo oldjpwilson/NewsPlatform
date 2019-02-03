@@ -73,15 +73,15 @@
                     </tr>
                     <tr>
                         <td>Most viewed article</td>
-                        <td>(WIP)</td>
+                        <td><a href="{{ most_viewed_article.get_absolute_url }}">{{ most_viewed_article }}</a></td>
                     </tr>
                     <tr>
                         <td>Highest rated article</td>
-                        <td>(WIP)</td>
+                        <td><a href="{{ highest_rated_article.get_absolute_url }}">{{ highest_rated_article }}</a></td>
                     </tr>
                     <tr>
                         <td>Channel rating</td>
-                        <td>(WIP)</td>
+                        <td>{{ channel.channel_rating.rating__avg }}</td>
                     </tr>
                 </tbody>
                 </table>

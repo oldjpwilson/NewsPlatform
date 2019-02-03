@@ -24,25 +24,25 @@
 
     {% if display == 'stats' %}
 
-    <h2>Top stories</h2>
+    <h2>My articles</h2>
     <table class="table table-striped">
       <thead>
         <tr>
           <th scope="col">Title</th>
           <th scope="col">Views</th>
-          <th scope="col">Channel</th>
         </tr>
       </thead>
       <tbody>
-      {% for article in article_list %}
+      {% for article in queryset %}
         <tr>
           <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
           <td>{{ article.view_count }}</td>
-          <td>{{ article.channel.name }}</td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
+
+    {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}      
 
     <br style="padding-top: 10px;" />
 

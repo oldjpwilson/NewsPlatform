@@ -1,17 +1,23 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
-from .forms import ChannelCreateForm, ProfileForm, ChannelUpdateForm
+from .forms import ChannelCreateForm, ChannelUpdateForm
 from .models import Profile, Channel
 from .helpers import paginate_queryset, get_most_viewed_channel
 
 
+def check_user_is_journalist(user):
+    try:
+        return user.channel
+    except:
+        return redirect(reverse('my-profile'))
+
+
+@login_required
 def my_profile(request):
-    if not request.user.is_authenticated:
-        return redirect(reverse('home'))
     profile = get_object_or_404(Profile, user=request.user)
     articles = Article.objects.get_highest_rated(3)
     queryset, page_request_var = paginate_queryset(request, articles)
@@ -29,23 +35,6 @@ def my_profile(request):
         'display': 'stats',
         'page_request_var': page_request_var
     }
-    return render(request, 'profile.html', context)
-
-
-@login_required
-def profile_update(request):
-    profile = get_object_or_404(Profile, user=request.user)
-    form = ProfileForm(request.POST or None, instance=profile)
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('my-profile'))
-
-    context = {
-        'display': 'edit_profile',
-        'form': form
-    }
-
     return render(request, 'profile.html', context)
 
 
@@ -95,17 +84,18 @@ def profile_update_payment_details(request):
 
 
 @login_required
+@user_passes_test(check_user_is_journalist)
 def my_channel(request):
-    if not request.user.is_authenticated:
-        return redirect('/')
     channel = get_object_or_404(Channel, user=request.user)
     articles = channel.articles.all().order_by('-published_date')
-
+    highest_rated_article = channel.articles.all().order_by('-rating')[0]
+    most_viewed_article = channel.articles.all().order_by('-view_count')[0]
     queryset, page_request_var = paginate_queryset(request, articles)
-
     context = {
         'channel': channel,
         'queryset': queryset,
+        'highest_rated_article': highest_rated_article,
+        'most_viewed_article': most_viewed_article,
         'page_request_var': page_request_var
     }
     return render(request, 'channel.html', context)
@@ -164,18 +154,24 @@ def channel_create(request):
 
 
 @login_required
+@user_passes_test(check_user_is_journalist)
 def channel_stats(request):
     if not request.user.channel:
         return redirect(reverse('profile'))
     channel = get_object_or_404(Channel, user=request.user)
+    queryset, page_request_var = paginate_queryset(
+        request, channel.articles.all())
     context = {
         'name': channel.name,
-        'display': 'stats'
+        'display': 'stats',
+        'queryset': queryset,
+        'page_request_var': page_request_var
     }
     return render(request, 'channel_update.html', context)
 
 
 @login_required
+@user_passes_test(check_user_is_journalist)
 def channel_update(request):
     if not request.user.channel:
         return redirect(reverse('profile'))
@@ -195,6 +191,7 @@ def channel_update(request):
 
 
 @login_required
+@user_passes_test(check_user_is_journalist)
 def channel_update_payment_details(request):
     channel = get_object_or_404(Channel, user=request.user)
     context = {

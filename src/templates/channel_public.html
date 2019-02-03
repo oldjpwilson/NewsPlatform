@@ -37,9 +37,9 @@
                     </div>
                 </div>
                 {% endfor %}
-
+            </div>
+            <div class="row">
                 {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}
-
             </div>
 
         </div>
@@ -64,10 +64,20 @@
             </div>
 
             <br />
-            {% if request.user.profile not in channel.subscribers.all %}
-            <a href="{% url 'subscribe' name=channel.name %}" style="width: 100%;" class="btn btn-warning">Subscribe</a>
+            {% if not request.user.channel %}
+                {% if request.user.profile not in channel.subscribers.all %}
+                    <a href="{% url 'subscribe' name=channel.name %}" style="width: 100%;" class="btn btn-warning">Subscribe</a>
+                {% else %}
+                    <a href="{% url 'unsubscribe' name=channel.name %}" style="width: 100%;" class="btn btn-warning">Unsubscribe</a>
+                {% endif %}
             {% else %}
-            <a href="{% url 'unsubscribe' name=channel.name %}" style="width: 100%;" class="btn btn-warning">Unsubscribe</a>
+                {% if request.user.channel != channel %}
+                    {% if request.user.profile not in channel.subscribers.all %}
+                        <a href="{% url 'subscribe' name=channel.name %}" style="width: 100%;" class="btn btn-warning">Subscribe</a>
+                    {% else %}
+                        <a href="{% url 'unsubscribe' name=channel.name %}" style="width: 100%;" class="btn btn-warning">Unsubscribe</a>
+                    {% endif %}
+                {% endif %}
             {% endif %}
 
         </div>

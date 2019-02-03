@@ -1,3 +1,4 @@
+from django.contrib.auth.signals import user_logged_in
 from django.db.models.signals import post_save
 from .models import User, Profile
 

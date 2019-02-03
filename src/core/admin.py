@@ -22,9 +22,9 @@ class ProfileAdmin(admin.ModelAdmin):
 
 
 class ChannelAdmin(admin.ModelAdmin):
-    list_display = ('user', 'name', 'subscriber_count')
+    list_display = ('user', 'name', 'subscriber_count', 'channel_rating')
     list_display_links = ('user', )
-    list_filter = ('user', 'name', 'date_joined', 'rating')
+    list_filter = ('user', 'name', 'date_joined')
     search_fields = ('user', 'email')
     fieldsets = (
         (None, {
@@ -35,7 +35,6 @@ class ChannelAdmin(admin.ModelAdmin):
                 'categories',
                 'profile_image',
                 'background_image',
-                'rating',
                 'payment_details'
             )
         }),

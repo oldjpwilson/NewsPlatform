@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Avg
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
 from categories.models import Category
@@ -36,8 +37,8 @@ class Channel(models.Model):
     description = models.TextField()
     profile_image = models.ImageField()
     background_image = models.ImageField()
-    rating = models.FloatField(default=0)
     categories = models.ManyToManyField(Category)
+    rating = models.FloatField(default=0)
     payment_details = models.CharField(
         max_length=18)  # TODO: store with stripe
     subscribers = models.ManyToManyField(Profile, blank=True)
@@ -54,6 +55,12 @@ class Channel(models.Model):
 
     def get_latest_articles(self):
         return self.articles.all().order_by('published_date')[:4]
+
+    # TODO: discuss this approach rather than someone rating the channel
+    # - change the rating with a signal every time an article is rated
+    @property
+    def channel_rating(self):
+        return self.articles.aggregate(Avg('rating'))
 
     @property
     def subscriber_count(self):

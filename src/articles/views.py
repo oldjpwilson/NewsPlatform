@@ -1,19 +1,20 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.mail import send_mail
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
 from core.helpers import paginate_queryset
 from core.models import Channel, Profile
+from core.views import check_user_is_journalist
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView
 
 
 def about(request):
-    # handle post request for logging in
     next = request.GET.get('next')
     form = LoginForm(request.POST or None)
     if request.method == 'POST':
@@ -67,7 +68,6 @@ def home(request):
     articles = Article.objects.get_highest_rated(3)
     channels = Channel.objects.get_highest_rated(3)
 
-    # handle post request for logging in
     next = request.GET.get('next')
     form = LoginForm(request.POST or None)
     if request.method == 'POST':
@@ -88,6 +88,7 @@ def home(request):
     return render(request, 'home.html', context)
 
 
+@login_required
 def article_list(request):
     profile = get_object_or_404(Profile, user=request.user)
     subscriptions = profile.subscriptions.all()
@@ -108,11 +109,9 @@ def article_list(request):
         if rating:
             articles = articles.order_by('-rating')
 
-    # only subscribed articles
+    # let user see only articles of subscribed channels
     final_articles = [a for a in articles if a.channel in subscriptions]
-
     queryset, page_request_var = paginate_queryset(request, final_articles)
-
     context = {
         'queryset': queryset,
         'page_request_var': page_request_var,
@@ -124,30 +123,36 @@ def article_list(request):
     return render(request, 'article_list.html', context)
 
 
+@login_required
 def article_detail(request, id):
     most_viewed = Article.objects.get_todays_most_viewed(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
-
     article = get_object_or_404(Article, id=id)
+    article_view, created = ArticleView.objects.get_or_create(
+        article=article, user=request.user)
+    if created:
+        article.view_count = article.view_count + 1
+        article.save()
 
-    if request.user.is_authenticated:
-        article_view, created = ArticleView.objects.get_or_create(
-            article=article, user=request.user)  # update view count of article
-
-        if created:
-            article.view_count = article.view_count + 1
-            article.save()
+    # handle if the visitor is subscribed
+    visitor_profile = get_object_or_404(Profile, user=request.user)
+    subscribed = False
+    if visitor_profile in article.channel.subscribers.all():
+        subscribed = True
 
     context = {
         'article': article,
         'most_viewed': most_viewed,
         'most_recent': most_recent,
-        'cats': most_popular_cats
+        'cats': most_popular_cats,
+        'visitor_is_subscribed': subscribed
     }
     return render(request, 'article_detail.html', context)
 
 
+@login_required
+@user_passes_test(check_user_is_journalist)
 def article_create(request):
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
@@ -164,6 +169,8 @@ def article_create(request):
     return render(request, 'article_create.html', context)
 
 
+@login_required
+@user_passes_test(check_user_is_journalist)
 def article_update(request, id):
     instance = get_object_or_404(Article, id=id)
     form = ArticleModelForm(request.POST or None,
@@ -180,6 +187,8 @@ def article_update(request, id):
     return render(request, 'article_create.html', context)
 
 
+@login_required
+@user_passes_test(check_user_is_journalist)
 def article_delete(request, id):
     article = get_object_or_404(Article, id=id)
     article.delete()
