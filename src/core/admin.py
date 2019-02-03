@@ -7,14 +7,13 @@ from .models import Channel, Profile, User
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'get_subscription_count')
     list_display_links = ('user', )
-    list_filter = ('user', 'phone', 'payment_details')
-    search_fields = ('user', 'email', 'phone')
+    list_filter = ('user', 'payment_details')
+    search_fields = ('user', 'email')
     fieldsets = (
         (None, {
             'fields': (
                 'user',
                 'middle_names',
-                'phone',
                 'date_of_birth',
                 'payment_details'
             )
@@ -26,7 +25,7 @@ class ChannelAdmin(admin.ModelAdmin):
     list_display = ('user', 'name', 'subscriber_count')
     list_display_links = ('user', )
     list_filter = ('user', 'name', 'date_joined', 'rating')
-    search_fields = ('user', 'email', 'phone')
+    search_fields = ('user', 'email')
     fieldsets = (
         (None, {
             'fields': (

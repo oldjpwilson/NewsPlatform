@@ -27,7 +27,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for article in articles %}
+                {% for article in queryset %}
                     <tr>
                     <td>{{ article.title }}</td>
                     <td>{{ article.published_date }}</td>
@@ -37,7 +37,14 @@
                 {% endfor %}
                 </tbody>
                 </table>
+
+                {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}
+            
+            <br />
+
             </div>
+
+
             <div class="col-12">
                 <h2>Channel stats</h2>
                 <table class="table table-striped">
@@ -84,17 +91,16 @@
             <div class="card">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">{{ channel.description }}</li>
-                    <li class="list-group-item"><b>First article: </b>(WIP)</li>
-                    <li class="list-group-item"><b>Articles: </b>{{ channel.article_set.count }}</li>
+                    <li class="list-group-item"><b>Articles: </b>{{ channel.article_count }}</li>
                     <li class="list-group-item">
                         <b>Categories: </b>
                         {% for c in channel.categories.all %}
-                            <span>{{ c }}</span> |
+                            <span>{{ c }}</span>
+                            {% if channel.category_count > 1 %} | {% endif %}
                         {% empty %}
                             No categories selected
                         {% endfor %}
                     </li>
-                    <li class="list-group-item"><b>Stripe account: </b>(WIP)</li>
                 </ul>
                 <a href="{% url 'channel-stats' %}" class="btn btn-primary">Edit channel</a>
                 <a href="{% url 'channel-public' channel.name %}" class="btn btn-secondary">View public channel</a>

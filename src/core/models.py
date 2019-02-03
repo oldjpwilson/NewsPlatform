@@ -15,13 +15,10 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True)
-    middle_names = models.CharField(max_length=30)  # TODO: necessary?
-    # TODO: phone length dependent on country
-    phone = models.CharField(max_length=15)
-    date_of_birth = models.DateField(blank=True, null=True)
+    # TODO: discuss removed fields
     # location_id = models.CharField() # TODO: geodjango?
     payment_details = models.CharField(
-        max_length=18)  # TODO: max credit card length?
+        max_length=18)  # TODO: store with stripe
     subscriptions = models.ManyToManyField('Channel')
 
     def __str__(self):
@@ -42,7 +39,7 @@ class Channel(models.Model):
     rating = models.FloatField(default=0)
     categories = models.ManyToManyField(Category)
     payment_details = models.CharField(
-        max_length=18)  # TODO: max credit card length?
+        max_length=18)  # TODO: store with stripe
     subscribers = models.ManyToManyField(Profile, blank=True)
 
     objects = ChannelManager()
@@ -51,7 +48,7 @@ class Channel(models.Model):
         return self.user.username
 
     def get_absolute_url(self):
-        return reverse("channel-public", kwargs={
+        return reverse('channel-public', kwargs={
             'name': self.name
         })
 

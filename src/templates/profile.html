@@ -30,28 +30,6 @@
 
     {% if display == 'stats' %}
 
-    {% comment %} <h2>Top stories</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Views</th>
-          <th scope="col">Channel</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for article in article_list %}
-        <tr>
-          <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
-          <td>{{ article.view_count }}</td>
-          <td>{{ article.channel.name }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-
-    <br style="padding-top: 10px;" /> {% endcomment %}
-
     <h2>Subscribed channels</h2>
     <table class="table table-striped">
       <thead>
@@ -59,7 +37,6 @@
           <th scope="col">Channel name</th>
           <th scope="col">Subscribers</th>
           <th scope="col">Description</th>
-          <th scope="col">Categories</th>
         </tr>
       </thead>
       <tbody>
@@ -68,7 +45,6 @@
           <td>{{ channel.name }}</td>
           <td>{{ channel.subscribers.count }}</td>
           <td>{{ channel.description }}</td>
-          <td>{% for cat in channel.categories.all %} <span>{{ cat }}</span>{% endfor %}</td>
         </tr>
       {% empty %}
         <tr>
@@ -77,6 +53,8 @@
       {% endfor %}
       </tbody>
     </table>
+
+    {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}
 
     <br style="padding-top: 10px;" />
 
@@ -99,11 +77,11 @@
         </tr>
         <tr>
           <td>Most viewed channel</td>
-          <td>JustDjango (WIP)</td>
+          <td>{{ most_viewed_channel.article__channel__name }}</td>
         </tr>
         <tr>
           <td>Total article views</td>
-          <td>12 (WIP)</td>
+          <td>{{ total_article_views }}</td>
         </tr>
       </tbody>
     </table>

@@ -9,8 +9,9 @@
       </li>
       {% if request.user.is_authenticated %}
       <li class="nav-item {% if request.get_full_path == '/create/' %} active {% endif %}">
-        {# TODO: only show for journalists #}
+        {% if request.user.channel %}
         <a class="nav-link" href="{% url 'article-create' %}">Create</a>
+        {% endif %}
       </li>
       {% endif %}
     </ul>
@@ -31,6 +32,10 @@
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a>
         </div>
+      </li>
+      {% else %}
+      <li class="nav-item {% if request.get_full_path == '/accounts/login/' %} active {% endif %}">
+        <a class="nav-link" href="{% url 'account_login' %}">Login</a>
       </li>
       {% endif %}
       <form class="form-inline my-2 my-lg-0" style="margin-left: 15px;">

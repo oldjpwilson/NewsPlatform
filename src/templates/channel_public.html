@@ -16,7 +16,7 @@
     <div class="row" style="margin: 10px;">
         <div class="col-8">
             <div class="row">
-                {% for article in articles %}
+                {% for article in queryset %}
                 <div class="col-4">
                     <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
                     <div class="shadow">
@@ -37,6 +37,9 @@
                     </div>
                 </div>
                 {% endfor %}
+
+                {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}
+
             </div>
 
         </div>
@@ -56,7 +59,7 @@
                     </li>
                 </ul>
                 {% if request.user.channel == channel %}
-                <a href="{% url 'channel-update' %}" class="btn btn-primary">Edit channel</a>
+                <a href="{% url 'edit-my-channel' %}" class="btn btn-primary">Edit channel</a>
                 {% endif %}
             </div>
 

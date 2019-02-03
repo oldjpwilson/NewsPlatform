@@ -6,9 +6,12 @@ from core.models import Channel, User
 from .managers import ArticleManager
 
 MEDIA_CHOICES = (
-    ('Article', 'article'),
-    ('Picture', 'picture'),
-    ('Video', 'video')
+    ('Text and Video', 'Text and Video'),
+    ('Text and Picture', 'Text and Picture'),
+    ('Text, Picture and Video', 'Text, Picture and Video'),
+    ('Text', 'Text'),
+    ('Picture', 'Picture'),
+    ('Video', 'Video'),
 )
 
 
@@ -34,7 +37,7 @@ class Article(models.Model):
         Channel, related_name='articles', on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     description = models.TextField()
-    thumbnail = models.ImageField()  # TODO: do we want this to be filled?
+    thumbnail = models.ImageField(blank=True, null=True)
     media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
     published_date = models.DateTimeField(auto_now_add=True)
     last_edit_date = models.DateTimeField(auto_now=True)
@@ -48,7 +51,6 @@ class Article(models.Model):
     view_count = models.IntegerField(default=0)
     draft = models.BooleanField(default=False)
 
-    # comments with disqus
     # location = models.ForeignKey(Location) # TODO: research
     objects = ArticleManager()
 

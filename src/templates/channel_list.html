@@ -4,7 +4,7 @@
 
   <div class="row" style="margin: 10px;">
     <div class="col-9">
-      {% for channel in channel_list %}
+      {% for channel in queryset %}
         <a href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a>
         <div class="row">
           {% for article in channel.get_latest_articles %}
@@ -29,6 +29,9 @@
           {% endfor %}
         </div>
       {% endfor %}
+
+    {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}      
+
     </div>
 
     {% include 'channel_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}    

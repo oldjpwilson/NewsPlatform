@@ -5,7 +5,8 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
-from core.models import Channel
+from core.helpers import paginate_queryset
+from core.models import Channel, Profile
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView
@@ -88,7 +89,9 @@ def home(request):
 
 
 def article_list(request):
-    queryset = Article.objects.all()  # TODO: make this the users subscription articles
+    profile = get_object_or_404(Profile, user=request.user)
+    subscriptions = profile.subscriptions.all()
+    articles = Article.objects.all()
     most_viewed = Article.objects.get_todays_most_viewed(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
@@ -97,16 +100,22 @@ def article_list(request):
     if form.is_valid():
         latest = form.cleaned_data.get('latest')
         if latest:
-            queryset = queryset.order_by('-published_date')
+            articles = articles.order_by('-published_date')
         view_count = form.cleaned_data.get('view_count')
         if view_count:
-            queryset = queryset.order_by('-view_count')
+            articles = articles.order_by('-view_count')
         rating = form.cleaned_data.get('rating')
         if rating:
-            queryset = queryset.order_by('-rating')
+            articles = articles.order_by('-rating')
+
+    # only subscribed articles
+    final_articles = [a for a in articles if a.channel in subscriptions]
+
+    queryset, page_request_var = paginate_queryset(request, final_articles)
 
     context = {
-        'article_list': queryset,
+        'queryset': queryset,
+        'page_request_var': page_request_var,
         'most_viewed': most_viewed,
         'most_recent': most_recent,
         'cats': most_popular_cats,
@@ -122,11 +131,13 @@ def article_detail(request, id):
 
     article = get_object_or_404(Article, id=id)
 
-    article_view, created = ArticleView.objects.get_or_create(
-        article=article, user=request.user)  # update view count of article
-    if created:
-        article.view_count = article.view_count + 1
-        article.save()
+    if request.user.is_authenticated:
+        article_view, created = ArticleView.objects.get_or_create(
+            article=article, user=request.user)  # update view count of article
+
+        if created:
+            article.view_count = article.view_count + 1
+            article.save()
 
     context = {
         'article': article,

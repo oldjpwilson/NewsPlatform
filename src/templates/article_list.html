@@ -31,7 +31,7 @@
       </div>
     
       <div class="row">
-        {% for article in article_list %}
+        {% for article in queryset %}
           <div class="col-4">
             <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
             <div class="shadow">
@@ -52,6 +52,9 @@
             </div>
           </div>
         {% endfor %}
+
+        {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}
+
       </div>
 
     </div>

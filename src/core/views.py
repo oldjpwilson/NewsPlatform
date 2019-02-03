@@ -2,10 +2,11 @@ from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404, reverse
-from articles.models import Article
+from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ProfileForm, ChannelUpdateForm
 from .models import Profile, Channel
+from .helpers import paginate_queryset, get_most_viewed_channel
 
 
 def my_profile(request):
@@ -13,14 +14,20 @@ def my_profile(request):
         return redirect(reverse('home'))
     profile = get_object_or_404(Profile, user=request.user)
     articles = Article.objects.get_highest_rated(3)
+    queryset, page_request_var = paginate_queryset(request, articles)
     channels = profile.subscriptions.all()
     sub_count = profile.subscriptions.count()
+    total_article_views = ArticleView.objects.filter(user=request.user).count()
+    most_viewed_channel = get_most_viewed_channel(request.user)
     context = {
         'profile': profile,
-        'article_list': articles,
+        'queryset': queryset,
         'channel_list': channels,
         'sub_count': sub_count,
-        'display': 'stats'
+        'total_article_views': total_article_views,
+        'most_viewed_channel': most_viewed_channel,
+        'display': 'stats',
+        'page_request_var': page_request_var
     }
     return render(request, 'profile.html', context)
 
@@ -92,10 +99,14 @@ def my_channel(request):
     if not request.user.is_authenticated:
         return redirect('/')
     channel = get_object_or_404(Channel, user=request.user)
-    articles = channel.articles.all()
+    articles = channel.articles.all().order_by('-published_date')
+
+    queryset, page_request_var = paginate_queryset(request, articles)
+
     context = {
         'channel': channel,
-        'articles': articles
+        'queryset': queryset,
+        'page_request_var': page_request_var
     }
     return render(request, 'channel.html', context)
 
@@ -103,12 +114,15 @@ def my_channel(request):
 def channel_list(request):
     channels = Channel.objects.all()
 
+    queryset, page_request_var = paginate_queryset(request, channels)
+
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
 
     context = {
-        'channel_list': channels,
+        'queryset': queryset,
+        'page_request_var': page_request_var,
         'most_viewed': most_viewed,
         'most_recent': most_recent,
         'cats': most_popular_cats
@@ -116,22 +130,23 @@ def channel_list(request):
     return render(request, 'channel_list.html', context)
 
 
-@login_required
 def channel_public(request, name):
     channel = get_object_or_404(Channel, name=name)
-    articles = channel.articles.all().order_by('-published_date')  # TODO: paginate
+    articles = channel.articles.all().order_by('-published_date')
+    queryset, page_request_var = paginate_queryset(request, articles)
     context = {
         'channel': channel,
-        'articles': articles
+        'queryset': queryset,
+        'page_request_var': page_request_var
     }
     return render(request, 'channel_public.html', context)
 
 
 @login_required
 def channel_create(request):
-    if request.user.channel:
-        messages.info(request, 'You already are a journalist!')
-        return redirect(reverse('my-profile'))
+    # if request.user.channel:
+    #     messages.info(request, 'You already are a journalist!')
+    #     return redirect(reverse('my-profile'))
 
     form = ChannelCreateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
@@ -183,6 +198,7 @@ def channel_update(request):
 def channel_update_payment_details(request):
     channel = get_object_or_404(Channel, user=request.user)
     context = {
+        'name': channel.name,
         'display': 'edit_payment_details',
     }
     return render(request, 'channel_update.html', context)
