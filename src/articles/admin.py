@@ -5,9 +5,7 @@ from .models import Article, ArticleView
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('title', 'channel')
     list_display_links = ('title', 'channel')
-    list_filter = ('title', 'channel', 'media_type', 'urgency',
-                   'duration',
-                   'rating')
+    list_filter = ('media_type', 'urgency', 'duration')
     search_fields = ('title', 'channel')
     fieldsets = (
         (None, {

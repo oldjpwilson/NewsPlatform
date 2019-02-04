@@ -20,11 +20,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'crispy_forms',
+    'star_ratings',
+    'tinymce',
 
     'articles',
     'categories',
-    'core',
-    'tinymce'
+    'core'
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,9 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 ACCOUNT_EMAIL_SUBJECT_PREFIX = config('ACCOUNT_EMAIL_SUBJECT_PREFIX')
 EMAIL_BACKEND = config('EMAIL_BACKEND')
+
+# Ratings
+
+STAR_RATINGS_RERATE = True
+STAR_RATINGS_RANGE = 10
+STAR_RATINGS_ANONYMOUS = False

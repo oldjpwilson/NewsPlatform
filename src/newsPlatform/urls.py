@@ -71,7 +71,8 @@ urlpatterns = [
 
     # package views
     re_path(r'^tinymce/', include('tinymce.urls')),
-    re_path(r'^accounts/', include('allauth.urls'))
+    re_path(r'^accounts/', include('allauth.urls')),
+    re_path(r'^ratings/', include('star_ratings.urls', namespace='ratings')),
 ]
 
 if settings.DEBUG:

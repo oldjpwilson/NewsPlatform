@@ -89,6 +89,9 @@
         </div>
         <div class="col-4">
             <div class="card">
+                <div class="card-header text-center">
+                    <img src="{{ channel.profile_image.url }}" alt="..." class="img-thumbnail" style="max-height: 100px;">
+                </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">{{ channel.description }}</li>
                     <li class="list-group-item"><b>Articles: </b>{{ channel.article_count }}</li>

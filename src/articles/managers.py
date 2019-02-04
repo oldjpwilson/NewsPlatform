@@ -11,7 +11,10 @@ RECENT = 'published_date'
 class ArticleQuerySet(models.QuerySet):
 
     def get_highest(self, field, count):
-        return self.order_by(f'-{field}')[0:count]
+        return self.order_by(f'-{field}')[:count]
+
+    def get_highest_rating(self, count):
+        return self.objects.filter(ratings__isnull=False).order_by('ratings__average')[:count]
 
     def get_before_time(self, hours):
         time_threshold = datetime.now() - timedelta(hours=hours)
@@ -22,10 +25,10 @@ class ArticleQuerySet(models.QuerySet):
         return self.filter(published_date__gt=time_threshold)
 
     def get_todays_most_viewed(self, field, count):
-        return self.get_todays().order_by(f'-{field}')[0:count]
+        return self.get_todays().order_by(f'-{field}')[:count]
 
     def get_todays_most_recent(self, field, count):
-        return self.get_todays().order_by(f'-{field}')[0:count]
+        return self.get_todays().order_by(f'-{field}')[:count]
 
     def get_todays_most_viewed_channels(self, count):
         return self.get_todays().values('channel__name').annotate(Sum('view_count')).order_by()[0:count]
@@ -40,7 +43,7 @@ class ArticleManager(models.Manager):
         return self.get_queryset()
 
     def get_highest_rated(self, count):
-        return self.get_queryset().get_highest(RATING, count)
+        return self.get_queryset().get_highest_rating(count)
 
     def get_todays(self):
         return self.get_queryset().get_todays()

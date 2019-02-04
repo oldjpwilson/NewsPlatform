@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Avg
+from django.db.models import Avg, Sum
 from django.contrib.auth.models import AbstractUser
 from django.urls import reverse
 from categories.models import Category
@@ -55,6 +55,9 @@ class Channel(models.Model):
 
     def get_latest_articles(self):
         return self.articles.all().order_by('published_date')[:4]
+
+    def get_total_article_views(self):
+        return self.articles.all().values('view_count').aggregate(Sum('view_count'))
 
     # TODO: discuss this approach rather than someone rating the channel
     # - change the rating with a signal every time an article is rated

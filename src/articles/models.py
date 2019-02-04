@@ -1,5 +1,7 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.contenttypes.fields import GenericRelation
+from star_ratings.models import Rating
 from tinymce import HTMLField
 from categories.models import Category
 from core.models import Channel, User
@@ -47,7 +49,8 @@ class Article(models.Model):
     duration = models.ForeignKey(
         Duration, on_delete=models.SET_NULL, blank=True, null=True)
     content = HTMLField('Content')  # tinymce
-    rating = models.FloatField(default=0)
+    # rating = models.FloatField(default=0)
+    rating = GenericRelation(Rating)
     view_count = models.IntegerField(default=0)
     draft = models.BooleanField(default=False)
 

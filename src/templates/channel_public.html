@@ -21,7 +21,7 @@
                     <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
                     <div class="shadow">
                     <div>
-                        <img class="img-fluid" src="{{ article.thumbnail.url }}" alt="article-image">
+                        <img class="img-fluid" src="{{ article.thumbnail.url }}" alt="article-image" style="max-height: 154.36px;">
                     </div>
                     <div class="media box" style="margin-bottom: 50px;">
                         <img style="width: 50px;" src="{{ article.channel.profile_image.url }}" class="mr-3" alt="profile-image">
@@ -45,6 +45,9 @@
         </div>
         <div class="col-4">
             <div class="card">
+                <div class="card-header text-center">
+                    <img src="{{ channel.profile_image.url }}" alt="..." class="img-thumbnail" style="max-height: 100px;">
+                </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">{{ channel.description }}</li>
                     <li class="list-group-item"><b>Articles: </b>{{ channel.article_count }}</li>

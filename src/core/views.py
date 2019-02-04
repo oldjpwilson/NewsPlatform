@@ -134,10 +134,9 @@ def channel_public(request, name):
 
 @login_required
 def channel_create(request):
-    # if request.user.channel:
-    #     messages.info(request, 'You already are a journalist!')
-    #     return redirect(reverse('my-profile'))
-
+    if request.user.channel is not None:
+        messages.warning(request, 'You already are a journalist!')
+        return redirect(reverse('my-profile'))
     form = ChannelCreateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
@@ -145,11 +144,9 @@ def channel_create(request):
             channel.user = request.user
             channel.save()
             return redirect(reverse('my-profile'))
-
     context = {
         'form': form,
     }
-
     return render(request, 'channel_create.html', context)
 
 
@@ -164,6 +161,7 @@ def channel_stats(request):
     context = {
         'name': channel.name,
         'display': 'stats',
+        'total_article_views': channel.get_total_article_views(),
         'queryset': queryset,
         'page_request_var': page_request_var
     }

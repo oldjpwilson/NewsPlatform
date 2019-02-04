@@ -134,7 +134,7 @@ def article_detail(request, id):
     if created:
         article.view_count = article.view_count + 1
         article.save()
-
+    print(article.rating())
     # handle if the visitor is subscribed
     visitor_profile = get_object_or_404(Profile, user=request.user)
     subscribed = False
