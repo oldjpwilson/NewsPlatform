@@ -59,11 +59,11 @@ class Channel(models.Model):
     def get_total_article_views(self):
         return self.articles.all().values('view_count').aggregate(Sum('view_count'))
 
-    # TODO: discuss this approach rather than someone rating the channel
-    # - change the rating with a signal every time an article is rated
     @property
     def channel_rating(self):
-        return self.articles.aggregate(Avg('rating'))
+        return self.articles \
+            .filter(rating__isnull=False, rating__count__gt=0) \
+            .aggregate(Avg('rating__average'))
 
     @property
     def subscriber_count(self):

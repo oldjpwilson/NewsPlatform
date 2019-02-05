@@ -49,8 +49,14 @@ class Article(models.Model):
     duration = models.ForeignKey(
         Duration, on_delete=models.SET_NULL, blank=True, null=True)
     content = HTMLField('Content')  # tinymce
-    # rating = models.FloatField(default=0)
-    rating = GenericRelation(Rating)
+    rating = GenericRelation(
+        Rating, related_query_name='articles')
+
+    '''
+    related_query_name allows you to query like:
+        Rating.objects.filter(articles__title='first article')
+    '''
+
     view_count = models.IntegerField(default=0)
     draft = models.BooleanField(default=False)
 
@@ -71,6 +77,10 @@ class Article(models.Model):
 
     def get_view_count(self):
         return ArticleView.objects.filter(article=self).count()
+
+    @property
+    def get_rating(self):
+        return Rating.objects.get(object_id=self.id)
 
 
 class ArticleView(models.Model):

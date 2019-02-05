@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models import Count, Sum
 from core.models import Channel
 
-RATING = 'rating'
 VIEW_COUNT = 'view_count'
 RECENT = 'published_date'
 
@@ -14,7 +13,7 @@ class ArticleQuerySet(models.QuerySet):
         return self.order_by(f'-{field}')[:count]
 
     def get_highest_rating(self, count):
-        return self.objects.filter(ratings__isnull=False).order_by('ratings__average')[:count]
+        return self.filter(rating__isnull=False, rating__count__gt=0).order_by('rating__average')[:count]
 
     def get_before_time(self, hours):
         time_threshold = datetime.now() - timedelta(hours=hours)

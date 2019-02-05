@@ -46,6 +46,12 @@
                   {{ article.description|truncatechars:80 }}
                   <br />
                   <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
+                  <br />
+                  {% if article.get_rating.count > 0 %}
+                  <small>Rating: {{ article.get_rating.average|floatformat:"2" }}/10</small>
+                  {% else %}
+                  No ratings
+                  {% endif %}
                 </div>
               </div>
             </a>

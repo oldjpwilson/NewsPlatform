@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect, get_object_or_404, reverse
+from star_ratings.models import Rating
 from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ChannelUpdateForm
@@ -20,6 +21,7 @@ def check_user_is_journalist(user):
 def my_profile(request):
     profile = get_object_or_404(Profile, user=request.user)
     articles = Article.objects.get_highest_rated(3)
+    print(articles)
     queryset, page_request_var = paginate_queryset(request, articles)
     channels = profile.subscriptions.all()
     sub_count = profile.subscriptions.count()

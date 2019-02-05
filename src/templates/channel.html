@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load ratings %}
 
 {% block content %}
 
@@ -29,10 +30,10 @@
                 <tbody>
                 {% for article in queryset %}
                     <tr>
-                    <td>{{ article.title }}</td>
+                    <td><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></td>
                     <td>{{ article.published_date }}</td>
                     <td>{{ article.view_count }}</td>
-                    <td>{{ article.rating }}</td>
+                    <td>{{ article.get_rating.average|floatformat:"2" }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -81,7 +82,7 @@
                     </tr>
                     <tr>
                         <td>Channel rating</td>
-                        <td>{{ channel.channel_rating.rating__avg }}</td>
+                        <td>{{ channel.channel_rating.rating__average__avg }}</td>
                     </tr>
                 </tbody>
                 </table>

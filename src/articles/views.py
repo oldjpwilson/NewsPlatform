@@ -107,7 +107,7 @@ def article_list(request):
             articles = articles.order_by('-view_count')
         rating = form.cleaned_data.get('rating')
         if rating:
-            articles = articles.order_by('-rating')
+            articles = articles.order_by('-rating__average')
 
     # let user see only articles of subscribed channels
     final_articles = [a for a in articles if a.channel in subscriptions]
@@ -134,7 +134,6 @@ def article_detail(request, id):
     if created:
         article.view_count = article.view_count + 1
         article.save()
-    print(article.rating())
     # handle if the visitor is subscribed
     visitor_profile = get_object_or_404(Profile, user=request.user)
     subscribed = False
