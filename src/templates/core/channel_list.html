@@ -6,7 +6,7 @@
     <div class="col-9">
       {% for channel in queryset %}
         <a href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a>
-        <div class="row">
+        {% comment %} <div class="row">
           {% for article in channel.get_latest_articles %}
             <div class="col-3">
               <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
@@ -18,7 +18,7 @@
                   <img style="width: 50px;" src="{{ article.channel.profile_image.url }}" class="mr-3" alt="profile-image">
                   <div class="media-body">
                     <h4 class="mt-0">{{ article.title }}</h4>
-                    {% comment %} {{ article.description|truncatechars:80 }} {% endcomment %}
+                    {{ article.description|truncatechars:80 }}
                     <br />
                     <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
                   </div>
@@ -27,16 +27,35 @@
               </div>
             </div>
           {% endfor %}
+        </div> {% endcomment %}
+
+        <div class="row">
+          {% for article in channel.get_latest_articles %}
+          <div class="col-sm">
+              <div class="ht-tm-codeblock mt-2">
+                  <div class="ht-tm-element card">
+                  <img class="card-img-top" src="{{ article.thumbnail.url }}" style="max-height: 154.36px;" alt="Article thumbnail">
+                  <div class="card-body">
+                      <h4 class="card-title">{{ article.title }}</h4>
+                      <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
+                      <p class="card-text">{{ article.description|truncatechars:50 }}</p>
+                      <a href="{{ article.get_absolute_url }}" class="btn btn-primary">View</a>
+                  </div>
+                  </div>
+              </div>
+          </div>
+          {% endfor %}
         </div>
+
       {% endfor %}
 
-      <div class="row">
-        {% include "paginator.html" with queryset=queryset page_request_var=page_request_var %}
+      <div class="row mt-5">
+        {% include "nav/paginator.html" with queryset=queryset page_request_var=page_request_var %}
       </div>
 
     </div>
 
-    {% include 'channel_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}    
+    {% include 'core/channel_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}    
 
   </div> 
 

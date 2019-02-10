@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1']
-WSGI_APPLICATION = 'newsPlatform.wsgi.development'
+WSGI_APPLICATION = 'newsPlatform.wsgi.application'
 
 INSTALLED_APPS += [
     'debug_toolbar'

@@ -29,7 +29,7 @@ def about(request):
     context = {
         'form': form
     }
-    return render(request, 'about.html', context)
+    return render(request, 'nav/about.html', context)
 
 
 def contact(request):
@@ -59,7 +59,7 @@ def contact(request):
         'form': form
     }
 
-    return render(request, "contact.html", context)
+    return render(request, "nav/contact.html", context)
 
 
 def home(request):
@@ -85,7 +85,7 @@ def home(request):
         'channel_list': channels,
         'form': form
     }
-    return render(request, 'home.html', context)
+    return render(request, 'nav/home.html', context)
 
 
 @login_required
@@ -120,7 +120,7 @@ def article_list(request):
         'cats': most_popular_cats,
         'form': form
     }
-    return render(request, 'article_list.html', context)
+    return render(request, 'articles/article_list.html', context)
 
 
 @login_required
@@ -147,7 +147,7 @@ def article_detail(request, id):
         'cats': most_popular_cats,
         'visitor_is_subscribed': subscribed
     }
-    return render(request, 'article_detail.html', context)
+    return render(request, 'articles/article_detail.html', context)
 
 
 @login_required
@@ -165,7 +165,7 @@ def article_create(request):
     context = {
         'form': form
     }
-    return render(request, 'article_create.html', context)
+    return render(request, 'articles/article_create.html', context)
 
 
 @login_required
@@ -183,7 +183,7 @@ def article_update(request, id):
     context = {
         'form': form
     }
-    return render(request, 'article_create.html', context)
+    return render(request, 'articles/article_create.html', context)
 
 
 @login_required

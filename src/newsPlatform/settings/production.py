@@ -3,7 +3,7 @@ from .base import *
 DEBUG = False
 ALLOWED_HOSTS = ['src-prod2.us-west-2.elasticbeanstalk.com',
                  'www.your-website.com']
-WSGI_APPLICATION = 'newsPlatform.wsgi.production'
+WSGI_APPLICATION = 'newsPlatform.wsgi'
 
 
 AUTH_PASSWORD_VALIDATORS = [

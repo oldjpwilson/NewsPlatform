@@ -17,11 +17,17 @@ def check_user_is_journalist(user):
         return redirect(reverse('my-profile'))
 
 
+def check_channel_status(request):
+    channel_qs = Channel.objects.filter(user=request.user)
+    if not channel_qs.exists():
+        return None
+    return channel_qs.first()
+
+
 @login_required
 def my_profile(request):
     profile = get_object_or_404(Profile, user=request.user)
     articles = Article.objects.get_highest_rated(3)
-    print(articles)
     queryset, page_request_var = paginate_queryset(request, articles)
     channels = profile.subscriptions.all()
     sub_count = profile.subscriptions.count()
@@ -37,7 +43,7 @@ def my_profile(request):
         'display': 'stats',
         'page_request_var': page_request_var
     }
-    return render(request, 'profile.html', context)
+    return render(request, 'core/profile.html', context)
 
 
 @login_required
@@ -72,7 +78,7 @@ def profile_update_account(request):
         'display': 'edit_account',
         'user': request.user,
     }
-    return render(request, 'profile.html', context)
+    return render(request, 'core/profile.html', context)
 
 
 @login_required
@@ -82,7 +88,7 @@ def profile_update_payment_details(request):
         'display': 'edit_payment_details',
         'user': request.user,
     }
-    return render(request, 'profile.html', context)
+    return render(request, 'core/profile.html', context)
 
 
 @login_required
@@ -100,7 +106,7 @@ def my_channel(request):
         'most_viewed_article': most_viewed_article,
         'page_request_var': page_request_var
     }
-    return render(request, 'channel.html', context)
+    return render(request, 'core/channel.html', context)
 
 
 def channel_list(request):
@@ -119,7 +125,7 @@ def channel_list(request):
         'most_recent': most_recent,
         'cats': most_popular_cats
     }
-    return render(request, 'channel_list.html', context)
+    return render(request, 'core/channel_list.html', context)
 
 
 def channel_public(request, name):
@@ -131,13 +137,14 @@ def channel_public(request, name):
         'queryset': queryset,
         'page_request_var': page_request_var
     }
-    return render(request, 'channel_public.html', context)
+    return render(request, 'core/channel_public.html', context)
 
 
 @login_required
 def channel_create(request):
-    if request.user.channel is not None:
-        messages.warning(request, 'You already are a journalist!')
+    channel_status = check_channel_status(request)
+    if channel_status is not None:
+        messages.info(request, "You already have a channel!")
         return redirect(reverse('my-profile'))
     form = ChannelCreateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
@@ -149,7 +156,7 @@ def channel_create(request):
     context = {
         'form': form,
     }
-    return render(request, 'channel_create.html', context)
+    return render(request, 'core/channel_create.html', context)
 
 
 @login_required
@@ -167,7 +174,7 @@ def channel_stats(request):
         'queryset': queryset,
         'page_request_var': page_request_var
     }
-    return render(request, 'channel_update.html', context)
+    return render(request, 'core/channel_update.html', context)
 
 
 @login_required
@@ -187,7 +194,7 @@ def channel_update(request):
         'name': channel.name,
         'display': 'edit_channel_details'
     }
-    return render(request, 'channel_update.html', context)
+    return render(request, 'core/channel_update.html', context)
 
 
 @login_required
@@ -198,7 +205,7 @@ def channel_update_payment_details(request):
         'name': channel.name,
         'display': 'edit_payment_details',
     }
-    return render(request, 'channel_update.html', context)
+    return render(request, 'core/channel_update.html', context)
 
 
 @login_required

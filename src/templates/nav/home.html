@@ -1,12 +1,24 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
+{% block header %}
+
+<div class="jumbotron bg-light mb-0 radius-0">
+  <div class="container">
+      <h2>Welcome to NewsPlatform!</h2>
+      <span class="lead">Linking the public to affordable, ad-free news from a continuously growing choice of 
+      journalists on a continuously growing change of topics.</span>
+
+      <div class="mt-4">
+        <p>Subscribe to news at $0.50 per channel, per month</p>
+        <p>No algorithms | No clickbait | No narratives</p>
+      </div>
+  </div>
+</div>
+
+{% endblock %}
+
 {% block content %}
-
-<p><b>NewsPlatform: </b>linking the public to affordable, ad-free news from a continuously growing choice of journalists on a continuously growing change of topics.</p>
-<p>Subscribe to news at $0.50 per channel, per month</p>
-<p>No algorithms | No clickbait | No narratives</p>
-
 
   <div class="row">
     <div class="col-8">
@@ -44,7 +56,7 @@
       <tbody>
       {% for channel in channel_list %}
         <tr>
-          <td>{{ channel.name }}</td>
+          <td><a href="{{ channel.get_absolute_url }}">{{ channel.name }}</a></td>
           <td>{{ channel.subscribers.count }}</td>
           <td>{{ channel.description }}</td>
         </tr>
