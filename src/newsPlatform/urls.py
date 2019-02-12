@@ -7,6 +7,7 @@ from articles.views import (
     about,
     contact,
     home,
+    search,
     article_list,
     article_detail,
     article_create,
@@ -68,6 +69,7 @@ urlpatterns = [
     # action views
     path('subscribe/<name>/', subscribe, name='subscribe'),
     path('unsubscribe/<name>/', unsubscribe, name='unsubscribe'),
+    path('search/', search, name='search'),
 
     # package views
     re_path(r'^tinymce/', include('tinymce.urls')),

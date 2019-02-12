@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row mt-5">
+    <div class="col-6 offset-3">
+        <h3>These are the article results from your search</h3>
+        {% for article in articles %}
+            <a href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+            <br />
+        {% empty %}
+        No articles match this search
+        {% endfor %}
+        <br />
+        <h3>These are the channel results from your search</h3>
+        {% for channel in channels %}
+            <a href="{{ channel.get_absolute_url }}">{{ channel.name }}</a>
+            <br />
+        {% empty %}
+        No channels match this search
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

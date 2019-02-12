@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -12,6 +13,29 @@ from core.views import check_user_is_journalist
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView
+
+
+def search(request):
+    articles = Article.objects.all()
+    channels = Channel.objects.all()
+    query = request.GET.get('q')
+    if query:
+        articles = articles.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(content__icontains=query)
+        ).distinct()
+
+        channels = channels.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        ).distinct()
+
+    context = {
+        'articles': articles,
+        'channels': channels
+    }
+    return render(request, 'articles/search_results.html', context)
 
 
 def about(request):
