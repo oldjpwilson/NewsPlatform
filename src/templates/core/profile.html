@@ -77,10 +77,12 @@
           <td>Monthly billing total</td>
           <td>$5 (WIP)</td>
         </tr>
+        {% if most_viewed_channel != None %}
         <tr>
           <td>Most viewed channel</td>
           <td>{{ most_viewed_channel.article__channel__name }}</td>
         </tr>
+        {% endif %}
         <tr>
           <td>Total article views</td>
           <td>{{ total_article_views }}</td>

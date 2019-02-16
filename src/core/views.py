@@ -7,7 +7,12 @@ from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ChannelUpdateForm
 from .models import Profile, Channel
-from .helpers import paginate_queryset, get_most_viewed_channel
+from .helpers import (
+    paginate_queryset,
+    get_most_viewed_channel,
+    get_highest_rated_article,
+    get_most_viewed_article
+)
 
 
 def check_user_is_journalist(user):
@@ -96,8 +101,8 @@ def profile_update_payment_details(request):
 def my_channel(request):
     channel = get_object_or_404(Channel, user=request.user)
     articles = channel.articles.all().order_by('-published_date')
-    highest_rated_article = channel.articles.all().order_by('-rating')[0]
-    most_viewed_article = channel.articles.all().order_by('-view_count')[0]
+    highest_rated_article = get_highest_rated_article(channel)
+    most_viewed_article = get_most_viewed_article(channel)
     queryset, page_request_var = paginate_queryset(request, articles)
     context = {
         'channel': channel,

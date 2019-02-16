@@ -30,7 +30,11 @@
                     <td><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></td>
                     <td>{{ article.published_date }}</td>
                     <td>{{ article.view_count }}</td>
-                    <td>{{ article.get_rating.average|floatformat:"2" }}</td>
+                    {% if article.get_rating.count < 1 %}
+                        <td>No ratings yet</td>
+                    {% else %}
+                        <td>{{ article.get_rating.average|floatformat:"2" }}</td>
+                    {% endif %}
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -69,17 +73,25 @@
                         <td>Total all-time income</td>
                         <td>(WIP)</td>
                     </tr>
+                    {% if most_viewed_article != None %}
                     <tr>
                         <td>Most viewed article</td>
                         <td><a href="{{ most_viewed_article.get_absolute_url }}">{{ most_viewed_article }}</a></td>
                     </tr>
+                    {% endif %}
+                    {% if most_viewed_article != None %}
                     <tr>
                         <td>Highest rated article</td>
                         <td><a href="{{ highest_rated_article.get_absolute_url }}">{{ highest_rated_article }}</a></td>
                     </tr>
+                    {% endif %}
                     <tr>
                         <td>Channel rating</td>
-                        <td>{{ channel.channel_rating.rating__average__avg }}</td>
+                        {% if most_viewed_article == None %}
+                            <td>No ratings yet</td>
+                        {% else %}
+                            <td>{{ channel.channel_rating.rating__average__avg }}</td>
+                        {% endif %}
                     </tr>
                 </tbody>
                 </table>
