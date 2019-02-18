@@ -18,17 +18,14 @@ MEDIA_CHOICES = (
 
 
 class Duration(models.Model):
-    type = models.CharField(max_length=20)
-    # update, article, report, documentary
-    description = models.TextField()
+    type = models.CharField(max_length=30)
 
     def __str__(self):
         return self.type
 
 
 class Urgency(models.Model):
-    type = models.CharField(max_length=20)  # Current, breaking
-    description = models.TextField()
+    type = models.CharField(max_length=30)
 
     def __str__(self):
         return self.type

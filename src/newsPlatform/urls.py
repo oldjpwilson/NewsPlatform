@@ -27,7 +27,8 @@ from core.views import (
     channel_update_payment_details,
     channel_public,
     subscribe,
-    unsubscribe
+    unsubscribe,
+    remove_credit_card
 )
 
 from newsletter.views import profile_update_email_preferences
@@ -62,6 +63,9 @@ urlpatterns = [
     path('my-profile/edit-email-preferences/',
          profile_update_email_preferences,
          name='edit-email-preferences'),
+    path('remove-credit-card/<card_id>/',
+         remove_credit_card,
+         name='remove-credit-card'),
 
     # channel views
     path('my-channel/', my_channel, name='my-channel'),

@@ -16,8 +16,8 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True)
-    # TODO: discuss removed fields
     # location_id = models.CharField() # TODO: geodjango?
+    stripe_customer_id = models.CharField(max_length=40)
     payment_details = models.CharField(
         max_length=18)  # TODO: store with stripe
     subscriptions = models.ManyToManyField('Channel')
@@ -39,6 +39,8 @@ class Channel(models.Model):
     background_image = models.ImageField()
     categories = models.ManyToManyField(Category)
     rating = models.FloatField(default=0)
+    stripe_account_id = models.CharField(max_length=40)
+    stripe_plan_id = models.CharField(max_length=40)
     payment_details = models.CharField(
         max_length=18)  # TODO: store with stripe
     subscribers = models.ManyToManyField(Profile, blank=True)

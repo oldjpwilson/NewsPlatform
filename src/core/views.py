@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -14,6 +15,19 @@ from .helpers import (
     get_most_viewed_article
 )
 
+import stripe
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+def check_user_payment_details(user):
+    profile_qs = Profile.objects.filter(user=user)
+    if profile_qs.exists():
+        customer = stripe.Customer.retrieve(profile_qs[0].stripe_customer_id)
+        if len(customer.sources) > 0:
+            return True
+        return False
+    return False
+
 
 def check_user_is_journalist(user):
     try:
@@ -24,9 +38,9 @@ def check_user_is_journalist(user):
 
 def check_channel_status(request):
     channel_qs = Channel.objects.filter(user=request.user)
-    if not channel_qs.exists():
-        return None
-    return channel_qs.first()
+    if channel_qs.exists():
+        return channel_qs[0]
+    return None
 
 
 @login_required
@@ -89,9 +103,19 @@ def profile_update_account(request):
 @login_required
 def profile_update_payment_details(request):
     profile = get_object_or_404(Profile, user=request.user)
+    customer = stripe.Customer.retrieve(profile.stripe_customer_id)
+    if request.method == "POST":
+        token = request.POST['stripeToken']
+        if token:
+            customer.source = token
+            customer.save()
+            return redirect(reverse("edit-profile-payment-details"))
+
     context = {
         'display': 'edit_payment_details',
         'user': request.user,
+        'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY,
+        'card_list': customer['sources']['data']
     }
     return render(request, 'core/profile.html', context)
 
@@ -116,13 +140,10 @@ def my_channel(request):
 
 def channel_list(request):
     channels = Channel.objects.all()
-
     queryset, page_request_var = paginate_queryset(request, channels)
-
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
-
     context = {
         'queryset': queryset,
         'page_request_var': page_request_var,
@@ -156,8 +177,29 @@ def channel_create(request):
         if form.is_valid():
             channel = form.instance
             channel.user = request.user
+
+            # here we create the journalist's stripe account
+            journalist_stripe_acc = stripe.Account.create(
+                type="standard",
+                email=request.user.email
+            )
+
+            plan = stripe.Plan.create(
+                id=f"monthly-membership-{journalist_stripe_acc['id']}",
+                amount=100,
+                interval="month",
+                currency="usd",
+                product={
+                    "name": f"{channel.name} membership"
+                },
+                stripe_account=journalist_stripe_acc['id'],
+            )
+
+            channel.stripe_account_id = journalist_stripe_acc['id']
+            channel.stripe_plan_id = plan['id']
             channel.save()
-            return redirect(reverse('my-profile'))
+
+            return redirect(reverse('my-channel'))
     context = {
         'form': form,
     }
@@ -209,6 +251,7 @@ def channel_update_payment_details(request):
     context = {
         'name': channel.name,
         'display': 'edit_payment_details',
+        'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY
     }
     return render(request, 'core/channel_update.html', context)
 
@@ -218,14 +261,40 @@ def subscribe(request, name):
     profile = get_object_or_404(Profile, user=request.user)
     channel = get_object_or_404(Channel, name=name)
 
-    # TODO: if user has no payment details - redirect
+    # redirect if user doesn't have a credit card
+    user_has_payment_details = check_user_payment_details(request.user)
+    if not user_has_payment_details:
+        messages.info(
+            request, "Please enter payment details to subscribe to a channel")
+        return redirect(reverse("edit-profile-payment-details"))
 
+    # create a token because the customer is shared between multiple accounts
+    token = stripe.Token.create(
+        customer=profile.stripe_customer_id,
+        usage="reusable",
+        stripe_account=channel.stripe_account_id,
+    )
+
+    customer = stripe.Customer.create(
+        description='Shared Customer',
+        source=token.id,
+        stripe_account=channel.stripe_account_id
+    )
+
+    subscription = stripe.Subscription.create(
+        customer=customer.id,
+        items=[
+            {
+                "plan": channel.stripe_plan_id,
+            },
+        ],
+        stripe_account=channel.stripe_account_id,
+        application_fee_percent=50
+    )
     profile.subscriptions.add(channel)
     profile.save()
-
     channel.subscribers.add(profile)
     channel.save()
-
     return redirect(channel.get_absolute_url())
 
 
@@ -233,11 +302,16 @@ def subscribe(request, name):
 def unsubscribe(request, name):
     profile = get_object_or_404(Profile, user=request.user)
     channel = get_object_or_404(Channel, name=name)
-
     profile.subscriptions.remove(channel)
     profile.save()
-
     channel.subscribers.remove(profile)
     channel.save()
-
     return redirect(channel.get_absolute_url())
+
+
+@login_required
+def remove_credit_card(request, card_id):
+    profile = get_object_or_404(Profile, user=request.user)
+    customer = stripe.Customer.retrieve(profile.stripe_customer_id)
+    customer.sources.retrieve(card_id).delete()
+    return redirect(reverse("edit-profile-payment-details"))

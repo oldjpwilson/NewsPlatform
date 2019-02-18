@@ -6,7 +6,7 @@
 
   <div class="row mt-5">
     <div class="col-9">
-      {% if visitor_is_subscribed %}
+      {% if visitor_is_subscribed or request.user == article.channel.user %}
 
         <h2>{{ article.title }}</h2>
         {{ article.content | safe }}

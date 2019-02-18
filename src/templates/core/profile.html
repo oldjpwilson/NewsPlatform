@@ -32,7 +32,7 @@
 
     {% if display == 'stats' %}
 
-    <h2>Subscribed channels</h2>
+    <h3>Subscribed channels</h3>
     <table class="table table-striped">
       <thead>
         <tr>
@@ -60,7 +60,7 @@
 
     <br style="padding-top: 10px;" />
 
-    <h2>Stats and information</h2>
+    <h3>Stats and information</h3>
     <table class="table table-striped">
       <thead>
         <tr>
@@ -92,7 +92,7 @@
 
     {% elif display == 'edit_account' %}
 
-    <h2>Update account details</h2>
+    <h3>Update account details</h3>
     <form method="POST" action="." enctype="multipart/form-data">
       {% csrf_token %}
       <div class="form-group">
@@ -117,7 +117,25 @@
 
     {% elif display == 'edit_payment_details' %}
 
-    Custom stripe form
+    <h3>Add a credit card</h3>
+    {% include 'core/stripe_credit_card.html' with STRIPE_PUBLIC_KEY=STRIPE_PUBLIC_KEY %}
+    <hr />
+    <div>
+      <h4>My credit cards</h4>
+      <ul class="list-group">
+        {% for card in card_list %}
+          <li class="list-group-item">          
+            <label class="title ellipsis">
+            <span style="float: left;"><i class="fab fa-2x fa-cc-{{ card.brand|lower }}"></i></span>            
+            <span style="margin-left: 10px; font-size: 17px;">**** **** **** <b>{{ card.last4 }}</b> | EXP: <b>{{ card.exp_month }}/{{ card.exp_year }}</b></span>
+            <a href="{% url 'remove-credit-card' card.id %}"><span style="float: right;"><i class="fas fa-2x fa-trash-alt"></i></span></a>
+            </label>
+          </li>
+          {% empty %}
+          You have no cards. Add a card to start subscribing
+         {% endfor %}
+      </ul>
+    </div>
 
     {% elif display == "edit_email_notifications" %}
 

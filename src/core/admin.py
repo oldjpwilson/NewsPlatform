@@ -13,8 +13,7 @@ class ProfileAdmin(admin.ModelAdmin):
         (None, {
             'fields': (
                 'user',
-                'middle_names',
-                'date_of_birth',
+                'stripe_customer_id',
                 'payment_details'
             )
         }),
@@ -35,6 +34,8 @@ class ChannelAdmin(admin.ModelAdmin):
                 'categories',
                 'profile_image',
                 'background_image',
+                'stripe_account_id',
+                'stripe_plan_id',
                 'payment_details'
             )
         }),

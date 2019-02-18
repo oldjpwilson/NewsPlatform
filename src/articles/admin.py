@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Article, ArticleView
+from .models import Article, ArticleView, Duration, Urgency
 from star_ratings.models import Rating
 
 
@@ -37,3 +37,5 @@ class ArticleAdmin(admin.ModelAdmin):
 
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(ArticleView)
+admin.site.register(Duration)
+admin.site.register(Urgency)
