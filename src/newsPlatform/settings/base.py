@@ -25,7 +25,8 @@ INSTALLED_APPS = [
 
     'articles',
     'categories',
-    'core'
+    'core',
+    'newsletter'
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,9 @@ EMAIL_BACKEND = config('EMAIL_BACKEND')
 STAR_RATINGS_RERATE = True
 STAR_RATINGS_RANGE = 10
 STAR_RATINGS_ANONYMOUS = False
+
+# Mailchimp
+
+MAILCHIMP_API_KEY = config('MAILCHIMP_API_KEY')
+MAILCHIMP_DATA_CENTER = config('MAILCHIMP_DATA_CENTER')
+MAILCHIMP_EMAIL_LIST_ID = config('MAILCHIMP_EMAIL_LIST_ID')

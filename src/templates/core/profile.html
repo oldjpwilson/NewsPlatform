@@ -14,7 +14,7 @@
         <li class="list-group-item"><a href="{% url 'my-profile' %}">Stats</a></li>
         <li class="list-group-item"><a href="{% url 'edit-my-account' %}">Account</a></li>
         <li class="list-group-item"><a href="{% url 'edit-profile-payment-details' %}">Credit cards</a></li>
-        <li class="list-group-item"><a href="#">Notifications</a></li>
+        <li class="list-group-item"><a href="{% url 'edit-email-preferences' %}">Notifications</a></li>
       </ul>
     </div>
 
@@ -119,6 +119,25 @@
 
     Custom stripe form
 
+    {% elif display == "edit_email_notifications" %}
+
+    <h3>My Email Preferences</h3>
+    <div style="display: inline-block;">
+    <form method="POST" action=".">
+        {% csrf_token %}
+        <div class="form-group">
+          {% if user.signup_set.first.subscribed %}
+          <p>Unsubscribe from specials, discounts and early course releases</p>
+          <button type="submit" name="unsubscribe" class="btn btn-outline-light">Unsubscribe</button>
+          {% else %}
+          <p>Subscribe for specials, discounts and other non-spammy notifications</p>
+          <input class="form-control mr-sm-2" placeholder="Your email" type="email" name="email">
+          <br />
+          <button type="submit" name="subscribe" class="btn btn-primary">Subscribe</button>
+          {% endif %}
+        </div>
+    </form>
+    </div>
     {% endif %}
 
   </div>

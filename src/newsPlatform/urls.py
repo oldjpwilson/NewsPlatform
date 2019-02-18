@@ -30,6 +30,8 @@ from core.views import (
     unsubscribe
 )
 
+from newsletter.views import profile_update_email_preferences
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -57,6 +59,9 @@ urlpatterns = [
     path('my-profile/edit-payment-details',
          profile_update_payment_details,
          name='edit-profile-payment-details'),
+    path('my-profile/edit-email-preferences/',
+         profile_update_email_preferences,
+         name='edit-email-preferences'),
 
     # channel views
     path('my-channel/', my_channel, name='my-channel'),
