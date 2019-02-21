@@ -18,8 +18,6 @@ class Profile(models.Model):
         User, on_delete=models.CASCADE, primary_key=True)
     # location_id = models.CharField() # TODO: geodjango?
     stripe_customer_id = models.CharField(max_length=40)
-    payment_details = models.CharField(
-        max_length=18)  # TODO: store with stripe
     subscriptions = models.ManyToManyField('Channel')
 
     def __str__(self):
@@ -41,9 +39,9 @@ class Channel(models.Model):
     rating = models.FloatField(default=0)
     stripe_account_id = models.CharField(max_length=40)
     stripe_plan_id = models.CharField(max_length=40)
-    payment_details = models.CharField(
-        max_length=18)  # TODO: store with stripe
     subscribers = models.ManyToManyField(Profile, blank=True)
+    # whether they've connected stripe
+    visible = models.BooleanField(default=False)
 
     objects = ChannelManager()
 
@@ -78,3 +76,27 @@ class Channel(models.Model):
     @property
     def categories_count(self):
         return self.categories.count()
+
+
+class Subscription(models.Model):
+    profile = models.OneToOneField(
+        Profile, on_delete=models.CASCADE, primary_key=True)
+    channel = models.OneToOneField(
+        Channel, on_delete=models.CASCADE)
+    stripe_subscription_id = models.CharField(max_length=50)
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+
+    def __str__(self):
+        return self.profile.user.username
+
+
+class Payout(models.Model):
+    channel = models.OneToOneField(Channel, on_delete=models.CASCADE)
+    amount = models.FloatField(default=0)
+    status = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def __str__(self):
+        return self.channel.name

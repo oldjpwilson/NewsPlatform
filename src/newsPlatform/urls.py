@@ -28,7 +28,9 @@ from core.views import (
     channel_public,
     subscribe,
     unsubscribe,
-    remove_credit_card
+    remove_credit_card,
+    StripeAuthorizeView,
+    StripeAuthorizeCallbackView
 )
 
 from newsletter.views import profile_update_email_preferences
@@ -48,10 +50,6 @@ urlpatterns = [
     path('articles/<id>/update/', article_update, name='article-update'),
     path('articles/<id>/delete/', article_delete, name='article-delete'),
 
-    # channel views
-    path('explore/', channel_list, name='channel-list'),
-    path('become-a-journalist/', channel_create, name='channel-create'),
-
     # profile views
     path('my-profile/', my_profile, name='my-profile'),
     path('my-profile/edit-account/',
@@ -68,6 +66,8 @@ urlpatterns = [
          name='remove-credit-card'),
 
     # channel views
+    path('explore/', channel_list, name='channel-list'),
+    path('become-a-journalist/', channel_create, name='channel-create'),
     path('my-channel/', my_channel, name='my-channel'),
     path('my-channel/stats/', channel_stats, name='channel-stats'),
     path('my-channel/edit-channel/', channel_update, name='edit-my-channel'),
@@ -79,6 +79,14 @@ urlpatterns = [
     path('subscribe/<name>/', subscribe, name='subscribe'),
     path('unsubscribe/<name>/', unsubscribe, name='unsubscribe'),
     path('search/', search, name='search'),
+
+    # stripe authorization views
+    path('stripe-authorize/',
+         StripeAuthorizeView.as_view(),
+         name='stripe-authorization'),
+    path('oauth/callback/',
+         StripeAuthorizeCallbackView.as_view(),
+         name='stripe-authorization-callback'),
 
     # package views
     re_path(r'^tinymce/', include('tinymce.urls')),

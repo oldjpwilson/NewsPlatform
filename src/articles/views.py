@@ -9,7 +9,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
 from core.helpers import paginate_queryset
 from core.models import Channel, Profile
-from core.views import check_user_is_journalist
+from core.views import check_user_is_journalist, check_channel_has_stripe_account
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView
@@ -177,10 +177,15 @@ def article_detail(request, id):
 @login_required
 @user_passes_test(check_user_is_journalist)
 def article_create(request):
+    channel = Channel.objects.get(user=request.user)
+    stripe_account = check_channel_has_stripe_account(channel)
+    if stripe_account is None:
+        messages.info(
+            request, "To start creating, connect a Stripe account to setup payments.")
+        return redirect(reverse("edit-channel-payment-details"))
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
-            channel = Channel.objects.get(user=request.user)
             form.instance.channel = channel
             form.save()
             return redirect(reverse('article-detail', kwargs={

@@ -1,13 +1,17 @@
+import requests
+import urllib
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404, reverse
+from django.views import View
 from star_ratings.models import Rating
 from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ChannelUpdateForm
-from .models import Profile, Channel
+from .models import Profile, Channel, Subscription
 from .helpers import (
     paginate_queryset,
     get_most_viewed_channel,
@@ -34,6 +38,12 @@ def check_user_is_journalist(user):
         return user.channel
     except:
         return redirect(reverse('my-profile'))
+
+
+def check_channel_has_stripe_account(channel):
+    if channel.stripe_account_id == '' or channel.stripe_account_id is None:
+        return None
+    return channel.stripe_account_id
 
 
 def check_channel_status(request):
@@ -139,7 +149,7 @@ def my_channel(request):
 
 
 def channel_list(request):
-    channels = Channel.objects.all()
+    channels = Channel.objects.filter(visible=True)
     queryset, page_request_var = paginate_queryset(request, channels)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
@@ -177,28 +187,7 @@ def channel_create(request):
         if form.is_valid():
             channel = form.instance
             channel.user = request.user
-
-            # here we create the journalist's stripe account
-            journalist_stripe_acc = stripe.Account.create(
-                type="standard",
-                email=request.user.email
-            )
-
-            plan = stripe.Plan.create(
-                id=f"monthly-membership-{journalist_stripe_acc['id']}",
-                amount=100,
-                interval="month",
-                currency="usd",
-                product={
-                    "name": f"{channel.name} membership"
-                },
-                stripe_account=journalist_stripe_acc['id'],
-            )
-
-            channel.stripe_account_id = journalist_stripe_acc['id']
-            channel.stripe_plan_id = plan['id']
             channel.save()
-
             return redirect(reverse('my-channel'))
     context = {
         'form': form,
@@ -268,33 +257,30 @@ def subscribe(request, name):
             request, "Please enter payment details to subscribe to a channel")
         return redirect(reverse("edit-profile-payment-details"))
 
-    # create a token because the customer is shared between multiple accounts
-    token = stripe.Token.create(
-        customer=profile.stripe_customer_id,
-        usage="reusable",
-        stripe_account=channel.stripe_account_id,
-    )
+    # create a customer to subscribe to the journalist
+    customer = stripe.Customer.retrieve(profile.stripe_customer_id)
 
-    customer = stripe.Customer.create(
-        description='Shared Customer',
-        source=token.id,
-        stripe_account=channel.stripe_account_id
-    )
-
+    # create the subscription to the journalists stripe account
     subscription = stripe.Subscription.create(
         customer=customer.id,
-        items=[
-            {
-                "plan": channel.stripe_plan_id,
-            },
-        ],
-        stripe_account=channel.stripe_account_id,
-        application_fee_percent=50
+        items=[{"plan": channel.stripe_plan_id}],
     )
+
+    # store the new stripe susbciption
+    sub = Subscription()
+    sub.profile = profile
+    sub.channel = channel
+    sub.stripe_subscription_id = subscription.id
+    sub.save()
+
+    # update the profile's subscriptions
     profile.subscriptions.add(channel)
     profile.save()
+
+    # update the channels subscribers
     channel.subscribers.add(profile)
     channel.save()
+
     return redirect(channel.get_absolute_url())
 
 
@@ -302,10 +288,24 @@ def subscribe(request, name):
 def unsubscribe(request, name):
     profile = get_object_or_404(Profile, user=request.user)
     channel = get_object_or_404(Channel, name=name)
+    subscription = get_object_or_404(Subscription, profile=profile)
+
+    # update the profile's subscriptions
     profile.subscriptions.remove(channel)
     profile.save()
+
+    # update the channels subscribers
     channel.subscribers.remove(profile)
     channel.save()
+
+    # update the stripe subscription
+    sub = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
+    sub.delete()
+
+    # update our record of stripe subscriptions
+    subscription.active = False
+    subscription.save()
+
     return redirect(channel.get_absolute_url())
 
 
@@ -315,3 +315,54 @@ def remove_credit_card(request, card_id):
     customer = stripe.Customer.retrieve(profile.stripe_customer_id)
     customer.sources.retrieve(card_id).delete()
     return redirect(reverse("edit-profile-payment-details"))
+
+
+class StripeAuthorizeView(LoginRequiredMixin, View):
+
+    def get(self, request):
+
+        url = 'https://connect.stripe.com/oauth/authorize'
+        params = {
+            'response_type': 'code',
+            'scope': 'read_write',
+            'client_id': settings.STRIPE_CONNECT_CLIENT_ID,
+            # 'redirect_uri': f'{settings.DOMAIN}/oauth/callback/' # TODO: can only test when live
+        }
+        url = f'{url}?{urllib.parse.urlencode(params)}'
+        return redirect(url)
+
+
+class StripeAuthorizeCallbackView(View):
+
+    def get(self, request):
+        code = request.GET.get('code')
+        if code:
+            data = {
+                'client_secret': settings.STRIPE_SECRET_KEY,
+                'grant_type': 'authorization_code',
+                'client_id': settings.STRIPE_CONNECT_CLIENT_ID,
+                'code': code
+            }
+            url = 'https://connect.stripe.com/oauth/token'
+            resp = requests.post(url, params=data)
+
+            channel = get_object_or_404(Channel, user=request.user)
+            # create the plan associated with the account
+            plan = stripe.Plan.create(
+                id=f"monthly-membership-{journalist_stripe_acc['id']}",
+                amount=100,  # 100 cents = $1
+                interval="month",
+                currency="usd",
+                product={
+                    "name": f"{channel.name} membership"
+                },
+                stripe_account=resp.json()['stripe_user_id']
+            )
+
+            channel.stripe_account_id = resp.json()['stripe_user_id']
+            channel.stripe_plan_id = plan['id']
+            channel.visible = True
+            channel.save()
+
+        response = redirect(reverse('edit-my-channel'))
+        return response

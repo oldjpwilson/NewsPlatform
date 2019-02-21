@@ -44,7 +44,7 @@
       <tbody>
       {% for channel in channel_list %}
         <tr>
-          <td>{{ channel.name }}</td>
+          <td><a href="{{ channel.get_absolute_url }}">{{ channel.name }}</a></td>
           <td>{{ channel.subscribers.count }}</td>
           <td>{{ channel.description }}</td>
         </tr>

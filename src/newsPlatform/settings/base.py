@@ -139,8 +139,6 @@ MAILCHIMP_API_KEY = config('MAILCHIMP_API_KEY')
 MAILCHIMP_DATA_CENTER = config('MAILCHIMP_DATA_CENTER')
 MAILCHIMP_EMAIL_LIST_ID = config('MAILCHIMP_EMAIL_LIST_ID')
 
-STRIPE_PUBLIC_KEY = ''
-
 # Percentage NewsPlatform takes for every subscription
 # Play with this number because Stripe takes a cut from their account account
 BUSINESS_PERCENTAGE_FEE = 50

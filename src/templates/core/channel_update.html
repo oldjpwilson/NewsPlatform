@@ -14,7 +14,6 @@
         <li class="list-group-item"><a href="{% url 'channel-stats' %}">Stats</a></li>
         <li class="list-group-item"><a href="{% url 'edit-my-channel' %}">Channel details</a></li>
         <li class="list-group-item"><a href="{% url 'edit-channel-payment-details' %}">Credit cards</a></li>
-        <li class="list-group-item"><a href="#">Notifications</a></li>
       </ul>
     </div>
   </div>
@@ -103,7 +102,8 @@
 
     {% elif display == 'edit_payment_details' %}
 
-    Custom stripe form
+    <h3>To start getting paid, connect to a stripe account</h3>
+    <a href="{% url 'stripe-authorization' %}" class="btn btn-primary">Connect Stripe Account</a>
 
     {% endif %}
 
