@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from articles.models import ArticleView
@@ -41,3 +43,18 @@ def get_most_viewed_article(channel):
     if qs.exists():
         return qs.order_by('-view_count')[0]
     return None
+
+
+def send_email(subject, full_name, message, email):
+    from_email = settings.EMAIL_HOST_USER
+    to_email = [email]
+    contact_message = "%s: %s via %s" % (
+        full_name,
+        message,
+        email
+    )
+    send_mail(subject,
+              contact_message,
+              from_email,
+              to_email,
+              fail_silently=True)

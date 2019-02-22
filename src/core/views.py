@@ -1,25 +1,29 @@
+from datetime import datetime, timedelta
+import os
 import requests
+import stripe
 import urllib
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.views import View
 from star_ratings.models import Rating
 from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ChannelUpdateForm
-from .models import Profile, Channel, Subscription
+from .models import Profile, Channel, Subscription, Payout
 from .helpers import (
     paginate_queryset,
     get_most_viewed_channel,
     get_highest_rated_article,
-    get_most_viewed_article
+    get_most_viewed_article,
+    send_email
 )
 
-import stripe
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
@@ -366,3 +370,58 @@ class StripeAuthorizeCallbackView(View):
 
         response = redirect(reverse('edit-my-channel'))
         return response
+
+
+def create_payouts(request, key):
+
+    # if key is not correct - don't create payments
+    if settings.PAYMENTS_KEY != key:
+        return HttpResponse(status=500)
+
+    first_DOM = datetime.now().replace(day=1)
+    lastend = first_DOM - timedelta(days=1)
+    last_DOM = lastend.replace(day=1)
+
+    channels = Channel.objects.all()
+    for channel in channels:
+        amount = 0
+        # get all subscriptions that started before 1 month ago
+        # - but only the ones that are still subscribed
+        recurring_subscriptions = Subscription.objects \
+            .filter(
+                channel=channel,
+                modified_at__lte=last_DOM
+            ).exclude(active=False)
+        amount = 0.5 * recurring_subscriptions.count()
+
+        # get subscriptions created in previous month
+        new_subscriptions = Subscription.objects \
+            .filter(
+                channel=channel,
+                modified_at__range=[last_DOM, first_DOM]
+            )
+
+        # update total amount to pay journalist
+        amount = amount + (0.5 * new_subscriptions.count())
+
+        # transfer from account to journalist account
+        stripe.Transfer.create(
+            amount=amount,
+            currency="usd",
+            destination=channel.stripe_account_id,
+            stripe_account='platform-stripe-account'
+        )
+
+        # record it on our side
+        payout = Payout(channel=channel, amount=amount)
+        payout.save()
+
+        # send email to journalist saying they've been paid
+        send_email(
+            "Newsplatform Monthly Payout Receiver",
+            channel.name,
+            f"We've just sent a payout of {amount} to your Stripe account",
+            channel.user.email
+        )
+
+        return HttpResponse(status=200)

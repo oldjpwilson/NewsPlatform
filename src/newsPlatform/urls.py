@@ -30,7 +30,8 @@ from core.views import (
     unsubscribe,
     remove_credit_card,
     StripeAuthorizeView,
-    StripeAuthorizeCallbackView
+    StripeAuthorizeCallbackView,
+    create_payouts
 )
 
 from newsletter.views import profile_update_email_preferences
@@ -87,6 +88,9 @@ urlpatterns = [
     path('oauth/callback/',
          StripeAuthorizeCallbackView.as_view(),
          name='stripe-authorization-callback'),
+
+    # stripe payout view
+    path('create-payouts/<key>/', create_payouts, name='create-payouts'),
 
     # package views
     re_path(r'^tinymce/', include('tinymce.urls')),
