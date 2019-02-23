@@ -29,36 +29,6 @@
           </form>
         </div>
       </div>
-    
-      {% comment %} <div class="row">
-        {% for article in queryset %}
-          <div class="col-4">
-            <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
-            <div class="shadow">
-              <div>
-                <img class="img-fluid" src="{{ article.thumbnail.url }}" alt="article-image">
-              </div>
-              <div class="media box" style="margin-bottom: 50px;">
-                <img style="width: 50px;" src="{{ article.channel.profile_image.url }}" class="mr-3" alt="profile-image">
-                <div class="media-body">
-                  <h4 class="mt-0">{{ article.title }}</h4>
-                  <h6>{{ article.channel.name }}</h6>
-                  {{ article.description|truncatechars:80 }}
-                  <br />
-                  <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
-                  <br />
-                  {% if article.get_rating.count > 0 %}
-                  <small>Rating: {{ article.get_rating.average|floatformat:"2" }}/10</small>
-                  {% else %}
-                  No ratings
-                  {% endif %}
-                </div>
-              </div>
-            </a>
-            </div>
-          </div>
-        {% endfor %}
-      </div> {% endcomment %}
 
       <div class="row">
         {% for article in queryset %}
@@ -67,6 +37,7 @@
                 <div class="ht-tm-element card">
                 <img class="card-img-top" src="{{ article.thumbnail.url }}" style="max-height: 154.36px;" alt="Article thumbnail">
                 <div class="card-body">
+                    <a href="{{ article.channel.get_absolute_url }}"><h3>{{ article.channel.name }}</h3></a>
                     <h4 class="card-title">{{ article.title }}</h4>
                     <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
                     <br />

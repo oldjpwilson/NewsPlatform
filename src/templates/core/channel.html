@@ -32,7 +32,7 @@
                 <td><a href="{{ article.get_absolute_url }}">{{ article.title }}</a></td>
                 <td>{{ article.published_date }}</td>
                 <td>{{ article.view_count }}</td>
-                {% if article.get_rating.count < 1 %}
+                {% if article.get_rating.count < 1 or article.get_rating != None %}
                     <td>No ratings yet</td>
                 {% else %}
                     <td>{{ article.get_rating.average|floatformat:"2" }}</td>
@@ -68,10 +68,6 @@
                 <tr>
                     <td>Subscriber count</td>
                     <td>{{ channel.subscribers.count }}</td>
-                </tr>
-                <tr>
-                    <td>Subscriber change from last month</td>
-                    <td>(WIP)</td>
                 </tr>
                 <tr>
                     <td>Total monthly income</td>

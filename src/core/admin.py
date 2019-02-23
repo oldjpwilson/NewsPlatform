@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib import admin
-from .models import Channel, Profile, User
+from .models import Channel, Profile, User, Subscription, Payout
 
 
 class ProfileAdmin(admin.ModelAdmin):
@@ -34,7 +34,8 @@ class ChannelAdmin(admin.ModelAdmin):
                 'profile_image',
                 'background_image',
                 'stripe_account_id',
-                'stripe_plan_id'
+                'stripe_plan_id',
+                'visible'
             )
         }),
     )
@@ -62,7 +63,42 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
 
 
+class SubscriptionAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (
+                'channel',
+                'profile',
+                'stripe_subscription_id',
+                'active'
+            )
+        }),
+    )
+    list_display = ['channel', 'profile', 'active']
+    list_display_links = ('channel', 'profile')
+    list_filter = ('active', )
+    search_fields = ('channel', 'profile', 'stripe_subscription_id')
+    ordering = ('created_at',)
+
+
+class PayoutAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (
+                'channel',
+                'amount'
+            )
+        }),
+    )
+    list_display = ['channel', 'amount']
+    list_display_links = ('channel', )
+    search_fields = ('channel', )
+    ordering = ('created_at',)
+
+
 admin.site.register(Channel, ChannelAdmin)
 admin.site.register(Profile, ProfileAdmin)
 admin.site.register(User, UserAdmin)
+admin.site.register(Payout, PayoutAdmin)
+admin.site.register(Subscription, SubscriptionAdmin)
 admin.site.unregister(Group)

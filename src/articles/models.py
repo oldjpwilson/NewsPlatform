@@ -37,7 +37,7 @@ class Article(models.Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
     thumbnail = models.ImageField(blank=True, null=True)
-    media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES)
+    media_type = models.CharField(max_length=40, choices=MEDIA_CHOICES)
     published_date = models.DateTimeField(auto_now_add=True)
     last_edit_date = models.DateTimeField(auto_now=True)
     categories = models.ManyToManyField(Category)

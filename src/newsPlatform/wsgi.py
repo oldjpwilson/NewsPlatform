@@ -1,11 +1,11 @@
 import os
-from django.conf import settings
+from decouple import config
 from django.core.wsgi import get_wsgi_application
 
+DEBUG = config('DEBUG')
 settings_module = 'newsPlatform.settings.production'
-if settings.DEBUG:
+if DEBUG is True:
     settings_module = 'newsPlatform.settings.development'
-
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 

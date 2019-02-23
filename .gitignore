@@ -1,8 +1,6 @@
 env
 __pycache__
-migrations
 **/*.pyc
-src/static_in_env
-media_root
-static_root
-src/billing
+migrations
+src/media_root
+src/static_root

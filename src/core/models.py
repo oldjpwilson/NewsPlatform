@@ -46,7 +46,7 @@ class Channel(models.Model):
     objects = ChannelManager()
 
     def __str__(self):
-        return self.user.username
+        return self.name
 
     def get_absolute_url(self):
         return reverse('channel-public', kwargs={
@@ -79,24 +79,25 @@ class Channel(models.Model):
 
 
 class Subscription(models.Model):
-    profile = models.OneToOneField(
-        Profile, on_delete=models.CASCADE, primary_key=True)
-    channel = models.OneToOneField(
+    id = models.BigIntegerField(primary_key=True)
+    profile = models.ForeignKey(
+        Profile, on_delete=models.CASCADE)
+    channel = models.ForeignKey(
         Channel, on_delete=models.CASCADE)
     stripe_subscription_id = models.CharField(max_length=50)
     active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.profile.user.username
 
 
 class Payout(models.Model):
-    channel = models.OneToOneField(Channel, on_delete=models.CASCADE)
+    channel = models.ForeignKey(
+        Channel, on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
-    status = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.channel.name

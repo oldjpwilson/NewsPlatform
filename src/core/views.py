@@ -351,7 +351,6 @@ class StripeAuthorizeCallbackView(View):
             resp = requests.post(url, params=data)
 
             channel = get_object_or_404(Channel, user=request.user)
-            # create the plan associated with the account
             plan = stripe.Plan.create(
                 id=f"monthly-membership-{journalist_stripe_acc['id']}",
                 amount=100,  # 100 cents = $1
@@ -359,8 +358,7 @@ class StripeAuthorizeCallbackView(View):
                 currency="usd",
                 product={
                     "name": f"{channel.name} membership"
-                },
-                stripe_account=resp.json()['stripe_user_id']
+                }
             )
 
             channel.stripe_account_id = resp.json()['stripe_user_id']
@@ -373,55 +371,69 @@ class StripeAuthorizeCallbackView(View):
 
 
 def create_payouts(request, key):
+    '''
+    The payouts calculated in this function return the amount earned in the previous month.
+    For example if todays date is the 14th February 2019, the calculated payout is for the period
+    between 1 January 2019 and 1 February 2019
+    '''
 
     # if key is not correct - don't create payments
     if settings.PAYMENTS_KEY != key:
         return HttpResponse(status=500)
 
-    first_DOM = datetime.now().replace(day=1)
-    lastend = first_DOM - timedelta(days=1)
-    last_DOM = lastend.replace(day=1)
+    try:
+        first_day_of_current_month = datetime.now().replace(day=1)
+        last_day_of_previous_month = first_day_of_current_month - \
+            timedelta(days=1)
+        first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
 
-    channels = Channel.objects.all()
-    for channel in channels:
-        amount = 0
-        # get all subscriptions that started before 1 month ago
-        # - but only the ones that are still subscribed
-        recurring_subscriptions = Subscription.objects \
-            .filter(
-                channel=channel,
-                modified_at__lte=last_DOM
-            ).exclude(active=False)
-        amount = 0.5 * recurring_subscriptions.count()
+        channels = Channel.objects.all()
 
-        # get subscriptions created in previous month
-        new_subscriptions = Subscription.objects \
-            .filter(
-                channel=channel,
-                modified_at__range=[last_DOM, first_DOM]
-            )
+        for channel in channels:
+            amount = 0
+            # get all subscriptions that started before 1 month ago
+            # - but only the ones that are still subscribed
 
-        # update total amount to pay journalist
-        amount = amount + (0.5 * new_subscriptions.count())
+            recurring_subscriptions = Subscription.objects \
+                .filter(
+                    channel=channel,
+                    modified_at__lte=first_day_of_previous_month
+                ).exclude(active=False)
 
-        # transfer from account to journalist account
-        stripe.Transfer.create(
-            amount=amount,
-            currency="usd",
-            destination=channel.stripe_account_id,
-            stripe_account='platform-stripe-account'
-        )
+            # get subscriptions created in previous month
+            new_subscriptions = Subscription.objects \
+                .filter(
+                    channel=channel,
+                    modified_at__range=[
+                        first_day_of_previous_month, first_day_of_current_month]
+                )
 
-        # record it on our side
-        payout = Payout(channel=channel, amount=amount)
-        payout.save()
+            # update total amount to pay journalist
+            # stripe requires an integer
+            amount += int(0.5 * (recurring_subscriptions.count() +
+                                 new_subscriptions.count()) // 1)
 
-        # send email to journalist saying they've been paid
-        send_email(
-            "Newsplatform Monthly Payout Receiver",
-            channel.name,
-            f"We've just sent a payout of {amount} to your Stripe account",
-            channel.user.email
-        )
+            if amount > 0:
+                # transfer from account to journalist account
+                stripe.Transfer.create(
+                    amount=amount * 100,  # this value is in cents
+                    currency="usd",
+                    destination=channel.stripe_account_id
+                )
 
-        return HttpResponse(status=200)
+                # record it on our side
+                payout = Payout(channel=channel, amount=amount)
+                payout.save()
+
+                # send email to journalist saying they've been paid
+                send_email(
+                    "Newsplatform Monthly Payout Receiver",
+                    channel.name,
+                    f"We've just sent a payout of {amount} to your Stripe account",
+                    channel.user.email
+                )
+
+        # make sure this is outside the forloop
+        return HttpResponse(status=201)
+    except:
+        return HttpResponse(status=500)
