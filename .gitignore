@@ -1,6 +1,5 @@
 env
 __pycache__
 **/*.pyc
-migrations
 src/media_root
 src/static_root

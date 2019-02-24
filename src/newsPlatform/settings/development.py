@@ -10,7 +10,7 @@ INSTALLED_APPS += [
 
 MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
 
-# DEBUG TOOLBAR SETTINGS
+# Debug toolbar
 
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.versions.VersionsPanel',
@@ -44,9 +44,23 @@ DATABASES = {
     }
 }
 
-STRIPE_PUBLIC_KEY = 'pk_test_yvNsCGcWsZwGtj66YNA8lpip'
-STRIPE_SECRET_KEY = 'sk_test_UST3EtJfUKd1GcvR1YrBH3RM'
-STRIPE_CONNECT_CLIENT_ID = 'ca_EZbadnfmquQd3PcD8LdkIhIHbgSy0yqO'
+# Static files (CSS, JavaScript, Images)
+
+STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, "static_root")
+MEDIA_ROOT = os.path.join(BASE_DIR, "media_root")
+
+# Stripe
+
+STRIPE_PUBLIC_KEY = ''
+STRIPE_SECRET_KEY = ''
+STRIPE_CONNECT_CLIENT_ID = ''
+
+# STRIPE_PUBLIC_KEY = 'pk_test_yvNsCGcWsZwGtj66YNA8lpip'
+# STRIPE_SECRET_KEY = 'sk_test_UST3EtJfUKd1GcvR1YrBH3RM'
+# STRIPE_CONNECT_CLIENT_ID = 'ca_EZbadnfmquQd3PcD8LdkIhIHbgSy0yqO'
 
 DOMAIN = 'http://127.0.0.1:8000'
 PAYMENTS_KEY = '123'

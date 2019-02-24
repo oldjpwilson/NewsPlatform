@@ -79,7 +79,6 @@ class Channel(models.Model):
 
 
 class Subscription(models.Model):
-    id = models.BigIntegerField(primary_key=True)
     profile = models.ForeignKey(
         Profile, on_delete=models.CASCADE)
     channel = models.ForeignKey(

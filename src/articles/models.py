@@ -18,14 +18,14 @@ MEDIA_CHOICES = (
 
 
 class Duration(models.Model):
-    type = models.CharField(max_length=30)
+    type = models.CharField(max_length=80)
 
     def __str__(self):
         return self.type
 
 
 class Urgency(models.Model):
-    type = models.CharField(max_length=30)
+    type = models.CharField(max_length=80)
 
     def __str__(self):
         return self.type
