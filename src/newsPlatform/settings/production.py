@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['src-prod.us-west-2.elasticbeanstalk.com',
                  'www.your-website.com']
 WSGI_APPLICATION = 'newsPlatform.wsgi.application'
@@ -65,5 +65,4 @@ STRIPE_CONNECT_CLIENT_ID = config('STRIPE_LIVE_CONNECT_CLIENT_ID')
 # Other
 
 DOMAIN = config('DOMAIN')
-BUSINESS_PERCENTAGE_FEE = config('BUSINESS_PERCENTAGE_FEE')
 PAYMENTS_KEY = config('PAYMENTS_KEY')

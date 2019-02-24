@@ -20,9 +20,7 @@ for an account and sign in below:{% endblocktrans %}</p>
 
 <div class="socialaccount_ballot">
 
-  {% comment %} <ul class="socialaccount_providers"> {% endcomment %}
-    {% include "socialaccount/snippets/provider_list.html" with process="login" %}
-  {% comment %} </ul> {% endcomment %}
+  {% include "socialaccount/snippets/provider_list.html" with process="login" %}
 
   <div class="login-or">{% trans 'or' %}</div>
 
