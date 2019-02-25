@@ -55,9 +55,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media_root")
 # Stripe
 
 # TODO: use newsplatform keys
-STRIPE_PUBLIC_KEY = ''
-STRIPE_SECRET_KEY = ''
-STRIPE_CONNECT_CLIENT_ID = ''
+STRIPE_PUBLIC_KEY = 'pk_test_fIPmHO5lxk4fFRiahVdem0oF'
+STRIPE_SECRET_KEY = 'sk_test_OrQwuL57Skdcm6SvowLXjxmj'
+STRIPE_CONNECT_CLIENT_ID = 'ca_EYEi6y2Pwsy9QOzceGEkVynyaTlLNMk9'
 
 DOMAIN = 'http://127.0.0.1:8000'
 PAYMENTS_KEY = config('PAYMENTS_KEY')
