@@ -7,4 +7,4 @@ class Command(BaseCommand):
         User = get_user_model()
         if not User.objects.filter(username="admin").exists():
             User.objects.create_superuser(
-                "admin", "newsplatform@gmail.com", "S6F#u2#2mJG8[C&W")
+                "admin", "admin@newsplatform.org", "S6F#u2#2mJG8[C&W")
