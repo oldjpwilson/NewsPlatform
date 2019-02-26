@@ -85,7 +85,7 @@ urlpatterns = [
     path('stripe-authorize/',
          StripeAuthorizeView.as_view(),
          name='stripe-authorization'),
-    path('oauth/callback/',
+    path('stripe/callback/',
          StripeAuthorizeCallbackView.as_view(),
          name='stripe-authorization-callback'),
 
