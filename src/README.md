@@ -6,13 +6,14 @@ Notes on the project
 
 1. Install dependencies with `pip install -r requirements.txt`
 2. Run migrations with `python manage.py migrate`
-3. Run the server
 
-### Settings
+In this repository, the dev branch is used for working on localhost. To run the server for development use: `python manage.py runserver --settings=newsPlatform.settings.development`. The admin user password is `newsplatform`.
+
+## Settings
 
 There are three settings in the projects root folder: **newsPlatform**. One for base settings. One for development (localhost) and one for production (live)
 
-### Apps
+## Apps
 
 There are currently four apps:
 
@@ -78,3 +79,7 @@ Lambda is a serverless service. You pay for when the code is actually executed. 
 The purpose of the lambda script is to call the create payouts view on the server. It is scheduled for the 15th day of each of month at 9:00 AM (UTC). To setup a script follow [this tutorial](https://docs.aws.amazon.com/lambda/latest/dg/with-scheduledevents-example.html).
 
 In the lambda console is a scheduled job created with Python. The cron settings for the scheduled event are `cron(0 9 15 * ? *)`. There are measures in place to check if an error occurs when calling the function - if there is an error an email is sent out to those on the subscriber list.
+
+## Domain management
+
+DNS records were changed from the domain account manager to AWS and can be managed in the Route53 console.

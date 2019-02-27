@@ -17,6 +17,9 @@ from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ChannelUpdateForm
 from .models import Profile, Channel, Subscription, Payout
 from .helpers import (
+    get_profile_current_billing_total,
+    get_channel_current_billing_revenue,
+    get_channel_alltime_billing_revenue,
     paginate_queryset,
     get_most_viewed_channel,
     get_highest_rated_article,
@@ -66,6 +69,7 @@ def my_profile(request):
     sub_count = profile.subscriptions.count()
     total_article_views = ArticleView.objects.filter(user=request.user).count()
     most_viewed_channel = get_most_viewed_channel(request.user)
+    current_monthly_billing_total = get_profile_current_billing_total(profile)
     context = {
         'profile': profile,
         'queryset': queryset,
@@ -74,6 +78,7 @@ def my_profile(request):
         'total_article_views': total_article_views,
         'most_viewed_channel': most_viewed_channel,
         'display': 'stats',
+        'current_monthly_billing_total': current_monthly_billing_total,
         'page_request_var': page_request_var
     }
     return render(request, 'core/profile.html', context)
@@ -142,12 +147,16 @@ def my_channel(request):
     highest_rated_article = get_highest_rated_article(channel)
     most_viewed_article = get_most_viewed_article(channel)
     queryset, page_request_var = paginate_queryset(request, articles)
+    current_billing_revenue = get_channel_current_billing_revenue(channel)
+    alltime_billing_revenue = get_channel_alltime_billing_revenue(channel)
     context = {
         'channel': channel,
         'queryset': queryset,
         'highest_rated_article': highest_rated_article,
         'most_viewed_article': most_viewed_article,
-        'page_request_var': page_request_var
+        'page_request_var': page_request_var,
+        'current_billing_revenue': current_billing_revenue,
+        'alltime_billing_revenue': alltime_billing_revenue
     }
     return render(request, 'core/channel.html', context)
 
@@ -409,9 +418,8 @@ def create_payouts(request, key):
                 )
 
             # update total amount to pay journalist
-            # stripe requires an integer
-            amount += int(0.5 * (recurring_subscriptions.count() +
-                                 new_subscriptions.count()) // 1)
+            amount += 0.5 * (recurring_subscriptions.count() +
+                             new_subscriptions.count())
 
             if amount > 0:
                 # transfer from account to journalist account

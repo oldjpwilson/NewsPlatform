@@ -69,14 +69,16 @@
                     <td>Subscriber count</td>
                     <td>{{ channel.subscribers.count }}</td>
                 </tr>
+                {% if channel.visible %}
                 <tr>
-                    <td>Total monthly income</td>
-                    <td>(WIP)</td>
+                    <td>Current months income</td>
+                    <td>${{ current_billing_revenue }}</td>
                 </tr>
                 <tr>
-                    <td>Total all-time income</td>
-                    <td>(WIP)</td>
+                    <td>All-time income</td>
+                    <td>${{ alltime_billing_revenue }}</td>
                 </tr>
+                {% endif %}
                 {% if most_viewed_article != None %}
                 <tr>
                     <td>Most viewed article</td>

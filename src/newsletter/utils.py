@@ -68,7 +68,6 @@ class Mailchimp(object):
                           auth=("", MAILCHIMP_API_KEY),
                           data=json.dumps(data)
                           )
-        print(r.json())
         return r.status_code, r.json()
 
     def check_valid_status(self, status):

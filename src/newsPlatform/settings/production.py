@@ -1,7 +1,8 @@
 from .base import *
 
 DEBUG = False
-ALLOWED_HOSTS = ['src-prod.us-west-2.elasticbeanstalk.com', config('DOMAIN')]
+ALLOWED_HOSTS = ['src-prod.us-west-2.elasticbeanstalk.com',
+                 'newsplatform.org', 'www.newsplatform.org']
 WSGI_APPLICATION = 'newsPlatform.wsgi.application'
 
 AUTH_PASSWORD_VALIDATORS = [
