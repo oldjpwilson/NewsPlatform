@@ -10,6 +10,7 @@ from core.forms import LoginForm
 from core.helpers import paginate_queryset
 from core.models import Channel, Profile
 from core.views import check_user_is_journalist, check_channel_has_stripe_account
+from categories.models import Category
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView
@@ -91,6 +92,7 @@ def home(request):
         return redirect(reverse('article-list'))
     articles = Article.objects.get_highest_rated(3)
     channels = Channel.objects.get_highest_rated(3)
+    categories = Category.objects.all()
 
     next = request.GET.get('next')
     form = LoginForm(request.POST or None)
@@ -107,6 +109,7 @@ def home(request):
     context = {
         'article_list': articles,
         'channel_list': channels,
+        'categories': categories,
         'form': form
     }
     return render(request, 'nav/home.html', context)
@@ -153,16 +156,17 @@ def article_detail(request, id):
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
     article = get_object_or_404(Article, id=id)
-    article_view, created = ArticleView.objects.get_or_create(
-        article=article, user=request.user)
-    if created:
-        article.view_count = article.view_count + 1
-        article.save()
+
     # handle if the visitor is subscribed
     visitor_profile = get_object_or_404(Profile, user=request.user)
     subscribed = False
     if visitor_profile in article.channel.subscribers.all():
         subscribed = True
+        article_view, created = ArticleView.objects.get_or_create(
+            article=article, user=request.user)
+        if created:
+            article.view_count = article.view_count + 1
+            article.save()
 
     context = {
         'article': article,
