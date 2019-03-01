@@ -9,6 +9,8 @@ Notes on the project
 
 In this repository, the dev branch is used for working on localhost. To run the server for development use: `python manage.py runserver --settings=newsPlatform.settings.development`. The admin user password is `newsplatform`.
 
+**IMPORTANT** - when working in development it's important to use the settings argument: `--settings=newsPlatform.settings.development` in every `python manage.py` command.
+
 ## Settings
 
 There are three settings in the projects root folder: **newsPlatform**. One for base settings. One for development (localhost) and one for production (live)
@@ -82,4 +84,16 @@ In the lambda console is a scheduled job created with Python. The cron settings 
 
 ## Domain management
 
-DNS records were changed from the domain account manager to AWS and can be managed in the Route53 console.
+DNS records were changed from the domain account manager to AWS and can be managed in the Route53 console. This also means the email host provider (Domain.com in this case) has to have an MX Record linked to its DNS so that mails sent to the AWS name servers are rerouted to the email host.
+
+## SSL
+
+[This Namecheap article](https://www.namecheap.com/support/knowledgebase/article.aspx/467/67/how-to-generate-csr-certificate-signing-request-code) provides a very clear article on creating a CSR needed for accessing your SSL. In this case, because I work on a Mac I used the [Apache OpenSSL/ModSSL/Nginx/Heroku](https://www.namecheap.com/support/knowledgebase/article.aspx/9446/14/generating-csr-on-apache--opensslmodsslnginx--heroku) link.
+
+Place the generated SSL files inside the project root directory. In a terminal run the following command to upload the SSL certificate to AWS:
+
+```
+aws iam upload-server-certificate --server-certificate-name NewsPlatformCertificate --certificate-body file://newsplatform_org.crt --certificate-chain file://newsplatform_org.ca-bundle --private-key file://server.key
+```
+
+Now we need to terminate our load balancer from Http to Https within the configuration settings of our elastic beanstalk environment. Click to _modify_ the Load Balancer and then add a new listener on port 443 with Https that uses our created Certificate. Make sure in the command line you are using the right environment otherwise the certificate will not show up. Use `eb use src-prod --region=us-west-2` to change to our defined environment.

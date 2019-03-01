@@ -3,6 +3,3 @@ __pycache__
 **/*.pyc
 src/media_root
 src/static_root
-server.key
-server.csr
-server.pass.key
