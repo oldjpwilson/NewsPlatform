@@ -15,6 +15,10 @@ from articles.views import (
     article_delete
 )
 
+from categories.views import (
+    category_detail
+)
+
 from core.views import (
     my_profile,
     my_channel,
@@ -50,6 +54,9 @@ urlpatterns = [
     path('create/', article_create, name='article-create'),
     path('articles/<id>/update/', article_update, name='article-update'),
     path('articles/<id>/delete/', article_delete, name='article-delete'),
+
+    # category views
+    path('categories/<name>/', category_detail, name='category-detail'),
 
     # profile views
     path('my-profile/', my_profile, name='my-profile'),

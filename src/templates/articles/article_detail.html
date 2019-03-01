@@ -3,9 +3,9 @@
 {% load ratings %}
 
 {% block content %}
-
+<main role="main" class="container">
   <div class="row mt-5">
-    <div class="col-9">
+    <div class="col-md-8">
       {% if visitor_is_subscribed or request.user == article.channel.user %}
 
         <h2>{{ article.title }}</h2>
@@ -31,5 +31,5 @@
 
     {% include 'articles/article_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
   </div>
-
+</main>
 {% endblock content %}

@@ -1,45 +1,40 @@
-<div class="col-3" style="margin-top: 50px;">
-    <ul class="list-group">
-    <li class="list-group-item active">Today's popular articles</li>
-    {% for article in most_viewed %}
-    <a href="{{ article.get_absolute_url }}">
-        <li class="list-group-item">
-        {{ article.title }}
-        <span style="float: right;">{{ article.view_count }} views</span>
-        </li>
-    </a>
-    {% empty %}
-        Not enough articles yet
+<aside class="col-md-4 blog-sidebar">
+    <div class="p-3 mb-3 bg-light rounded">
+    <h4 class="font-italic">Popular categories today</h4>
+    {% for cat in cats %}
+    <a href="#" class="tag badge badge-secondary">#{{ cat.categories__name }} ({{ cat.cat_count }})</a>
     {% endfor %}
-    </ul>
-
-    <hr />
-
-    <ul class="list-group">
-    <li class="list-group-item active">Today's latest articles</li>
-    {% for article in most_recent %}
-    <a href="{{ article.get_absolute_url }}">
-        <li class="list-group-item">
-        {{ article.title }}
-        <span style="float: right;">{{ article.view_count }} views</span>
-        </li>
-    </a>
-    {% empty %}
-        Not enough articles yet
-    {% endfor %}
-    </ul>
-
-    <hr />
-
-    <div class="card">
-    <div class="card-header">
-        Today's popular categories
     </div>
-    <div class="post-tags" style="padding: 3px;">
-        {% for cat in cats %}
-        <a href="#" class="tag badge badge-secondary">#{{ cat.categories__name }} ({{ cat.cat_count }})</a>
+
+    <div class="p-3">
+    <h4 class="font-italic">Latest today</h4>
+    <ol class="list-unstyled mb-0">
+        {% for article in most_recent %}
+        <a href="{{ article.get_absolute_url }}">
+            <li>
+            {{ article.title }}
+            <span style="float: right;">{{ article.view_count }} views</span>
+            </li>
+        </a>
+        {% empty %}
+            Not enough articles yet
         {% endfor %}
-    </div>
+    </ol>
     </div>
 
-</div>
+    <div class="p-3">
+    <h4 class="font-italic">Most viewed today</h4>
+    <ol class="list-unstyled mb-0">
+        {% for article in most_viewed %}
+        <a href="{{ article.get_absolute_url }}">
+            <li>
+            {{ article.title }}
+            <span style="float: right;">{{ article.view_count }} views</span>
+            </li>
+        </a>
+        {% empty %}
+            Not enough articles yet
+        {% endfor %}
+    </ol>
+    </div>
+</aside>

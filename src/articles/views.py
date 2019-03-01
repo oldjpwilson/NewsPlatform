@@ -138,7 +138,9 @@ def article_list(request):
 
     # let user see only articles of subscribed channels
     final_articles = [a for a in articles if a.channel in subscriptions]
+    print(final_articles)
     queryset, page_request_var = paginate_queryset(request, final_articles)
+
     context = {
         'queryset': queryset,
         'page_request_var': page_request_var,

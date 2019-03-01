@@ -22,7 +22,7 @@
       <div class="navbar">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-          <a class="text-muted" href="{% url 'channel-list' %}">Explore</a>
+          <a class="text-muted mr-2" href="{% url 'channel-list' %}">Explore</a>
           </li>
           <li class="nav-item mr-2">
           {% if request.user.channel %}
@@ -52,3 +52,18 @@
     </div>
   </nav>
 </header>
+
+<div class="nav-scroller py-1 mb-2">
+  <nav class="nav d-flex justify-content-between">
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Sport' %}">Sport</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Tech' %}">Tech</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Lifestyle' %}">Lifestyle</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Entertainment' %}">Entertainment</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Historical' %}">Historical</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Political' %}">Political</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Religious' %}">Religious</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Humour' %}">Humour</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Arts' %}">Arts</a>
+    <a class="p-2 text-muted" href="{% url 'category-detail' 'Education' %}">Education</a>
+  </nav>
+</div>

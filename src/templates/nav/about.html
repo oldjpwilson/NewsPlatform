@@ -7,7 +7,7 @@
   <div class="container">
       <h2>Welcome to NewsPlatform!</h2>
       <span class="lead">Linking the public to affordable, ad-free news from a continuously growing choice of 
-      journalists on a continuously growing change of topics.</span>
+      journalists on a continuously growing range of topics.</span>
 
       <div class="mt-4">
         <p>Subscribe to news at $0.50 per channel, per month</p>
@@ -21,7 +21,7 @@
 {% block content %}
 
   <div class="row" style="margin: 10px;">
-    <div class="col-8">
+    <div class="col-12">
       <h2>Users</h2>
       <p>Find channels that report on news that you find important. only want a daily roundup of
        world news? there will be a channel for exactly that (or many). have many interests? 
@@ -32,7 +32,7 @@
       <h2>Journalists</h2>
       <p>Do you have a smart phone, and interest in current affairs or any unique body 
       of knowledge? why not get paid to share your information. for every subscruber, 
-      you earn $ 0.25. unlike youtube, you will know exactly how much you will earn, 
+      you earn $0.25. unlike youtube, you will know exactly how much you will earn, 
       and your number of subscribers is linked directly with the quality of your reporting. 
       join the most revolutionary platform in the history of news. 
       journalists get paid by their subscribers, and there is no network/ 
@@ -41,17 +41,6 @@
       everyone wins. there is zero signup cost to start. just make a profile and 
       make high quality content and see if people want to subscribe to what you report on</p>
   </div>
-
-  <div class="col-4">
-    <h2>Login</h2>
-    <form method="POST" action=".">
-      {% csrf_token %}
-      {{ form|crispy }}
-      <button type="submit" class="btn btn-primary">Login</button>
-      <a href="{% url 'account_signup' %}">signup</a>
-    </form>
-  </div>
-
 </div>
 
 

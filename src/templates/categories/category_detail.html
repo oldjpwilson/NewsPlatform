@@ -6,11 +6,8 @@
   <div class="row">
 
     <div class="col-md-8 blog-main">
-      {% for channel in queryset %}
-        <a class="text-muted" href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a>
-
-        <div class="row">
-          {% for article in channel.get_latest_articles %}
+      <div class="row">
+        {% for article in queryset %}
           <div class="col-md-6">
             <div class="mt-2">
                 <div class="card">
@@ -34,12 +31,10 @@
                 </div>
             </div>
           </div>
-          {% empty %}
-          <h3>You do not have any subscriptions. <a href="{% url 'channel-list' %}" class="text-muted">Explore some channels now</a></p>
-          {% endfor %}
-        </div>
-
-      {% endfor %}
+        {% empty %}
+          <h3>There are no articles for this category yet.</p>
+        {% endfor %}
+      </div>
 
       <div class="row mt-5">
         {% include "nav/paginator.html" with queryset=queryset page_request_var=page_request_var %}
