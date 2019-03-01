@@ -2,44 +2,34 @@
 
 {% block content %}
 
-  <div class="row" style="margin: 10px;">
-    <div class="col-9">
+<main role="main" class="container">
+  <div class="row">
+
+    <div class="col-md-8 blog-main">
       {% for channel in queryset %}
-        <a href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a>
-        {% comment %} <div class="row">
-          {% for article in channel.get_latest_articles %}
-            <div class="col-3">
-              <a style="text-decoration: none; color: #212529;" href="{{ article.get_absolute_url }}">
-              <div class="shadow">
-                <div>
-                  <img class="img-fluid" src="{{ article.thumbnail.url }}" alt="article-image">
-                </div>
-                <div class="media box" style="margin-bottom: 50px;">
-                  <img style="width: 50px;" src="{{ article.channel.profile_image.url }}" class="mr-3" alt="profile-image">
-                  <div class="media-body">
-                    <h4 class="mt-0">{{ article.title }}</h4>
-                    {{ article.description|truncatechars:80 }}
-                    <br />
-                    <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
-                  </div>
-                </div>
-              </a>
-              </div>
-            </div>
-          {% endfor %}
-        </div> {% endcomment %}
+        <p class="text-muted"><a href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a></p>
 
         <div class="row">
           {% for article in channel.get_latest_articles %}
-          <div class="col-sm">
+          <div class="col-md-6">
               <div class="ht-tm-codeblock mt-2">
                   <div class="ht-tm-element card">
                   <img class="card-img-top" src="{{ article.thumbnail.url }}" style="max-height: 154.36px;" alt="Article thumbnail">
                   <div class="card-body">
-                      <h4 class="card-title">{{ article.title }}</h4>
-                      <small>{{ article.view_count }} views • {{ article.published_date|timesince }} ago</small>
+                      <strong class="d-inline-block mb-2 text-primary">
+                      {% for cat in article.categories.all %}
+                      {{ cat }} {% if article.categories.count > 1 %} | {% endif %} 
+                      {% endfor %}
+                      </strong>
+                      <h3 class="mb-0">
+                        <a class="text-dark" href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                      </h3>
+                      <div class="mb-1 text-muted">
+                      {{ article.published_date|timesince }} ago
+                      <span>({{ article.view_count }} views)</span>
+                      </div>
                       <p class="card-text">{{ article.description|truncatechars:50 }}</p>
-                      <a href="{{ article.get_absolute_url }}" class="btn btn-primary">View</a>
+                      <a href="{{ article.get_absolute_url }}">Get informed..</a>
                   </div>
                   </div>
               </div>
@@ -58,6 +48,6 @@
     {% include 'core/channel_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}    
 
   </div> 
-
+</main>
 
 {% endblock content %}

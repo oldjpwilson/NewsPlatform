@@ -38,6 +38,8 @@
                     <td>{{ article.get_rating.average|floatformat:"2" }}</td>
                 {% endif %}
                 </tr>
+            {% empty %}
+            <p>You have no articles. <a href="{% url 'article-create' %}">Create one now</a></p>
             {% endfor %}
             </tbody>
             </table>

@@ -29,14 +29,10 @@ class LoginForm(forms.Form):
         return super(LoginForm, self).clean(*args, **kwargs)
 
 
-class ChannelCreateForm(forms.ModelForm):
+class ChannelCreateUpdateForm(forms.ModelForm):
+    background_image = forms.ImageField(
+        help_text='Ideal size is 2560 pixels wide by x 1440 pixels tall.')
+
     class Meta:
         model = Channel
         fields = COMMON_CHANNEL_FIELDS
-
-
-class ChannelUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Channel
-        # channels cannot update their name?
-        fields = COMMON_CHANNEL_FIELDS[1:]

@@ -14,7 +14,7 @@ from django.views import View
 from star_ratings.models import Rating
 from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
-from .forms import ChannelCreateForm, ChannelUpdateForm
+from .forms import ChannelCreateUpdateForm
 from .models import Profile, Channel, Subscription, Payout
 from .helpers import (
     get_profile_current_billing_total,
@@ -195,7 +195,7 @@ def channel_create(request):
     if channel_status is not None:
         messages.info(request, "You already have a channel!")
         return redirect(reverse('my-profile'))
-    form = ChannelCreateForm(request.POST or None, request.FILES or None)
+    form = ChannelCreateUpdateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
             channel = form.instance
@@ -232,7 +232,7 @@ def channel_update(request):
     if not request.user.channel:
         return redirect(reverse('profile'))
     channel = get_object_or_404(Channel, user=request.user)
-    form = ChannelUpdateForm(request.POST or None, instance=channel)
+    form = ChannelCreateUpdateForm(request.POST or None, instance=channel)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
