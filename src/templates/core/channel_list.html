@@ -7,7 +7,7 @@
 
     <div class="col-md-8 blog-main">
       {% for channel in queryset %}
-        <p class="text-muted"><a href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a></p>
+        <a class="text-muted" href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a>
 
         <div class="row">
           {% for article in channel.get_latest_articles %}
