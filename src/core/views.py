@@ -323,6 +323,10 @@ def remove_credit_card(request, card_id):
     profile = get_object_or_404(Profile, user=request.user)
     customer = stripe.Customer.retrieve(profile.stripe_customer_id)
     # TODO: prevent if user has outstanding bill
+
+    # if their last charge was last month, then they still owe this month
+
+    # don't let them remove the card - show a button that says pay now or add a new card
     customer.sources.retrieve(card_id).delete()
     return redirect(reverse("edit-profile-payment-details"))
 

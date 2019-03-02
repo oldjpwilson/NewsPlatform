@@ -56,8 +56,6 @@ class Article(models.Model):
 
     view_count = models.IntegerField(default=0)
     draft = models.BooleanField(default=False)
-
-    # location = models.ForeignKey(Location) # TODO: research
     objects = ArticleManager()
 
     def __str__(self):

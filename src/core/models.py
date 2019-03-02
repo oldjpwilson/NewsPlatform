@@ -16,7 +16,6 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True)
-    # location_id = models.CharField() # TODO: geodjango?
     stripe_customer_id = models.CharField(max_length=40)
     subscriptions = models.ManyToManyField('Channel')
 
