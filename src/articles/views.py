@@ -66,9 +66,9 @@ def contact(request):
             form_email = form.cleaned_data['email']
             form_message = form.cleaned_data['message']
             form_full_name = form.cleaned_data['name']
-            subject = 'Message from Justdjango contact form'
+            subject = 'Message from NewsPlatform contact form'
             from_email = settings.EMAIL_HOST_USER
-            to_email = ['admin@justdjango.com']
+            to_email = [settings.DEFAULT_FROM_EMAIL]  # we send it to ourselves
             contact_message = "%s: %s via %s" % (
                 form_full_name,
                 form_message,
