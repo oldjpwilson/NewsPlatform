@@ -214,6 +214,8 @@ def channel_stats(request):
     if not request.user.channel:
         return redirect(reverse('profile'))
     channel = get_object_or_404(Channel, user=request.user)
+    current_billing_revenue = get_channel_current_billing_revenue(channel)
+    alltime_billing_revenue = get_channel_alltime_billing_revenue(channel)
     queryset, page_request_var = paginate_queryset(
         request, channel.articles.all())
     context = {
@@ -221,6 +223,8 @@ def channel_stats(request):
         'display': 'stats',
         'total_article_views': channel.get_total_article_views(),
         'queryset': queryset,
+        'current_billing_revenue': current_billing_revenue,
+        'alltime_billing_revenue': alltime_billing_revenue,
         'page_request_var': page_request_var
     }
     return render(request, 'core/channel_update.html', context)
@@ -339,7 +343,8 @@ class StripeAuthorizeView(LoginRequiredMixin, View):
             'response_type': 'code',
             'scope': 'read_write',
             'client_id': settings.STRIPE_CONNECT_CLIENT_ID,
-            # 'redirect_uri': f'{settings.DOMAIN}/oauth/callback/' # TODO: can only test when live
+            # TODO: can only test when live
+            'redirect_uri': f'{settings.DOMAIN}/stripe/callback/'
         }
         url = f'{url}?{urllib.parse.urlencode(params)}'
         return redirect(url)
@@ -348,35 +353,44 @@ class StripeAuthorizeView(LoginRequiredMixin, View):
 class StripeAuthorizeCallbackView(View):
 
     def get(self, request):
-        code = request.GET.get('code')
-        if code:
-            data = {
-                'client_secret': settings.STRIPE_SECRET_KEY,
-                'grant_type': 'authorization_code',
-                'client_id': settings.STRIPE_CONNECT_CLIENT_ID,
-                'code': code
-            }
-            url = 'https://connect.stripe.com/oauth/token'
-            resp = requests.post(url, params=data)
-
-            channel = get_object_or_404(Channel, user=request.user)
-            plan = stripe.Plan.create(
-                id=f"monthly-membership-{journalist_stripe_acc['id']}",
-                amount=100,  # 100 cents = $1
-                interval="month",
-                currency="usd",
-                product={
-                    "name": f"{channel.name} membership"
+        try:
+            code = request.GET.get('code')
+            if code:
+                data = {
+                    'client_secret': settings.STRIPE_SECRET_KEY,
+                    'grant_type': 'authorization_code',
+                    'client_id': settings.STRIPE_CONNECT_CLIENT_ID,
+                    'code': code
                 }
-            )
+                url = 'https://connect.stripe.com/oauth/token'
+                resp = requests.post(url, params=data)
 
-            channel.stripe_account_id = resp.json()['stripe_user_id']
-            channel.stripe_plan_id = plan['id']
-            channel.visible = True
-            channel.save()
+                channel = get_object_or_404(Channel, user=request.user)
+                plan = stripe.Plan.create(
+                    id=f"monthly-membership-{resp.json()['stripe_user_id']}",
+                    amount=100,  # 100 cents = $1
+                    interval="month",
+                    currency="usd",
+                    product={
+                        "name": f"{channel.name} membership"
+                    }
+                )
 
-        response = redirect(reverse('edit-my-channel'))
-        return response
+                channel.stripe_account_id = resp.json()['stripe_user_id']
+                channel.stripe_plan_id = plan['id']
+                channel.visible = True
+                channel.save()
+
+            messages.info(
+                request, "Your Stripe account was successfully linked!")
+            response = redirect(reverse('edit-my-channel'))
+            return response
+
+        except:
+            messages.error(
+                request, "There was an error connecting your Stripe account. If the error persists please contact support.")
+            response = redirect(reverse('edit-my-channel'))
+            return response
 
 
 def create_payouts(request, key):

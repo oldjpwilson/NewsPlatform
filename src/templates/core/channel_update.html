@@ -3,9 +3,10 @@
 
 {% block content %}
 
-<div class="row" style="margin: 10px;">
+<main role="main" class="container">
+<div class="row">
 
-  <div class="col-3">
+  <aside class="col-md-4 blog-sidebar">
     <div class="card" style="width: 100%;">
       <div class="card-header">
         <h4>{{ name }}</h4>
@@ -13,67 +14,76 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item"><a href="{% url 'channel-stats' %}">Stats</a></li>
         <li class="list-group-item"><a href="{% url 'edit-my-channel' %}">Channel details</a></li>
-        <li class="list-group-item"><a href="{% url 'edit-channel-payment-details' %}">Credit cards</a></li>
+        <li class="list-group-item"><a href="{% url 'edit-channel-payment-details' %}">Payment Details</a></li>
       </ul>
     </div>
-  </div>
+  </aside>
 
 
-  <div class="col-9">
+  <div class="col-md-8">
 
     {% if display == 'stats' %}
+    
+    <div class="mt-5">
+      <h2>My articles</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Title</th>
+            <th scope="col">Views</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for article in queryset %}
+          <tr>
+            <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
+            <td>{{ article.view_count }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
 
-    <h2>My articles</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Title</th>
-          <th scope="col">Views</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for article in queryset %}
-        <tr>
-          <td><a href="{{ article.get_absolute_url }}">{{ article.title }}<a></td>
-          <td>{{ article.view_count }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+      {% include "nav/paginator.html" with queryset=queryset page_request_var=page_request_var %}      
 
-    {% include "nav/paginator.html" with queryset=queryset page_request_var=page_request_var %}      
+      <br style="padding-top: 10px;" />
 
-    <br style="padding-top: 10px;" />
-
-    <h2>Stats and information</h2>
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Metric</th>
-          <th scope="col">Value</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Number of article views</td>
-          <td>{{ total_article_views.view_count__sum }}</td>
-        </tr>
-        <tr>
-          <td>Monthly channel revenue</td>
-          <td>$5 (WIP)</td>
-        </tr>
-      </tbody>
-    </table>
+      <h2>Stats and information</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Metric</th>
+            <th scope="col">Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Number of article views</td>
+            <td>{{ total_article_views.view_count__sum }}</td>
+          </tr>
+          <tr>
+            <td>Current months revenue</td>
+            <td>${{ current_billing_revenue }}</td>
+          </tr>
+          <tr>
+            <td>All-time revenue</td>
+            <td>${{ alltime_billing_revenue }}</td>
+          </tr>
+        </tbody>
+      </table>
+    
+    </div>
 
     {% elif display == 'edit_channel_details' %}
 
-    <h2>Update channel details</h2>
-    <form method="POST" action="." enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form|crispy }}
-      <button type="submit" class="btn btn-primary">Save</button>
-      <a href="{% url 'edit-my-channel' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+    <div class="mt-5">
+      <h2>Update channel details</h2>
+      <form method="POST" action="." enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'edit-my-channel' %}" class="btn btn-secondary">Cancel</a>
+      </form>
+    </div>
 
     {% elif display == 'edit_account' %}
 
@@ -102,13 +112,20 @@
 
     {% elif display == 'edit_payment_details' %}
 
-    <h3>To start getting paid, connect to a stripe account</h3>
-    <a href="{% url 'stripe-authorization' %}" class="btn btn-primary">Connect Stripe Account</a>
+    <div class="mt-5">
+      {% if not visible %}
+      <h3>To start getting paid, connect to a stripe account</h3>
+      <a href="{% url 'stripe-authorization' %}" class="btn btn-primary">Connect Stripe Account</a>
+      {% else %}
+      <h3>Your Stripe account has been linked. <a class="text muted" href="https://dashboard.stripe.com/login">Visit your Stripe account</a></h3>
+      {% endif %}
+    </div>
 
     {% endif %}
 
   </div>
 
 </div>
+</main>
 
 {% endblock content %}
