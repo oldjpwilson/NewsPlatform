@@ -60,3 +60,4 @@ STRIPE_CONNECT_CLIENT_ID = 'ca_EZbadnfmquQd3PcD8LdkIhIHbgSy0yqO'
 
 DOMAIN = 'http://127.0.0.1:8000'
 PAYMENTS_KEY = config('PAYMENTS_KEY')
+BILL_KEY = config('BILL_KEY')

@@ -3,6 +3,7 @@ import os
 import requests
 import stripe
 import urllib
+from django.db.models import Count
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate
@@ -14,8 +15,8 @@ from django.views import View
 from star_ratings.models import Rating
 from articles.models import Article, ArticleView
 from categories.views import get_todays_most_popular_article_categories
-from .forms import ChannelCreateUpdateForm
-from .models import Profile, Channel, Subscription, Payout
+from .forms import ChannelCreateForm, ChannelUpdateForm
+from .models import Profile, Channel, Subscription, Payout, Charge
 from .helpers import (
     get_profile_current_billing_total,
     get_channel_current_billing_revenue,
@@ -162,7 +163,7 @@ def my_channel(request):
 
 
 def channel_list(request):
-    channels = Channel.objects.filter(visible=True)
+    channels = Channel.objects.all()
     queryset, page_request_var = paginate_queryset(request, channels)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
@@ -195,12 +196,15 @@ def channel_create(request):
     if channel_status is not None:
         messages.info(request, "You already have a channel!")
         return redirect(reverse('my-profile'))
-    form = ChannelCreateUpdateForm(request.POST or None, request.FILES or None)
+
+    form = ChannelCreateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
-            channel = form.instance
+            channel = form.save(commit=False)
             channel.user = request.user
+            channel.stripe_account_id = None
             channel.save()
+            form.save_m2m()
             return redirect(reverse('my-channel'))
     context = {
         'form': form,
@@ -236,7 +240,8 @@ def channel_update(request):
     if not request.user.channel:
         return redirect(reverse('profile'))
     channel = get_object_or_404(Channel, user=request.user)
-    form = ChannelCreateUpdateForm(request.POST or None, instance=channel)
+    form = ChannelUpdateForm(request.POST or None,
+                             request.FILES or None, instance=channel)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
@@ -255,6 +260,7 @@ def channel_update(request):
 def channel_update_payment_details(request):
     channel = get_object_or_404(Channel, user=request.user)
     context = {
+        'channel': channel,
         'name': channel.name,
         'display': 'edit_payment_details',
         'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY
@@ -274,20 +280,10 @@ def subscribe(request, name):
             request, "Please enter payment details to subscribe to a channel")
         return redirect(reverse("edit-profile-payment-details"))
 
-    # create a customer to subscribe to the journalist
-    customer = stripe.Customer.retrieve(profile.stripe_customer_id)
-
-    # create the subscription to the journalists stripe account
-    subscription = stripe.Subscription.create(
-        customer=customer.id,
-        items=[{"plan": channel.stripe_plan_id}],
-    )
-
     # store the new stripe susbciption
     sub = Subscription()
     sub.profile = profile
     sub.channel = channel
-    sub.stripe_subscription_id = subscription.id
     sub.save()
 
     # update the profile's subscriptions
@@ -315,10 +311,6 @@ def unsubscribe(request, name):
     channel.subscribers.remove(profile)
     channel.save()
 
-    # update the stripe subscription
-    sub = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
-    sub.delete()
-
     # update our record of stripe subscriptions
     subscription.active = False
     subscription.save()
@@ -330,6 +322,7 @@ def unsubscribe(request, name):
 def remove_credit_card(request, card_id):
     profile = get_object_or_404(Profile, user=request.user)
     customer = stripe.Customer.retrieve(profile.stripe_customer_id)
+    # TODO: prevent if user has outstanding bill
     customer.sources.retrieve(card_id).delete()
     return redirect(reverse("edit-profile-payment-details"))
 
@@ -337,13 +330,17 @@ def remove_credit_card(request, card_id):
 class StripeAuthorizeView(LoginRequiredMixin, View):
 
     def get(self, request):
+        channel = get_object_or_404(Channel, user=request.user)
+        if channel.subscribers.count() < 0:
+            messages.info(
+                request, "You need more than 20 subscribers to start receiving payouts")
+            return redirect(reverse('edit-channel-payment-details'))
 
         url = 'https://connect.stripe.com/oauth/authorize'
         params = {
             'response_type': 'code',
             'scope': 'read_write',
             'client_id': settings.STRIPE_CONNECT_CLIENT_ID,
-            # TODO: can only test when live
             'redirect_uri': f'{settings.DOMAIN}/stripe/callback/'
         }
         url = f'{url}?{urllib.parse.urlencode(params)}'
@@ -366,19 +363,8 @@ class StripeAuthorizeCallbackView(View):
                 resp = requests.post(url, params=data)
 
                 channel = get_object_or_404(Channel, user=request.user)
-                plan = stripe.Plan.create(
-                    id=f"monthly-membership-{resp.json()['stripe_user_id']}",
-                    amount=100,  # 100 cents = $1
-                    interval="month",
-                    currency="usd",
-                    product={
-                        "name": f"{channel.name} membership"
-                    }
-                )
-
                 channel.stripe_account_id = resp.json()['stripe_user_id']
-                channel.stripe_plan_id = plan['id']
-                channel.visible = True
+                channel.connected = True
                 channel.save()
 
             messages.info(
@@ -405,57 +391,125 @@ def create_payouts(request, key):
         return HttpResponse(status=500)
 
     try:
-        first_day_of_current_month = datetime.now().replace(day=1)
-        last_day_of_previous_month = first_day_of_current_month - \
-            timedelta(days=1)
-        first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
-
-        channels = Channel.objects.all()
+        channels = Channel.objects \
+            .filter(connected=True) \
+            .annotate(num_subs=Count('subscribers')) \
+            .filter(num_subs__gte=20)
 
         for channel in channels:
-            amount = 0
-            # get all subscriptions that started before 1 month ago
-            # - but only the ones that are still subscribed
-
-            recurring_subscriptions = Subscription.objects \
-                .filter(
-                    channel=channel,
-                    modified_at__lte=first_day_of_previous_month
-                ).exclude(active=False)
-
-            # get subscriptions created in previous month
-            new_subscriptions = Subscription.objects \
-                .filter(
-                    channel=channel,
-                    modified_at__range=[
-                        first_day_of_previous_month, first_day_of_current_month]
-                )
-
-            # update total amount to pay journalist
-            amount += 0.5 * (recurring_subscriptions.count() +
-                             new_subscriptions.count())
-
+            amount = get_channel_current_billing_revenue(channel)
             if amount > 0:
                 # transfer from account to journalist account
-                stripe.Transfer.create(
-                    amount=amount * 100,  # this value is in cents
-                    currency="usd",
-                    destination=channel.stripe_account_id
-                )
+                try:
+                    stripe.Transfer.create(
+                        amount=amount * 100,  # this value is in cents
+                        currency="usd",
+                        destination=channel.stripe_account_id
+                    )
 
-                # record it on our side
-                payout = Payout(channel=channel, amount=amount)
-                payout.save()
+                    # record it on our side
+                    payout = Payout(channel=channel, amount=amount)
+                    payout.save()
 
-                # send email to journalist saying they've been paid
-                send_email(
-                    "Newsplatform Monthly Payout Receiver",
-                    channel.name,
-                    f"We've just sent a payout of {amount} to your Stripe account",
-                    channel.user.email
-                )
+                    # send email to journalist saying they've been paid
+                    send_email(
+                        "Newsplatform Monthly Payout Receiver",
+                        channel.name,
+                        f"We've just sent a payout of {amount} to your Stripe account",
+                        channel.user.email
+                    )
+
+                except:
+                    # record it on our side
+                    payout = Payout(channel=channel,
+                                    amount=amount,
+                                    success=False)
+                    payout.save()
 
         # make sure this is outside the forloop
         return HttpResponse(status=201)
     except:
+        # send email to alert us
+        send_email(
+            "Newsplatform Monthly Payout Receiver Alert",
+            "Admin"
+            f"Failed attempt to payout to Stripe account. Investigate ASAP",
+            settings.DEFAULT_FROM_EMAIL
+        )
+        return HttpResponse(status=500)
+
+
+def bill_customers(request, key):
+    '''
+    The charges calculated in this function return the amount each customer owes for the previous month. 
+    This script runs on the 26th of each month and calculates the number of new subscriptions between the
+    26th day of the last month and this month. It then adds the recurring subscriptions from outside the
+    previous months period.
+    '''
+
+    # if key is not correct - don't bill customers
+    if settings.BILL_KEY != key:
+        return HttpResponse(status=500)
+
+    try:
+        profiles = Profile.objects.all()
+        for profile in profiles:
+            amount = get_profile_current_billing_total(profile)
+            if amount > 0:
+
+                try:
+                    # charge the customer once
+                    # TODO: prevent user not having a credit card
+                    charge = stripe.Charge.create(
+                        amount=int(amount * 100),  # this value is in cents
+                        currency="usd",
+                        customer=profile.stripe_customer_id
+                    )
+
+                    # record it on our side
+                    charge = Charge(
+                        profile=profile,
+                        amount=amount,
+                        stripe_charge_id=charge.id
+                    )
+                    charge.save()
+
+                    # send email to user saying they've been charged
+                    send_email(
+                        "Newsplatform Invoice",
+                        profile.user.username,
+                        f"Thank you for using NewsPlatform. \
+                        We've successfully charged your credit card an amount of ${amount} \
+                        for the previous month's subscriptions.",
+                        profile.user.email
+                    )
+
+                except Exception as e:
+                    # create an alert because this failed
+                    charge = Charge(
+                        profile=profile,
+                        amount=amount,
+                        success=False
+                    )
+                    charge.save()
+
+                    # send email to alert the user
+                    send_email(
+                        "Newsplatform Invoice",
+                        profile.user.username,
+                        f"We've failed to bill you for your subscriptions on NewsPlatform. \
+                        Please login and add a credit card to your account.",
+                        profile.user.email
+                    )
+
+        # make sure this is outside the forloop
+        return HttpResponse(status=201)
+    except Exception as e:
+        # send email to alert us
+        send_email(
+            "Newsplatform Monthly Payout Receiver Alert",
+            "Admin"
+            f"Failed attempt to payout to Stripe account. Error message: {e}",
+            settings.DEFAULT_FROM_EMAIL
+        )
         return HttpResponse(status=500)

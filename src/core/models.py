@@ -30,18 +30,17 @@ class Profile(models.Model):
 class Channel(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True)
-    name = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=50, unique=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
     profile_image = models.ImageField()
     background_image = models.ImageField()
     categories = models.ManyToManyField(Category)
     rating = models.FloatField(default=0)
-    stripe_account_id = models.CharField(max_length=40)
-    stripe_plan_id = models.CharField(max_length=40)
+    stripe_account_id = models.CharField(max_length=50, blank=True, null=True)
     subscribers = models.ManyToManyField(Profile, blank=True)
     # whether they've connected stripe
-    visible = models.BooleanField(default=False)
+    connected = models.BooleanField(default=False)
 
     objects = ChannelManager()
 
@@ -83,7 +82,6 @@ class Subscription(models.Model):
         Profile, on_delete=models.CASCADE)
     channel = models.ForeignKey(
         Channel, on_delete=models.CASCADE)
-    stripe_subscription_id = models.CharField(max_length=50)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -94,9 +92,23 @@ class Subscription(models.Model):
 
 class Payout(models.Model):
     channel = models.ForeignKey(
-        Channel, on_delete=models.CASCADE)
+        Channel, on_delete=models.SET_NULL, blank=True, null=True)
     amount = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    stripe_transfer_id = models.CharField(max_length=50, blank=True, null=True)
+    success = models.BooleanField(default=True)
 
     def __str__(self):
         return self.channel.name
+
+
+class Charge(models.Model):
+    profile = models.ForeignKey(
+        Profile, on_delete=models.SET_NULL, blank=True, null=True)
+    amount = models.FloatField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    stripe_charge_id = models.CharField(max_length=50, blank=True, null=True)
+    success = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.profile.user.username

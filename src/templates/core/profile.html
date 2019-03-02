@@ -146,7 +146,7 @@
         {% csrf_token %}
         <div class="form-group">
           {% if user.signup_set.first.subscribed %}
-          <p>Unsubscribe from specials, discounts and early course releases</p>
+          <p>Unsubscribe from specials, discounts and other notifications</p>
           <button type="submit" name="unsubscribe" class="btn btn-outline-secondary">Unsubscribe</button>
           {% else %}
           <p>Subscribe for specials, discounts and other non-spammy notifications</p>

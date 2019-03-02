@@ -138,7 +138,6 @@ def article_list(request):
 
     # let user see only articles of subscribed channels
     final_articles = [a for a in articles if a.channel in subscriptions]
-    print(final_articles)
     queryset, page_request_var = paginate_queryset(request, final_articles)
 
     context = {
@@ -184,16 +183,12 @@ def article_detail(request, id):
 @user_passes_test(check_user_is_journalist)
 def article_create(request):
     channel = Channel.objects.get(user=request.user)
-    stripe_account = check_channel_has_stripe_account(channel)
-    if stripe_account is None:
-        messages.info(
-            request, "To start creating, connect a Stripe account to setup payments.")
-        return redirect(reverse("edit-channel-payment-details"))
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
             form.instance.channel = channel
             form.save()
+            form.save_m2m()
             return redirect(reverse('article-detail', kwargs={
                 'id': form.instance.id
             }))

@@ -1,14 +1,15 @@
-from datetime import datetime, timedelta
+import datetime
+from datetime import timedelta
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from articles.models import ArticleView
-from core.models import Channel, Subscription
+from core.models import Channel, Subscription, Payout
 
 
 def get_dates():
-    first_day_of_current_month = datetime.now().replace(day=1)
+    first_day_of_current_month = datetime.datetime.now().replace(day=1)
     last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
     first_day_of_previous_month = last_day_of_previous_month.replace(day=1)
     return (first_day_of_current_month, first_day_of_previous_month)
@@ -16,16 +17,6 @@ def get_dates():
 
 def get_channel_current_billing_revenue(channel):
     # get subscriptions created in previous month
-    dates = get_dates()
-    new_subscriptions = Subscription.objects \
-        .filter(
-            channel=channel,
-            modified_at__range=[dates[1], dates[0]]
-        )
-    return 0.5 * new_subscriptions.count()
-
-
-def get_channel_alltime_billing_revenue(channel):
     dates = get_dates()
     amount = 0
     # get all subscriptions that started before 1 month ago
@@ -44,19 +35,49 @@ def get_channel_alltime_billing_revenue(channel):
     # update total amount to pay journalist
     amount += 0.5 * (recurring_subscriptions.count() +
                      new_subscriptions.count())
-    return amount
+    return 0.5 * new_subscriptions.count()
+
+
+def get_channel_alltime_billing_revenue(channel):
+    channel_payouts = Payout.objects \
+        .filter(channel=channel) \
+        .exclude(success=False) \
+        .values('amount') \
+        .annotate(total=Sum('amount'))
+    return channel_payouts[0]['total']
+
+
+def get_previous_pay_date(curr_date):
+    new_month = curr_date.month - 1
+    new_year = curr_date.year
+    if curr_date.month == 1:
+        new_month = 12
+        new_year = curr_date.year - 1
+    return datetime.date(new_year, new_month, 25)
 
 
 def get_profile_current_billing_total(profile):
-    dates = get_dates()
+    today_date = datetime.date.today()
+    today_date_midnight = datetime.date(
+        today_date.year, today_date.month, today_date.day + 1)
+    previous_pay_date = get_previous_pay_date(today_date)
+    amount = 0
+    # get all subscriptions that started before 1 month ago
+    # - but only the ones that are still subscribed
+    recurring_subscriptions = Subscription.objects \
+        .filter(
+            profile=profile,
+            modified_at__lte=previous_pay_date
+        ).exclude(active=False)
     # get subscriptions created in previous month
     new_subscriptions = Subscription.objects \
         .filter(
             profile=profile,
-            modified_at__range=[
-                dates[1], dates[0]]
+            modified_at__range=[previous_pay_date, today_date_midnight]
         )
-    return 0.5 * new_subscriptions.count()
+    amount += 0.5 * (recurring_subscriptions.count() +
+                     new_subscriptions.count())
+    return amount
 
 
 def paginate_queryset(request, queryset):

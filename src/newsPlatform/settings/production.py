@@ -2,7 +2,7 @@ from .base import *
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ['src-prod.us-west-2.elasticbeanstalk.com',
                  'newsplatform.org', 'www.newsplatform.org']
 WSGI_APPLICATION = 'newsPlatform.wsgi.application'
@@ -68,3 +68,4 @@ STRIPE_CONNECT_CLIENT_ID = config('STRIPE_LIVE_CONNECT_CLIENT_ID')
 
 DOMAIN = config('DOMAIN')
 PAYMENTS_KEY = config('PAYMENTS_KEY')
+BILL_KEY = config('BILL_KEY')

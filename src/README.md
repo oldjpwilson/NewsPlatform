@@ -97,3 +97,23 @@ aws iam upload-server-certificate --server-certificate-name NewsPlatformCertific
 ```
 
 Now we need to terminate our load balancer from Http to Https within the configuration settings of our elastic beanstalk environment. Click to _modify_ the Load Balancer and then add a new listener on port 443 with Https that uses our created Certificate. Make sure in the command line you are using the right environment otherwise the certificate will not show up. Use `eb use src-prod --region=us-west-2` to change to our defined environment.
+
+## S3
+
+When in production it's good to make use of S3 for hosting static files. This is good for permissions and access to those files, preventing anyone from scraping your css, js and images. Unexpectedly, web fonts behave weirdly in S3 and hence we needed to add special CORS configuration so that the WYSIWIG editor could have its icons display:
+
+```
+<CORSConfiguration>
+  <CORSRule>
+    <AllowedOrigin>http://www.newsplatform.org</AllowedOrigin>
+    <AllowedOrigin>http://newsplatform.org</AllowedOrigin>
+    <AllowedOrigin>https://www.newsplatform.org</AllowedOrigin>
+    <AllowedOrigin>https://newsplatform.org</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>HEAD</AllowedMethod>
+    <AllowedMethod>DELETE</AllowedMethod>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedMethod>POST</AllowedMethod>
+  </CORSRule>
+</CORSConfiguration>
+```

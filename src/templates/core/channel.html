@@ -53,9 +53,9 @@
 
         <div class="col-12">
             <h2>Channel stats</h2>
-            {% if not channel.visible %}
-            <h4>Note: Your channel is not visible as you have 
-            not connected a stripe account for payments.
+            {% if not channel.connected %}
+            <h4>Note: Your channel cannot receive payments as you have 
+            not connected a Stripe account for payments.
             <a href="{% url 'edit-channel-payment-details' %}">
                 Connect now to complete your channel
             </a></h4>
@@ -72,7 +72,6 @@
                     <td>Subscriber count</td>
                     <td>{{ channel.subscribers.count }}</td>
                 </tr>
-                {% if channel.visible %}
                 <tr>
                     <td>Current months income</td>
                     <td>${{ current_billing_revenue }}</td>
@@ -81,7 +80,6 @@
                     <td>All-time income</td>
                     <td>${{ alltime_billing_revenue }}</td>
                 </tr>
-                {% endif %}
                 {% if most_viewed_article != None %}
                 <tr>
                     <td>Most viewed article</td>

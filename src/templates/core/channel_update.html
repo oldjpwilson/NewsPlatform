@@ -113,7 +113,7 @@
     {% elif display == 'edit_payment_details' %}
 
     <div class="mt-5">
-      {% if not visible %}
+      {% if not channel.connected %}
       <h3>To start getting paid, connect to a stripe account</h3>
       <a href="{% url 'stripe-authorization' %}" class="btn btn-primary">Connect Stripe Account</a>
       {% else %}

@@ -3,13 +3,6 @@ from django import forms
 from .models import User, Channel
 
 
-COMMON_CHANNEL_FIELDS = ('name',
-                         'description',
-                         'profile_image',
-                         'background_image',
-                         'categories')
-
-
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(
         attrs={'placeholder': 'Username'}))
@@ -29,10 +22,30 @@ class LoginForm(forms.Form):
         return super(LoginForm, self).clean(*args, **kwargs)
 
 
-class ChannelCreateUpdateForm(forms.ModelForm):
+class ChannelCreateForm(forms.ModelForm):
     background_image = forms.ImageField(
         help_text='Ideal size is 2560 pixels wide by x 1440 pixels tall.')
 
     class Meta:
         model = Channel
-        fields = COMMON_CHANNEL_FIELDS
+        fields = (
+            'name',
+            'description',
+            'profile_image',
+            'background_image',
+            'categories'
+        )
+
+
+class ChannelUpdateForm(forms.ModelForm):
+    background_image = forms.ImageField(
+        help_text='Ideal size is 2560 pixels wide by 1440 pixels tall.')
+
+    class Meta:
+        model = Channel
+        fields = (
+            'description',
+            'profile_image',
+            'background_image',
+            'categories'
+        )
