@@ -9,6 +9,7 @@
       {% if visitor_is_subscribed or request.user == article.channel.user %}
 
         <h2>{{ article.title }}</h2>
+        <img style="width: 100%;" src="{{ article.thumbnail.url }}" alt="Article thumbnail" />
         {{ article.content | safe }}
         {% if article.channel.user == request.user %}
           <a class="btn btn-secondary" href="{{ article.get_update_url }}">Update</a>
