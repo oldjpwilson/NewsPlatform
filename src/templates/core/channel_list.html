@@ -35,10 +35,12 @@
             </div>
           </div>
           {% empty %}
-          <h3>You do not have any subscriptions. <a href="{% url 'channel-list' %}" class="text-muted">Explore some channels now</a></p>
+          This channel has not created any articles yet
           {% endfor %}
         </div>
 
+      {% empty %}
+        There are currently no channels to subscribe to
       {% endfor %}
 
       <div class="row mt-5">

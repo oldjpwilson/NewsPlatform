@@ -186,8 +186,9 @@ def article_create(request):
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
-            form.instance.channel = channel
-            form.save()
+            article = form.save(commit=False)
+            article.channel = channel
+            article.save()
             form.save_m2m()
             return redirect(reverse('article-detail', kwargs={
                 'id': form.instance.id

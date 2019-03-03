@@ -33,9 +33,9 @@ def get_channel_current_billing_revenue(channel):
             modified_at__range=[dates[1], dates[0]]
         )
     # update total amount to pay journalist
-    amount += 0.5 * (recurring_subscriptions.count() +
-                     new_subscriptions.count())
-    return 0.5 * new_subscriptions.count()
+    amount += 0.25 * (recurring_subscriptions.count() +
+                      new_subscriptions.count())
+    return amount
 
 
 def get_channel_alltime_billing_revenue(channel):
