@@ -44,7 +44,9 @@ def get_channel_alltime_billing_revenue(channel):
         .exclude(success=False) \
         .values('amount') \
         .annotate(total=Sum('amount'))
-    return channel_payouts[0]['total']
+    if channel_payouts.exists():
+        return channel_payouts[0]['total']
+    return 0.0
 
 
 def get_previous_pay_date(curr_date):
