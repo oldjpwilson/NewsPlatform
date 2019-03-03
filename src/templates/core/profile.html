@@ -29,7 +29,7 @@
   </aside>
 
 
-  <div class="col-md-8 mt-5">
+  <div class="col-md-8">
 
     {% if display == 'stats' %}
 
@@ -75,8 +75,16 @@
           <td>{{ sub_count }}</td>
         </tr>
         <tr>
-          <td>Monthly billing total</td>
+          <td>Total article views</td>
+          <td>{{ total_article_views }}</td>
+        </tr>
+        <tr>
+          <td>Current months billing total</td>
           <td>${{ current_monthly_billing_total }}</td>
+        </tr>
+        <tr>
+          <td>Next payment date</td>
+          <td>{{ next_payment_date }}</td>
         </tr>
         {% if most_viewed_channel != None %}
         <tr>
@@ -84,10 +92,6 @@
           <td>{{ most_viewed_channel.article__channel__name }}</td>
         </tr>
         {% endif %}
-        <tr>
-          <td>Total article views</td>
-          <td>{{ total_article_views }}</td>
-        </tr>
       </tbody>
     </table>
 
@@ -115,6 +119,10 @@
       <input type="hidden" name="account_form" value="account_form">
       <button type="submit" class="btn btn-primary">Save</button>
     </form>
+
+    <hr />
+
+    <a href="{% url 'close-account' %}" class="btn btn-secondary">Close account</a>
 
     {% elif display == 'edit_payment_details' %}
 

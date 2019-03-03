@@ -51,13 +51,13 @@ class UserAdmin(BaseUserAdmin):
     )
     fieldsets = (
         (None, {
-            'fields': ('email', 'username', 'password')
+            'fields': ('email', 'username', 'password', 'is_active')
         }),
         ('Permissions', {
             'fields': ('is_superuser', 'is_staff')
         })
     )
-    list_display = ['email', 'username']
+    list_display = ['email', 'username', 'is_active']
     search_fields = ('email', 'username')
     ordering = ('email',)
 

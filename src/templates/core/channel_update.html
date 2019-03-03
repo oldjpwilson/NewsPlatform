@@ -24,7 +24,7 @@
 
     {% if display == 'stats' %}
     
-    <div class="mt-5">
+    <div>
       <h2>My articles</h2>
       <table class="table table-striped">
         <thead>
@@ -68,6 +68,10 @@
             <td>All-time revenue</td>
             <td>${{ alltime_billing_revenue }}</td>
           </tr>
+          <tr>
+            <td>Next Stripe payout</td>
+            <td>{{ next_payout_date }}</td>
+          </tr>
         </tbody>
       </table>
     
@@ -75,7 +79,7 @@
 
     {% elif display == 'edit_channel_details' %}
 
-    <div class="mt-5">
+    <div>
       <h2>Update channel details</h2>
       <form method="POST" action="." enctype="multipart/form-data">
         {% csrf_token %}
@@ -83,36 +87,14 @@
         <button type="submit" class="btn btn-primary">Save</button>
         <a href="{% url 'edit-my-channel' %}" class="btn btn-secondary">Cancel</a>
       </form>
+
+      <hr />
+      <a href="{% url 'close-channel' %}" class="btn btn-secondary">Delete channel</a>
     </div>
-
-    {% elif display == 'edit_account' %}
-
-    <h2>Update account details</h2>
-    <form method="POST" action="." enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="form-group">
-        <label>Email</label>
-        <input name="email" type="text" class="form-control" value="{{ user.email }}">
-      </div>
-      <div class="form-group">
-        <label>Old password</label>
-        <input class="form-control" name="old_password" type="password">
-      </div>
-      <div class="form-group">
-        <label>New password</label>
-        <input class="form-control" name="new_password" type="password">
-      </div>
-      <div class="form-group">
-        <label>Confirm new password</label>
-        <input class="form-control" name="confirm_password" type="password">
-      </div>
-      <input type="hidden" name="account_form" value="account_form">
-      <button type="submit" class="btn btn-primary">Save</button>
-    </form>
 
     {% elif display == 'edit_payment_details' %}
 
-    <div class="mt-5">
+    <div>
       {% if not channel.connected %}
       <h3>To start getting paid, connect to a stripe account</h3>
       <a href="{% url 'stripe-authorization' %}" class="btn btn-primary">Connect Stripe Account</a>

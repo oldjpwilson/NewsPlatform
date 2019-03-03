@@ -80,6 +80,10 @@
                     <td>All-time income</td>
                     <td>${{ alltime_billing_revenue }}</td>
                 </tr>
+                <tr>
+                    <td>Next Stripe payout</td>
+                    <td>{{ next_payout_date }}</td>
+                </tr>
                 {% if most_viewed_article != None %}
                 <tr>
                     <td>Most viewed article</td>

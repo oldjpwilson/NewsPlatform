@@ -6,7 +6,7 @@ import urllib
 from django.db.models import Count
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
@@ -21,6 +21,7 @@ from .helpers import (
     get_profile_current_billing_total,
     get_channel_current_billing_revenue,
     get_channel_alltime_billing_revenue,
+    get_next_date,
     paginate_queryset,
     get_most_viewed_channel,
     get_highest_rated_article,
@@ -71,6 +72,7 @@ def my_profile(request):
     total_article_views = ArticleView.objects.filter(user=request.user).count()
     most_viewed_channel = get_most_viewed_channel(request.user)
     current_monthly_billing_total = get_profile_current_billing_total(profile)
+    next_payment_date = get_next_date(26)
     context = {
         'profile': profile,
         'queryset': queryset,
@@ -80,7 +82,8 @@ def my_profile(request):
         'most_viewed_channel': most_viewed_channel,
         'display': 'stats',
         'current_monthly_billing_total': current_monthly_billing_total,
-        'page_request_var': page_request_var
+        'page_request_var': page_request_var,
+        'next_payment_date': next_payment_date
     }
     return render(request, 'core/profile.html', context)
 
@@ -150,6 +153,7 @@ def my_channel(request):
     queryset, page_request_var = paginate_queryset(request, articles)
     current_billing_revenue = get_channel_current_billing_revenue(channel)
     alltime_billing_revenue = get_channel_alltime_billing_revenue(channel)
+    next_payout_date = get_next_date(15)
     context = {
         'channel': channel,
         'queryset': queryset,
@@ -157,7 +161,8 @@ def my_channel(request):
         'most_viewed_article': most_viewed_article,
         'page_request_var': page_request_var,
         'current_billing_revenue': current_billing_revenue,
-        'alltime_billing_revenue': alltime_billing_revenue
+        'alltime_billing_revenue': alltime_billing_revenue,
+        'next_payout_date': next_payout_date
     }
     return render(request, 'core/channel.html', context)
 
@@ -222,6 +227,7 @@ def channel_stats(request):
     alltime_billing_revenue = get_channel_alltime_billing_revenue(channel)
     queryset, page_request_var = paginate_queryset(
         request, channel.articles.all())
+    next_payout_date = get_next_date(15)
     context = {
         'name': channel.name,
         'display': 'stats',
@@ -229,7 +235,8 @@ def channel_stats(request):
         'queryset': queryset,
         'current_billing_revenue': current_billing_revenue,
         'alltime_billing_revenue': alltime_billing_revenue,
-        'page_request_var': page_request_var
+        'page_request_var': page_request_var,
+        'next_payout_date': next_payout_date
     }
     return render(request, 'core/channel_update.html', context)
 
@@ -335,7 +342,7 @@ class StripeAuthorizeView(LoginRequiredMixin, View):
 
     def get(self, request):
         channel = get_object_or_404(Channel, user=request.user)
-        if channel.subscribers.count() < 0:
+        if channel.subscribers.count() < 20:
             messages.info(
                 request, "You need more than 20 subscribers to start receiving payouts")
             return redirect(reverse('edit-channel-payment-details'))
@@ -423,7 +430,7 @@ def create_payouts(request, key):
                         channel.user.email
                     )
 
-                except:
+                except Exception as e:
                     # record it on our side
                     payout = Payout(channel=channel,
                                     amount=amount,
@@ -438,7 +445,7 @@ def create_payouts(request, key):
             "Newsplatform Monthly Payout Receiver Alert",
             "Admin"
             f"Failed attempt to payout to Stripe account. Investigate ASAP",
-            settings.DEFAULT_FROM_EMAIL
+            settings.ADMIN_EMAIL
         )
         return HttpResponse(status=500)
 
@@ -514,6 +521,43 @@ def bill_customers(request, key):
             "Newsplatform Monthly Payout Receiver Alert",
             "Admin"
             f"Failed attempt to payout to Stripe account. Error message: {e}",
-            settings.DEFAULT_FROM_EMAIL
+            settings.ADMIN_EMAIL
         )
         return HttpResponse(status=500)
+
+
+def close_profile(request):
+    user = request.user
+    channel_status = check_channel_status(request)
+    if channel_status is not None:
+        messages.info(
+            request, "You cannot delete your account without closing your channel first.")
+        return redirect(reverse('my-channel'))
+    user.is_active = False
+    user.save()
+    logout(request)
+    messages.success(request, 'Account successfully closed.')
+    send_email(
+        "NewsPlatform account closure",
+        user.username,
+        "Your NewsPlatform account has successfully been closed",
+        user.email
+    )
+    return redirect(reverse('home'))
+
+
+def close_channel(request):
+    channel = get_object_or_404(Channel, user=request.user)
+    user = request.user
+    channel_status = check_channel_status(request)
+    if channel_status is None:
+        return redirect(reverse('my-profile'))
+    messages.success(request, 'We have received notification to close your channel. \
+        We will be in touch when all due processes are complete')
+    send_email(
+        "Channel closure request",
+        "Admin",
+        f"Channel: {channel.name} has requested to be closed",
+        settings.ADMIN_EMAIL
+    )
+    return redirect(reverse('my-profile'))

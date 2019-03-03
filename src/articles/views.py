@@ -68,7 +68,7 @@ def contact(request):
             form_full_name = form.cleaned_data['name']
             subject = 'Message from NewsPlatform contact form'
             from_email = settings.EMAIL_HOST_USER
-            to_email = [settings.DEFAULT_FROM_EMAIL]  # we send it to ourselves
+            to_email = [settings.ADMIN_EMAIL]  # we send it to ourselves
             contact_message = "%s: %s via %s" % (
                 form_full_name,
                 form_message,

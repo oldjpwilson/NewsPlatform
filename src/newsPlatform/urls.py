@@ -36,7 +36,9 @@ from core.views import (
     StripeAuthorizeView,
     StripeAuthorizeCallbackView,
     create_payouts,
-    bill_customers
+    bill_customers,
+    close_profile,
+    close_channel
 )
 
 from newsletter.views import profile_update_email_preferences
@@ -99,9 +101,12 @@ urlpatterns = [
 
     # stripe payout to journalists view
     path('create-payouts/<key>/', create_payouts, name='create-payouts'),
-
     # stripe charge customers view
     path('charge-customers/<key>/', bill_customers, name='charge-customers'),
+
+    # close account views
+    path('close-account/', close_profile, name='close-account'),
+    path('close-channel/', close_channel, name='close-channel'),
 
     # package views
     re_path(r'^tinymce/', include('tinymce.urls')),

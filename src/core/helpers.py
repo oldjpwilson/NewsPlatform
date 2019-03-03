@@ -55,7 +55,19 @@ def get_previous_pay_date(curr_date):
     if curr_date.month == 1:
         new_month = 12
         new_year = curr_date.year - 1
-    return datetime.date(new_year, new_month, 25)
+    return datetime.date(new_year, new_month, 26)
+
+
+def get_next_date(day):
+    curr_date = datetime.date.today()
+    if curr_date.day >= day:
+        new_month = curr_date.month + 1
+        new_year = curr_date.year
+        if curr_date.month == 12:
+            new_month = 1
+            new_year = curr_date.year + 1
+        return datetime.date(new_year, new_month, day)
+    return datetime.date(curr_date.year, curr_date.month, day)
 
 
 def get_profile_current_billing_total(profile):
