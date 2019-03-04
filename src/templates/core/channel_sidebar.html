@@ -2,7 +2,7 @@
     <div class="p-3 mb-3 bg-light rounded">
     <h4 class="font-italic">Popular categories today</h4>
     {% for cat in cats %}
-    <a href="{{ cat.get_absolute_url }}" class="tag badge badge-secondary">#{{ cat.categories__name }} ({{ cat.cat_count }})</a>
+    <a href="/categories/{{ cat.categories__name }}" class="tag badge badge-secondary">#{{ cat.categories__name }} ({{ cat.cat_count }})</a>
     {% endfor %}
     </div>
 

@@ -62,6 +62,17 @@ def check_channel_status(request):
     return None
 
 
+def is_article_creator(request, article_being_viewed):
+    channel_status = check_channel_status(request)
+    if channel_status is None:
+        return False
+    else:
+        if article_being_viewed.channel == channel_status:
+            return True
+        else:
+            return False
+
+
 @login_required
 def my_profile(request):
     profile = get_object_or_404(Profile, user=request.user)
@@ -533,6 +544,61 @@ def close_profile(request):
         messages.info(
             request, "You cannot delete your account without closing your channel first.")
         return redirect(reverse('my-channel'))
+
+    profile = get_object_or_404(Profile, user=user)
+
+    # charge account for this month
+    amount = get_profile_current_billing_total(profile)
+    if amount > 0:
+        try:
+            # charge the customer once
+            # TODO: prevent user not having a credit card
+            charge = stripe.Charge.create(
+                amount=int(amount * 100),  # this value is in cents
+                currency="usd",
+                customer=profile.stripe_customer_id
+            )
+
+            # record it on our side
+            charge = Charge(
+                profile=profile,
+                amount=amount,
+                stripe_charge_id=charge.id
+            )
+            charge.save()
+
+            # send email to user saying they've been charged
+            send_email(
+                "Newsplatform Invoice",
+                profile.user.username,
+                f"Thank you for using NewsPlatform. \
+                We've successfully charged your credit card an amount of ${amount} \
+                for the previous month's subscriptions.",
+                profile.user.email
+            )
+
+        except Exception as e:
+            # create an alert because this failed
+            charge = Charge(
+                profile=profile,
+                amount=amount,
+                success=False
+            )
+            charge.save()
+
+    # remove profile from the channels' subscriptions
+    for channel in profile.subscriptions.all():
+        channel.subscribers.remove(profile)
+
+    # remove from channel subscribers
+    profile.subscriptions.clear()
+
+    # cancel all subscription objects
+    subscription = Subscription.objects \
+        .filter(profile=profile) \
+        .update(active=False)
+
+    # user won't be able to login after setting inactive
     user.is_active = False
     user.save()
     logout(request)

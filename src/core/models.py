@@ -52,7 +52,7 @@ class Channel(models.Model):
         })
 
     def get_latest_articles(self):
-        return self.articles.all().order_by('published_date')[:4]
+        return self.articles.all().order_by('published_date')[:3]
 
     def get_total_article_views(self):
         return self.articles.all().values('view_count').aggregate(Sum('view_count'))

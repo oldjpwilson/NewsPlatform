@@ -44,6 +44,7 @@
                 </strong>
                 <h3 class="mb-0">
                   <a class="text-dark" href="{{ article.get_absolute_url }}">{{ article.title }}</a>
+                  <small style="font-size: 50%;">Posted by <a href="{{ article.channel.get_absolute_url }}">{{ article.channel }}</a></small>
                 </h3>
                 <div class="mb-1 text-muted">
                 {{ article.published_date|timesince }} ago

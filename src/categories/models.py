@@ -8,6 +8,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    @property
     def get_absolute_url(self):
         return reverse('category-detail', kwargs={
             'name': self.name

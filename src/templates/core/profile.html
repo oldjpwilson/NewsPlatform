@@ -122,7 +122,10 @@
 
     <hr />
 
-    <a href="{% url 'close-account' %}" class="btn btn-secondary">Close account</a>
+    <!-- Button trigger payment modal -->
+    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#paymentModal">
+      Close account
+    </button>
 
     {% elif display == 'edit_payment_details' %}
 

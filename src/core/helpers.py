@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Count, Sum
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from articles.models import ArticleView
+from articles.models import ArticleView, FreeView
 from core.models import Channel, Subscription, Payout
 
 
@@ -146,3 +146,10 @@ def send_email(subject, full_name, message, email):
               from_email,
               to_email,
               fail_silently=True)
+
+
+def get_remaining_free_views(user, channel):
+    free_view_count = FreeView.objects \
+        .filter(user=user, channel=channel) \
+        .count()
+    return int(settings.NUM_FREE_VIEWS_PER_CHANNEL) - free_view_count

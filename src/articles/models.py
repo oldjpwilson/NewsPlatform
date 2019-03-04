@@ -85,4 +85,16 @@ class ArticleView(models.Model):
         User, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return self.user.username
+        return self.article.title
+
+
+class FreeView(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True)
+    channel = models.ForeignKey(
+        Channel, on_delete=models.SET_NULL, blank=True, null=True)
+    article_view = models.ForeignKey(
+        ArticleView, on_delete=models.SET_NULL, blank=True, null=True)
+
+    def __str__(self):
+        return self.article_view.article.title

@@ -7,13 +7,13 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
-from core.helpers import paginate_queryset
+from core.helpers import paginate_queryset, get_remaining_free_views
 from core.models import Channel, Profile
-from core.views import check_user_is_journalist, check_channel_has_stripe_account
+from core.views import check_user_is_journalist, check_channel_has_stripe_account, is_article_creator
 from categories.models import Category
 from categories.views import get_todays_most_popular_article_categories
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
-from .models import Article, ArticleView
+from .models import Article, ArticleView, FreeView
 
 
 def search(request):
@@ -159,22 +159,46 @@ def article_detail(request, id):
     article = get_object_or_404(Article, id=id)
 
     # handle if the visitor is subscribed
-    visitor_profile = get_object_or_404(Profile, user=request.user)
+    profile = get_object_or_404(Profile, user=request.user)
     subscribed = False
-    if visitor_profile in article.channel.subscribers.all():
+    RFV = 0
+
+    if profile in article.channel.subscribers.all():
         subscribed = True
-        article_view, created = ArticleView.objects.get_or_create(
-            article=article, user=request.user)
-        if created:
-            article.view_count = article.view_count + 1
-            article.save()
+        if not is_article_creator(request, article):
+            article_view, created = ArticleView.objects.get_or_create(
+                article=article, user=request.user)
+            if created:
+                article.view_count = article.view_count + 1
+                article.save()
+    else:
+        RFV = get_remaining_free_views(request.user, article.channel)
+        # create a new free view only if user is not the creator
+        if not is_article_creator(request, article):
+            article_view, created = ArticleView.objects.get_or_create(
+                article=article,
+                user=request.user
+            )
+            FreeView.objects.get_or_create(
+                user=request.user,
+                channel=article.channel,
+                article_view=article_view
+            )
+
+    if RFV > 0:
+        messages.info(
+            request, f"You have {RFV} free views left for this channel")
+
+    allowed_to_view = False
+    if subscribed is True or RFV > 0:
+        allowed_to_view = True
 
     context = {
         'article': article,
         'most_viewed': most_viewed,
         'most_recent': most_recent,
         'cats': most_popular_cats,
-        'visitor_is_subscribed': subscribed
+        'allowed_to_view': allowed_to_view
     }
     return render(request, 'articles/article_detail.html', context)
 

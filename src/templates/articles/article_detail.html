@@ -6,9 +6,10 @@
 <main role="main" class="container">
   <div class="row mt-5">
     <div class="col-md-8">
-      {% if visitor_is_subscribed or request.user == article.channel.user %}
+      {% if allowed_to_view or request.user == article.channel.user %}
 
-        <h2>{{ article.title }}</h2>
+        <h2>{{ article.title }} <small style="font-size: 50%;">Posted by <a href="{{ article.channel.get_absolute_url }}">{{ article.channel }}</a></small></h2>
+        
         <img style="width: 100%;" src="{{ article.thumbnail.url }}" alt="Article thumbnail" />
         {{ article.content | safe }}
         {% if article.channel.user == request.user %}
@@ -32,5 +33,6 @@
 
     {% include 'articles/article_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
   </div>
+
 </main>
 {% endblock content %}
