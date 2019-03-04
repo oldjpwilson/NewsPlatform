@@ -545,6 +545,13 @@ def close_profile(request):
             request, "You cannot delete your account without closing your channel first.")
         return redirect(reverse('my-channel'))
 
+    # if user has no credit card sources then reject
+    user_has_payment_details = check_user_payment_details(user)
+    if not user_has_payment_details:
+        messages.info(
+            request, "Please add a credit card to you profile to pay your last subscription invoice.")
+        return redirect(reverse("edit-profile-payment-details"))
+
     profile = get_object_or_404(Profile, user=user)
 
     # charge account for this month
@@ -585,6 +592,9 @@ def close_profile(request):
                 success=False
             )
             charge.save()
+
+        messages.warning(
+            request, "There was an error processing your payment. If the error persists please contact support.")
 
     # remove profile from the channels' subscriptions
     for channel in profile.subscriptions.all():
