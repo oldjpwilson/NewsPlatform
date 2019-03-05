@@ -30,6 +30,7 @@ from core.views import (
     channel_update,
     channel_update_payment_details,
     channel_public,
+    change_selected_channel,
     subscribe,
     unsubscribe,
     remove_credit_card,
@@ -85,6 +86,8 @@ urlpatterns = [
     path('channel/<name>/', channel_public, name='channel-public'),
     path('my-channel/edit-payment-details/',
          channel_update_payment_details, name='edit-channel-payment-details'),
+    path('change-selected-channel/<name>/', change_selected_channel,
+         name='change-selected-channel'),
 
     # action views
     path('subscribe/<name>/', subscribe, name='subscribe'),

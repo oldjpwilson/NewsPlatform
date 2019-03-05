@@ -4,8 +4,20 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models import Count, Sum
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import get_object_or_404
 from articles.models import ArticleView, FreeView
 from core.models import Channel, Subscription, Payout
+
+
+def get_channel_or_404(request):
+    user_channels = Channel.objects.filter(user=request.user)
+    try:
+        channel_name = request.session['selected_channel']
+    except KeyError:
+        channel_name = user_channels[0].name
+        request.session['selected_channel'] = channel_name
+    channel = get_object_or_404(Channel, name=channel_name)
+    return channel
 
 
 def get_dates():

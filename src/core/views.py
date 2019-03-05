@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.views import View
 from star_ratings.models import Rating
@@ -18,6 +18,7 @@ from categories.views import get_todays_most_popular_article_categories
 from .forms import ChannelCreateForm, ChannelUpdateForm
 from .models import Profile, Channel, Subscription, Payout, Charge
 from .helpers import (
+    get_channel_or_404,
     get_profile_current_billing_total,
     get_channel_current_billing_revenue,
     get_channel_alltime_billing_revenue,
@@ -157,7 +158,7 @@ def profile_update_payment_details(request):
 @login_required
 @user_passes_test(check_user_is_journalist)
 def my_channel(request):
-    channel = get_object_or_404(Channel, user=request.user)
+    channel = get_channel_or_404(request)
     articles = channel.articles.all().order_by('-published_date')
     highest_rated_article = get_highest_rated_article(channel)
     most_viewed_article = get_most_viewed_article(channel)
@@ -178,6 +179,11 @@ def my_channel(request):
     return render(request, 'core/channel.html', context)
 
 
+def change_selected_channel(request, name):
+    request.session['selected_channel'] = name
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 def channel_list(request):
     channels = Channel.objects.all()
     queryset, page_request_var = paginate_queryset(request, channels)
@@ -195,7 +201,7 @@ def channel_list(request):
 
 
 def channel_public(request, name):
-    channel = get_object_or_404(Channel, name=name)
+    channel = get_channel_or_404(request, name)
     articles = channel.articles.all().order_by('-published_date')
     queryset, page_request_var = paginate_queryset(request, articles)
     context = {
@@ -208,11 +214,6 @@ def channel_public(request, name):
 
 @login_required
 def channel_create(request):
-    channel_status = check_channel_status(request)
-    if channel_status is not None:
-        messages.info(request, "You already have a channel!")
-        return redirect(reverse('my-profile'))
-
     form = ChannelCreateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():
@@ -231,9 +232,9 @@ def channel_create(request):
 @login_required
 @user_passes_test(check_user_is_journalist)
 def channel_stats(request):
-    if not request.user.channel:
+    if not request.user.profile.channels().count() > 0:
         return redirect(reverse('profile'))
-    channel = get_object_or_404(Channel, user=request.user)
+    channel = get_channel_or_404(request)
     current_billing_revenue = get_channel_current_billing_revenue(channel)
     alltime_billing_revenue = get_channel_alltime_billing_revenue(channel)
     queryset, page_request_var = paginate_queryset(
@@ -255,9 +256,9 @@ def channel_stats(request):
 @login_required
 @user_passes_test(check_user_is_journalist)
 def channel_update(request):
-    if not request.user.channel:
+    if not request.user.profile.channels().count() > 0:
         return redirect(reverse('profile'))
-    channel = get_object_or_404(Channel, user=request.user)
+    channel = get_channel_or_404(request)
     form = ChannelUpdateForm(request.POST or None,
                              request.FILES or None, instance=channel)
     if request.method == 'POST':
@@ -276,7 +277,7 @@ def channel_update(request):
 @login_required
 @user_passes_test(check_user_is_journalist)
 def channel_update_payment_details(request):
-    channel = get_object_or_404(Channel, user=request.user)
+    channel = get_channel_or_404(request)
     context = {
         'channel': channel,
         'name': channel.name,
@@ -289,7 +290,7 @@ def channel_update_payment_details(request):
 @login_required
 def subscribe(request, name):
     profile = get_object_or_404(Profile, user=request.user)
-    channel = get_object_or_404(Channel, name=name)
+    channel = get_channel_or_404(request, name)
 
     # redirect if user doesn't have a credit card
     user_has_payment_details = check_user_payment_details(request.user)
@@ -318,7 +319,7 @@ def subscribe(request, name):
 @login_required
 def unsubscribe(request, name):
     profile = get_object_or_404(Profile, user=request.user)
-    channel = get_object_or_404(Channel, name=name)
+    channel = get_channel_or_404(request, name)
     subscription = get_object_or_404(Subscription, profile=profile)
 
     # update the profile's subscriptions
@@ -352,7 +353,7 @@ def remove_credit_card(request, card_id):
 class StripeAuthorizeView(LoginRequiredMixin, View):
 
     def get(self, request):
-        channel = get_object_or_404(Channel, user=request.user)
+        channel = get_channel_or_404(request)
         if channel.subscribers.count() < 20:
             messages.info(
                 request, "You need more than 20 subscribers to start receiving payouts")
@@ -384,7 +385,7 @@ class StripeAuthorizeCallbackView(View):
                 url = 'https://connect.stripe.com/oauth/token'
                 resp = requests.post(url, params=data)
 
-                channel = get_object_or_404(Channel, user=request.user)
+                channel = channel = get_channel_or_404(request)
                 channel.stripe_account_id = resp.json()['stripe_user_id']
                 channel.connected = True
                 channel.save()
@@ -623,7 +624,7 @@ def close_profile(request):
 
 
 def close_channel(request):
-    channel = get_object_or_404(Channel, user=request.user)
+    channel = channel = get_channel_or_404(request)
     user = request.user
     channel_status = check_channel_status(request)
     if channel_status is None:

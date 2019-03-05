@@ -206,7 +206,8 @@ def article_detail(request, id):
 @login_required
 @user_passes_test(check_user_is_journalist)
 def article_create(request):
-    channel = Channel.objects.get(user=request.user)
+    channel_name = request.session['selected_channel']
+    channel = Channel.objects.get(user=request.user, name=channel_name)
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':
         if form.is_valid():

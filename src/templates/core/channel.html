@@ -110,8 +110,18 @@
     </div>
     <aside class="col-md-4 blog-sidebar">
         <div class="card">
-            <div class="card-header text-center">
-                <img src="{{ channel.profile_image.url }}" alt="..." class="img-thumbnail" style="max-height: 100px;">
+            <div class="card-header">
+                <div class="text-center">
+                    <img src="{{ channel.profile_image.url }}" alt="..." class="img-thumbnail" style="max-height: 100px;">
+                </div>
+                <span style="float: right;" class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                </span>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <h6 class="dropdown-header">Select a channel</h6>
+                {% for channel in request.user.profile.channels %}
+                <a class="dropdown-item" href="{% url 'change-selected-channel' channel.name %}">{{ channel.name }}</a>
+                {% endfor %}
+                </div>
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">{{ channel.description }}</li>

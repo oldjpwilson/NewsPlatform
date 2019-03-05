@@ -25,9 +25,13 @@ class Profile(models.Model):
     def get_subscription_count(self):
         return self.subscriptions.count()
 
+    def channels(self):
+        return self.user.channels.all()
+
 
 class Channel(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, related_name='channels', on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     description = models.TextField()

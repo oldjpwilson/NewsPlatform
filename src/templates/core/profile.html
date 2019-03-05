@@ -9,7 +9,20 @@
   <aside class="col-md-4 blog-sidebar">
     <div class="card" style="width: 100%;">
       <div class="card-header">
-        <h4>{{ request.user.username }}</h4>
+        <h4>{{ request.user.username }}
+        <span style="float: right;">
+          <div class="dropdown">
+            <span class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            </span>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <h6 class="dropdown-header">Select a channel</h6>
+              {% for channel in request.user.profile.channels %}
+              <a class="dropdown-item" href="{% url 'change-selected-channel' channel.name %}">{{ channel.name }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </span>
+        </h4>
       </div>
       <ul class="list-group list-group-flush">
         <li class="list-group-item"><a href="{% url 'my-profile' %}">Stats</a></li>
@@ -24,6 +37,7 @@
         <a style="width: 100%;" href="{% url 'channel-create' %}" class="btn btn-primary">Become a Journalist!</a>
         {% else %}
         <a style="width: 100%;" href="{% url 'channel-stats' %}" class="btn btn-primary">Edit channel</a>
+        <a style="width: 100%;" href="{% url 'channel-create' %}" class="btn btn-secondary mt-2">Create another channel</a>        
       {% endif %}
     </div>
   </aside>
