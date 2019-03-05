@@ -229,7 +229,8 @@ def article_create(request):
 def article_update(request, id):
     instance = get_object_or_404(Article, id=id)
     form = ArticleModelForm(request.POST or None,
-                            request.FILES or None, instance=instance)
+                            request.FILES or None,
+                            instance=instance)
     if request.method == 'POST':
         if form.is_valid():
             form.save()

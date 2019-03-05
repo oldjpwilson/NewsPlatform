@@ -9,7 +9,7 @@ from articles.models import ArticleView, FreeView
 from core.models import Channel, Subscription, Payout
 
 
-def get_channel_or_404(request):
+def get_channel_from_session(request):
     user_channels = Channel.objects.filter(user=request.user)
     try:
         channel_name = request.session['selected_channel']
@@ -18,6 +18,13 @@ def get_channel_or_404(request):
         request.session['selected_channel'] = channel_name
     channel = get_object_or_404(Channel, name=channel_name)
     return channel
+
+
+def get_channel_or_404(request, name=None):
+    if name is None:
+        return get_channel_from_session(request)
+    else:
+        return get_object_or_404(Channel, name=name)
 
 
 def get_dates():

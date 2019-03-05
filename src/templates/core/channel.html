@@ -114,6 +114,7 @@
                 <div class="text-center">
                     <img src="{{ channel.profile_image.url }}" alt="..." class="img-thumbnail" style="max-height: 100px;">
                 </div>
+                {% if request.user.profile.channels.count > 0 %}
                 <span style="float: right;" class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 </span>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -122,6 +123,7 @@
                 <a class="dropdown-item" href="{% url 'change-selected-channel' channel.name %}">{{ channel.name }}</a>
                 {% endfor %}
                 </div>
+                {% endif %}
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">{{ channel.description }}</li>

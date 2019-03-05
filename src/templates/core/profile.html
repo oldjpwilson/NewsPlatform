@@ -10,6 +10,7 @@
     <div class="card" style="width: 100%;">
       <div class="card-header">
         <h4>{{ request.user.username }}
+        {% if request.user.profile.channels.count > 0 %}
         <span style="float: right;">
           <div class="dropdown">
             <span class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -22,6 +23,7 @@
             </div>
           </div>
         </span>
+        {% endif %}
         </h4>
       </div>
       <ul class="list-group list-group-flush">
@@ -33,7 +35,7 @@
     </div>
 
     <div class="mt-1">
-      {% if not request.user.channel %}
+      {% if request.user.profile.channels.count < 0 %}
         <a style="width: 100%;" href="{% url 'channel-create' %}" class="btn btn-primary">Become a Journalist!</a>
         {% else %}
         <a style="width: 100%;" href="{% url 'channel-stats' %}" class="btn btn-primary">Edit channel</a>
