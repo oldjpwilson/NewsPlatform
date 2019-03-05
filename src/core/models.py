@@ -27,8 +27,7 @@ class Profile(models.Model):
 
 
 class Channel(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
