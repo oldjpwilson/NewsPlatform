@@ -67,11 +67,9 @@ def is_article_creator(request, article_being_viewed):
     channel_status = check_channel_status(request)
     if channel_status is None:
         return False
-    else:
-        if article_being_viewed.channel == channel_status:
-            return True
-        else:
-            return False
+    elif article_being_viewed.channel.user.profile == channel_status.user.profile:
+        return True
+    return False
 
 
 @login_required

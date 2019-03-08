@@ -185,9 +185,10 @@ def article_detail(request, id):
                 article_view=article_view
             )
 
-    if RFV > 0:
-        messages.info(
-            request, f"You have {RFV} free views left for this channel")
+    if not is_article_creator(request, article) and subscribed is False:
+        if RFV > 0:
+            messages.info(
+                request, f"You have {RFV} free views left for this channel")
 
     allowed_to_view = False
     if subscribed is True or RFV > 0:
