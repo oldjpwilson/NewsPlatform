@@ -163,29 +163,31 @@ def article_detail(request, id):
     subscribed = False
     RFV = 0
 
+    if is_article_creator(request, article) is False:
+        article_view, created = ArticleView.objects.get_or_create(
+            article=article,
+            user=request.user
+        )
+        article.view_count = article.view_count + 1
+        article.save()
+
     if profile in article.channel.subscribers.all():
         subscribed = True
-        if not is_article_creator(request, article):
-            article_view, created = ArticleView.objects.get_or_create(
-                article=article, user=request.user)
+        if is_article_creator(request, article) is False:
             if created:
                 article.view_count = article.view_count + 1
                 article.save()
     else:
         RFV = get_remaining_free_views(request.user, article.channel)
         # create a new free view only if user is not the creator
-        if not is_article_creator(request, article):
-            article_view, created = ArticleView.objects.get_or_create(
-                article=article,
-                user=request.user
-            )
+        if is_article_creator(request, article) is False:
             FreeView.objects.get_or_create(
                 user=request.user,
                 channel=article.channel,
                 article_view=article_view
             )
 
-    if not is_article_creator(request, article) and subscribed is False:
+    if is_article_creator(request, article) is False and subscribed is False:
         if RFV > 0:
             messages.info(
                 request, f"You have {RFV} free views left for this channel")

@@ -97,4 +97,4 @@ class FreeView(models.Model):
         ArticleView, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return self.article_view.article.title
+        return self.user.username

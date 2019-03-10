@@ -21,7 +21,7 @@ class ArticleAdmin(admin.ModelAdmin):
                 'urgency',
                 'duration',
                 'content',
-                'draft'
+                'view_count'
             )
         }),
     )
