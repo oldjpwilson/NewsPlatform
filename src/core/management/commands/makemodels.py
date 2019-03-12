@@ -7,12 +7,12 @@ names = [
     'Tech',
     'Lifestyle',
     'Entertainment',
-    'Historical',
+    'Motoring',
     'Political',
-    'Religious',
-    'Humour',
-    'Arts',
-    'Education'
+    'Science',
+    'Business',
+    'Health',
+    'Environment'
 ]
 
 durations = [
