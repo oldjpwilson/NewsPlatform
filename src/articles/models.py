@@ -34,7 +34,7 @@ class Urgency(models.Model):
 class Article(models.Model):
     channel = models.ForeignKey(
         Channel, related_name='articles', on_delete=models.CASCADE)
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=50, blank=False, null=False)
     description = models.TextField()
     thumbnail = models.ImageField(blank=False, null=False)
     media_type = models.CharField(max_length=40, choices=MEDIA_CHOICES)
@@ -85,7 +85,7 @@ class ArticleView(models.Model):
         User, on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
-        return self.article.title
+        return self.user.username
 
 
 class FreeView(models.Model):
