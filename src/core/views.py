@@ -139,9 +139,16 @@ def profile_update_payment_details(request):
     customer = stripe.Customer.retrieve(profile.stripe_customer_id)
     if request.method == "POST":
         token = request.POST['stripeToken']
+        next = request.POST['next']
         if token:
             customer.source = token
             customer.save()
+            if next != '':
+                messages.info(
+                    request, 'Your payment details have been entered and you are now subscribed to this channel.')
+                return redirect(reverse("subscribe", kwargs={
+                    'name': next
+                }))
             return redirect(reverse("edit-profile-payment-details"))
 
     context = {
@@ -295,7 +302,7 @@ def subscribe(request, name):
     if not user_has_payment_details:
         messages.info(
             request, "Please enter payment details to subscribe to a channel")
-        return redirect(reverse("edit-profile-payment-details"))
+        return redirect(reverse("edit-profile-payment-details") + f'?next={name}')
 
     # store the new stripe susbciption
     sub = Subscription()

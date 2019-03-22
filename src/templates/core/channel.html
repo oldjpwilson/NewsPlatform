@@ -114,16 +114,24 @@
                 <div class="text-center">
                     <img src="{{ channel.profile_image.url }}" alt="..." class="img-thumbnail" style="max-height: 100px;">
                 </div>
-                {% if request.user.profile.channels.count > 0 %}
-                <span style="float: right;" class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                </span>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <h6 class="dropdown-header">Select a channel</h6>
-                {% for channel in request.user.profile.channels %}
-                <a class="dropdown-item" href="{% url 'change-selected-channel' channel.name %}">{{ channel.name }}</a>
-                {% endfor %}
+                <div class="card-body">
+                    {% if request.user.profile.channels.count > 0 %}
+                    <span>Current channel: </span>
+                    <span style="float: right;">
+                    <div class="dropdown">
+                        <span class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <b>{{ request.session.selected_channel }}</b>
+                        </span>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <h6 class="dropdown-header">Select a channel</h6>
+                            {% for channel in request.user.profile.channels %}
+                                <a class="dropdown-item" href="{% url 'change-selected-channel' channel.name %}">{{ channel.name }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    </span>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">{{ channel.description }}</li>

@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.urls import reverse
 from django.shortcuts import render, get_object_or_404, redirect
 from core.forms import LoginForm
-from core.helpers import paginate_queryset, get_remaining_free_views
+from core.helpers import paginate_queryset, get_remaining_free_views, get_channel_from_session
 from core.models import Channel, Profile
 from core.views import check_user_is_journalist, check_channel_has_stripe_account, is_article_creator
 from categories.models import Category
@@ -209,7 +209,7 @@ def article_detail(request, id):
 @login_required
 @user_passes_test(check_user_is_journalist)
 def article_create(request):
-    channel_name = request.session['selected_channel']
+    channel_name = get_channel_from_session(request)
     channel = Channel.objects.get(user=request.user, name=channel_name)
     form = ArticleModelForm(request.POST or None, request.FILES or None)
     if request.method == 'POST':

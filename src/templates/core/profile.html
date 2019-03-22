@@ -7,13 +7,17 @@
 <div class="row mt-5">
 
   <aside class="col-md-4 blog-sidebar">
-    <div class="card" style="width: 100%;">
+    <div class="card">
       <div class="card-header">
-        <h4>{{ request.user.username }}
+        <h4>{{ request.user.username }}</h4>
+      </div>
+      <div class="card-body">
         {% if request.user.profile.channels.count > 0 %}
+        <span>Current channel: </span>
         <span style="float: right;">
           <div class="dropdown">
             <span class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <b>{{ request.session.selected_channel }}</b>
             </span>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <h6 class="dropdown-header">Select a channel</h6>
@@ -24,7 +28,6 @@
           </div>
         </span>
         {% endif %}
-        </h4>
       </div>
       <ul class="list-group list-group-flush">
         <li class="list-group-item"><a href="{% url 'my-profile' %}">Stats</a></li>
@@ -153,10 +156,12 @@
       <ul class="list-group">
         {% for card in card_list %}
           <li class="list-group-item">          
-            <label class="title ellipsis">
+            <label class="title ellipsis" style="width: 100%; margin-bottom: 0;">
             <span style="float: left;"><i class="fab fa-2x fa-cc-{{ card.brand|lower }}"></i></span>            
-            <span style="margin-left: 10px; font-size: 17px;">**** **** **** <b>{{ card.last4 }}</b> | EXP: <b>{{ card.exp_month }}/{{ card.exp_year }}</b></span>
-            <a href="{% url 'remove-credit-card' card.id %}"><span style="float: right;"><i class="fas fa-2x fa-trash-alt"></i></span></a>
+            <span style="margin-left: 10px; font-size: 17px; vertical-align: -webkit-baseline-middle;">
+            **** **** **** <b>{{ card.last4 }}</b> | EXP: <b>{{ card.exp_month }}/{{ card.exp_year }}</b>
+            </span>
+            <a href="{% url 'remove-credit-card' card.id %}"><span style="float: right;"><i class="fas fa-2x fa-trash-alt" style="float: right;"></i></span></a>
             </label>
           </li>
           {% empty %}

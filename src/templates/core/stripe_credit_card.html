@@ -1,6 +1,6 @@
 <style>
 
-label {
+#addCardLabel {
   font-family: "Helvetica Neue", Helvetica, sans-serif;
   font-size: 16px;
   font-variant: normal;
@@ -13,7 +13,7 @@ label {
   margin-bottom: 8px;
 }
 
-button {
+#addCardBtn {
   border: none;
   border-radius: 4px;
   outline: none;
@@ -36,9 +36,10 @@ button {
   float: left;
   margin-left: 12px;
   margin-top: 28px;
+  cursor: pointer;
 }
 
-button:hover {
+#addCardBtn:hover {
   transform: translateY(-1px);
   box-shadow: 0 7px 14px rgba(50, 50, 93, .10), 0 3px 6px rgba(0, 0, 0, .08);
   background-color: #43458b;
@@ -111,7 +112,7 @@ button:hover {
   <form action="{% url 'edit-profile-payment-details' %}" method="POST" id="payment-form">
     {% csrf_token %}
     <div class="stripe-form-row">
-      <label for="card-element">
+      <label id="addCardLabel" for="card-element">
         Credit or debit card
       </label>
       <div id="card-element" class="StripeElement StripeElement--empty">
@@ -123,7 +124,7 @@ button:hover {
       </div>
       <div id="card-errors" role="alert"></div>
     </div>
-    <button>Add Card</button>
+    <button id="addCardBtn">Add Card</button>
   </form>
   <div id="stripe-token-handler" class="is-hidden">Your card has been added to your profile</div>
 </div>
@@ -177,10 +178,32 @@ var successElement = document.getElementById("stripe-token-handler");
 function stripeTokenHandler(token) {
   var form = document.getElementById("payment-form");
   var hiddenInput = document.createElement("input");
+  var params = getParams(window.location.href);
+  if (params.next !== '') {
+    var hiddenNextInput = document.createElement("input");
+    hiddenNextInput.setAttribute("type", "hidden");
+    hiddenNextInput.setAttribute("name", "next");
+    hiddenNextInput.setAttribute("value", params.next);
+    form.appendChild(hiddenNextInput);
+  }
   hiddenInput.setAttribute("type", "hidden");
   hiddenInput.setAttribute("name", "stripeToken");
   hiddenInput.setAttribute("value", token.id);
   form.appendChild(hiddenInput);
   form.submit();
 }
+
+function getParams(url) {
+	var params = {};
+	var parser = document.createElement('a');
+	parser.href = url;
+	var query = parser.search.substring(1);
+	var vars = query.split('&');
+	for (var i = 0; i < vars.length; i++) {
+		var pair = vars[i].split('=');
+		params[pair[0]] = decodeURIComponent(pair[1]);
+	}
+	return params;
+};
+
 </script>
