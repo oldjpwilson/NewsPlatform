@@ -9,17 +9,18 @@ When making a change to the project we need to test it before pushing it live. T
 1. Change into the test branch (already created for you)
 2. Pull the latest version of the master branch
 3. Make the change you want to implement
-4. Change the _manage.py_ file to use the **newsPlatform.settings.test** file (Important)
-5. Change the _wsgi.py_ file to use the **newsPlatform.settings.test** (Important)
+4. Change the _manage.py_ file to use **newsPlatform.settings.test** file (Important)
+5. Change the _wsgi.py_ file to use **newsPlatform.settings.test** (Important)
 6. Change the elasticbeanstalk _config.yml_ file to use the **test environment** (Important)
-7. Commit the changes to the test branch
-8. Deploy the changes to the AWS test environment (already created for you)
-9. See if the change works
-10. Change the _manage.py_ and _wsgi.py_ back to use the **newsPlatform.settings.development** (Important)
-11. Change the elasticbeanstalk _config.yml_ back to use the **prod environment** (Important)
-12. Commit the changes to the test branch
-13. Push the changes to the test branch
-14. Merge the test branch into the master branch
+7. Change the ebextensions _django.config_ file to use **newsPlatform.settings.test** (Important)
+8. Commit the changes to the test branch
+9. Deploy the changes to the AWS test environment (already created for you)
+10. See if the change works
+11. Change the _manage.py_, _wsgi.py_ and _django.config_ files back to use the **newsPlatform.settings.development** (Important)
+12. Change the elasticbeanstalk _config.yml_ file back to use the **prod environment** (Important)
+13. Commit the changes to the test branch
+14. Push the changes to the test branch
+15. Merge the test branch into the master branch
 
 ## Development
 
