@@ -8,79 +8,109 @@
 
 {% block content %}
 
+<style>
+.check-item {
+  margin-left: 35px;
+  display: inline;
+}
+</style>
+
 <main role="main" class="container">
   <div class="row">
     <div class="col-md-8 blog-main">
-      <div class="row mb-5">
+      <div class="row mb-5" style="display: none;">
         <div class="col-12">
           <form method="GET">
           <div class="well">
-            <h4 style="margin-top: 0">Filter or Search Channels</h4>
-            <div class="form-row mb-1">
-              <div class="col-12 input-group">
-                <input class="form-control py-2 border-right-0 border" type="search" placeholder="Channel name" id="search-input" name="channel_name">
-                <span class="input-group-append">
-                  <button class="btn btn-outline-secondary border-left-0 border" type="button">
-                        <i class="fa fa-search"></i>
-                  </button>
-                </span>
+            <h4>Order by</h4>
+            <div class="form-row mb-4 mr-sm-2 form-check">
+              <div class="check-item">
+                <input class="form-check-input" type="checkbox" id="latest">
+                <label class="form-check-label" for="latest">
+                  Latest
+                </label>
+              </div>
+              <div class="check-item">
+                <input class="form-check-input" type="checkbox" id="view_count">
+                <label class="form-check-label" for="view_count">
+                  View count
+                </label>
+              </div>
+              <div class="check-item">
+                <input class="form-check-input" type="checkbox" id="rating">
+                <label class="form-check-label" for="rating">
+                  Rating
+                </label>
               </div>
             </div>
-            <div class="form-row mb-1">
-              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                <div class="form-row">
-                  <div class="col-6">
-                    <input type="text" class="form-control" placeholder="0" aria-describedby="subCountMinHelp" name="subCountMin">
-                    <small id="subCountMinHelp" class="form-text text-muted">
-                      Minimum number of subscribers
-                    </small>
+            <h4>Advanced Search</h4>
+            <div id="advancedForm">
+              <div class="form-row mb-1">
+                <div class="col-12 input-group">
+                  <input class="form-control py-2 border-right-0 border" type="search" placeholder="Channel name" id="search-input" name="channel_name">
+                  <span class="input-group-append">
+                    <button class="btn btn-outline-secondary border-left-0 border" type="button">
+                          <i class="fa fa-search"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="form-row mb-1">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                  <div class="form-row">
+                    <div class="col-6">
+                      <input type="text" class="form-control" placeholder="0" aria-describedby="subCountMinHelp" name="subCountMin">
+                      <small id="subCountMinHelp" class="form-text text-muted">
+                        Minimum number of subscribers
+                      </small>
+                    </div>
+                    <div class="col-6">
+                      <input type="text" id="viewCountMax" class="form-control" placeholder="100" aria-describedby="subCountMaxHelp" name="subCountMax">
+                      <small id="subCountMaxHelp" class="form-text text-muted">
+                        Maximum number of subscribers
+                      </small>
+                    </div>
                   </div>
-                  <div class="col-6">
-                    <input type="text" id="viewCountMax" class="form-control" placeholder="100" aria-describedby="subCountMaxHelp" name="subCountMax">
-                    <small id="subCountMaxHelp" class="form-text text-muted">
-                      Maximum number of subscribers
-                    </small>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                  <div class="form-row">
+                    <div class="col-6">
+                      <input type="text" class="form-control" placeholder="0" aria-describedby="articleCountMinHelp" name="articleCountMin">
+                      <small id="articleCountMinHelp" class="form-text text-muted">
+                        Minimum number of articles
+                      </small>
+                    </div>
+                    <div class="col-6">
+                      <input type="text" id="viewCountMax" class="form-control" placeholder="25" aria-describedby="articleCountMaxHelp" name="articleCountMax">
+                      <small id="articleCountMaxHelp" class="form-text text-muted">
+                        Maximum number of articles
+                      </small>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                <div class="form-row">
-                  <div class="col-6">
-                    <input type="text" class="form-control" placeholder="0" aria-describedby="articleCountMinHelp" name="articleCountMin">
-                    <small id="articleCountMinHelp" class="form-text text-muted">
-                      Minimum number of articles
-                    </small>
-                  </div>
-                  <div class="col-6">
-                    <input type="text" id="viewCountMax" class="form-control" placeholder="25" aria-describedby="articleCountMaxHelp" name="articleCountMax">
-                    <small id="articleCountMaxHelp" class="form-text text-muted">
-                      Maximum number of articles
-                    </small>
-                  </div>
+              <div class="form-row mb-1">
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                  <select class="custom-select" id="categories" multiple="multiple" name="categories">
+                    {% for c in categories %}
+                      <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
                 </div>
-              </div>
-            </div>
-            <div class="form-row mb-1">
-              <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
-                <select class="custom-select" id="categories" multiple="multiple" name="categories">
-                  {% for c in categories %}
-                    <option value="{{ c }}">{{ c }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div class="col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
-                <div class="form-row">
-                  <div class="col-6">
-                    <input type="text" class="form-control" placeholder="0" aria-describedby="viewCountMinHelp" name="viewCountMin">
-                    <small id="viewCountMinHelp" class="form-text text-muted">
-                      Minimum number of views
-                    </small>
-                  </div>
-                  <div class="col-6">
-                    <input type="text" id="viewCountMax" class="form-control" placeholder="10000" aria-describedby="viewCountMaxHelp" name="viewCountMax">
-                    <small id="viewCountMaxHelp" class="form-text text-muted">
-                      Maximum number of views
-                    </small>
+                <div class="col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+                  <div class="form-row">
+                    <div class="col-6">
+                      <input type="text" class="form-control" placeholder="0" aria-describedby="viewCountMinHelp" name="viewCountMin">
+                      <small id="viewCountMinHelp" class="form-text text-muted">
+                        Minimum number of views
+                      </small>
+                    </div>
+                    <div class="col-6">
+                      <input type="text" id="viewCountMax" class="form-control" placeholder="10000" aria-describedby="viewCountMaxHelp" name="viewCountMax">
+                      <small id="viewCountMaxHelp" class="form-text text-muted">
+                        Maximum number of views
+                      </small>
+                    </div>
                   </div>
                 </div>
               </div>
