@@ -1,5 +1,12 @@
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+# Project Files
 env
 __pycache__
 **/*.pyc
-src/media_root
-src/static_root
+media_root
+static_root
