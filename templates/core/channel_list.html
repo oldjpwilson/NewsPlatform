@@ -1,11 +1,98 @@
 {% extends "base.html" %}
+{% load static %}
+
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/bootstrap-multiselect.css' %}" type="text/css"/>
+{% endblock %}
 
 {% block content %}
 
 <main role="main" class="container">
   <div class="row">
-
     <div class="col-md-8 blog-main">
+      <div class="row mb-5">
+        <div class="col-12">
+          <form method="GET">
+          <div class="well">
+            <h4 style="margin-top: 0">Filter or Search Channels</h4>
+            <div class="form-row mb-1">
+              <div class="col-12 input-group">
+                <input class="form-control py-2 border-right-0 border" type="search" placeholder="Channel name" id="search-input" name="channel_name">
+                <span class="input-group-append">
+                  <button class="btn btn-outline-secondary border-left-0 border" type="button">
+                        <i class="fa fa-search"></i>
+                  </button>
+                </span>
+              </div>
+            </div>
+            <div class="form-row mb-1">
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="form-row">
+                  <div class="col-6">
+                    <input type="text" class="form-control" placeholder="0" aria-describedby="subCountMinHelp" name="subCountMin">
+                    <small id="subCountMinHelp" class="form-text text-muted">
+                      Minimum number of subscribers
+                    </small>
+                  </div>
+                  <div class="col-6">
+                    <input type="text" id="viewCountMax" class="form-control" placeholder="100" aria-describedby="subCountMaxHelp" name="subCountMax">
+                    <small id="subCountMaxHelp" class="form-text text-muted">
+                      Maximum number of subscribers
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                <div class="form-row">
+                  <div class="col-6">
+                    <input type="text" class="form-control" placeholder="0" aria-describedby="articleCountMinHelp" name="articleCountMin">
+                    <small id="articleCountMinHelp" class="form-text text-muted">
+                      Minimum number of articles
+                    </small>
+                  </div>
+                  <div class="col-6">
+                    <input type="text" id="viewCountMax" class="form-control" placeholder="25" aria-describedby="articleCountMaxHelp" name="articleCountMax">
+                    <small id="articleCountMaxHelp" class="form-text text-muted">
+                      Maximum number of articles
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-row mb-1">
+              <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                <select class="custom-select" id="categories" multiple="multiple" name="categories">
+                  {% for c in categories %}
+                    <option value="{{ c }}">{{ c }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+                <div class="form-row">
+                  <div class="col-6">
+                    <input type="text" class="form-control" placeholder="0" aria-describedby="viewCountMinHelp" name="viewCountMin">
+                    <small id="viewCountMinHelp" class="form-text text-muted">
+                      Minimum number of views
+                    </small>
+                  </div>
+                  <div class="col-6">
+                    <input type="text" id="viewCountMax" class="form-control" placeholder="10000" aria-describedby="viewCountMaxHelp" name="viewCountMax">
+                    <small id="viewCountMaxHelp" class="form-text text-muted">
+                      Maximum number of views
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+              <span class="fa fa-search"></span> Search
+            </button>
+          </div>
+          </form>
+        </div>
+      </div>
+
       {% for channel in queryset %}
         <div class="row">
           <a class="text-muted" href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a>
@@ -56,3 +143,14 @@
 </main>
 
 {% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'js/bootstrap-multiselect.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#categories').multiselect({
+            nonSelectedText: 'Select a category(s)'
+        });
+    });
+</script>
+{% endblock scripts %}

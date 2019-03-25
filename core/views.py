@@ -14,7 +14,9 @@ from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.views import View
 from star_ratings.models import Rating
 from articles.models import Article, ArticleView
+from categories.models import Category
 from categories.views import get_todays_most_popular_article_categories
+from .filters import ChannelFilter
 from .forms import ChannelCreateForm, ChannelUpdateForm
 from .models import Profile, Channel, Subscription, Payout, Charge
 from .helpers import (
@@ -192,6 +194,7 @@ def change_selected_channel(request, name):
 def channel_list(request):
     channels = Channel.objects.all()
     queryset, page_request_var = paginate_queryset(request, channels)
+    channel_filter = ChannelFilter(request, queryset=queryset)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
@@ -200,7 +203,9 @@ def channel_list(request):
         'page_request_var': page_request_var,
         'most_viewed': most_viewed,
         'most_recent': most_recent,
-        'cats': most_popular_cats
+        'cats': most_popular_cats,
+        'filter': channel_filter,
+        'categories': Category.objects.all()
     }
     return render(request, 'core/channel_list.html', context)
 

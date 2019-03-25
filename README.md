@@ -2,6 +2,31 @@
 
 Notes on the project
 
+## Workflow
+
+When making a change to the project we need to test it before pushing it live. This is the workflow for that:
+
+1. Change into the test branch (already created for you)
+2. Pull the latest version of the master branch
+3. Make the change you want to implement
+4. Change the _manage.py_ file to use **newsPlatform.settings.test** file (Important)
+5. Change the _wsgi.py_ file to use **newsPlatform.settings.test** (Important)
+6. Change the elasticbeanstalk _config.yml_ file to use the **test** environment (Important)
+7. Change the ebextensions _django.config_ file to use **newsPlatform.settings.test** (Important)
+8. Commit the changes to the test branch
+9. Deploy the changes to the AWS test environment (already created for you)
+10. See if the change works
+11. Change the _manage.py_, _wsgi.py_ and _django.config_ files back to use **newsPlatform.settings.production** (Important)
+12. Change the elasticbeanstalk _config.yml_ file back to use the **prod** environment (Important)
+13. Commit the changes to the test branch
+14. Push the changes to the test branch
+15. Merge the test branch into the master branch
+16. Deploy the now updated project to the AWS prod enviroment
+
+## Something important to know about when deploying for the first time to a new environment
+
+In the django.config file are a list of commands to execute after every deployment. For some reason the first deployment fails on the second command. I believe this is because the code needs to be deployed on its own before any commands are included. So to get around this issue, for the first deployment, remove the commands from the config file (commit, push to git) and the deploy. That deployment is basically just deploying the code. Then add the commands back to the config file (commit, push to git) and deploy again. This time the commands will be executed with no problem because the code is definitely there.
+
 ## Development
 
 1. Install dependencies with `pip install -r requirements.txt`
@@ -13,7 +38,7 @@ In this repository, the dev branch is used for working on localhost. To run the 
 
 ## Settings
 
-There are three settings in the projects root folder: **newsPlatform**. One for base settings. One for development (localhost) and one for production (live)
+There are four settings in the projects root folder: **newsPlatform**. One for base settings. One for development (localhost), one for testing purposes (live) and one for production (live)
 
 ## Apps
 
@@ -28,7 +53,7 @@ There are currently four apps:
 
 This project is hosted using Elastic Beanstalk. Elastic Beanstalk is a Platform As A Service (PaaS) that streamlines the setup, deployment, and maintenance of your app on Amazon AWS. It’s a managed service, coupling the server (EC2), database (RDS), and your static files (S3).
 
-The project's **src** directory contains two required EB directories - **.ebextensions** and **.elasticbeanstalk**
+The project contains two required EB directories - **.ebextensions** and **.elasticbeanstalk**
 
 The **.ebextensions** contains a config file with settings for the Django project. In the config file the following commands are set to execute on deployment:
 
@@ -37,7 +62,7 @@ The **.ebextensions** contains a config file with settings for the Django projec
 3. Create required model instances
 4. Collect static files
 
-The **.elasticbeanstalk** contains a config file specifying settings. The important ones being the default region of the application (us-west-2), the Python version (3.6) and environment (src-prod)
+The **.elasticbeanstalk** contains a config file specifying settings. The important ones are the default region of the application (us-west-2), the Python version (3.6) and environment (prod or test)
 
 From scratch, the deployment process is as follows:
 
