@@ -2,6 +2,25 @@
 
 Notes on the project
 
+## Workflow
+
+When making a change to the project we need to test it before pushing it live. This is the workflow for that:
+
+1. Change into the test branch (already created for you)
+2. Pull the latest version of the master branch
+3. Make the change you want to implement
+4. Change the _manage.py_ file to use the **newsPlatform.settings.test** file (Important)
+5. Change the _wsgi.py_ file to use the **newsPlatform.settings.test** (Important)
+6. Change the elasticbeanstalk _config.yml_ file to use the **test environment** (Important)
+7. Commit the changes to the test branch
+8. Deploy the changes to the AWS test environment (already created for you)
+9. See if the change works
+10. Change the _manage.py_ and _wsgi.py_ back to use the **newsPlatform.settings.development** (Important)
+11. Change the elasticbeanstalk _config.yml_ back to use the **prod environment** (Important)
+12. Commit the changes to the test branch
+13. Push the changes to the test branch
+14. Merge the test branch into the master branch
+
 ## Development
 
 1. Install dependencies with `pip install -r requirements.txt`
