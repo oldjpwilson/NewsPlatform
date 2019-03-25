@@ -14,7 +14,7 @@ When making a change to the project we need to test it before pushing it live. T
 6. Change the elasticbeanstalk _config.yml_ file to use the **test** environment (Important)
 7. Change the ebextensions _django.config_ file to use **newsPlatform.settings.test** (Important)
 8. Commit the changes to the test branch
-9. Deploy the changes to the AWS test environment (already created for you)
+9. Deploy the changes to the AWS test environment (already created for you) ['eb deploy']
 10. See if the change works
 11. Change the _manage.py_, _wsgi.py_ and _django.config_ files back to use **newsPlatform.settings.production** (Important)
 12. Change the elasticbeanstalk _config.yml_ file back to use the **prod** environment (Important)
