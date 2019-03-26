@@ -9,8 +9,16 @@
 {% block content %}
 
 <style>
+.text-muted:hover {
+  text-decoration: none;
+  color: #6c757d !important;
+}
 .check-item {
   margin-left: 35px;
+  display: inline;
+}
+.check-item:nth-child(1) {
+  margin-left: 6px;
   display: inline;
 }
 </style>
@@ -18,38 +26,42 @@
 <main role="main" class="container">
   <div class="row">
     <div class="col-md-8 blog-main">
-      <div class="row mb-5" style="display: none;">
+      <div class="row mb-5">
         <div class="col-12">
           <form method="GET">
           <div class="well">
             <h4>Order by</h4>
             <div class="form-row mb-4 mr-sm-2 form-check">
               <div class="check-item">
-                <input class="form-check-input" type="checkbox" id="latest">
-                <label class="form-check-label" for="latest">
-                  Latest
-                </label>
-              </div>
-              <div class="check-item">
-                <input class="form-check-input" type="checkbox" id="view_count">
-                <label class="form-check-label" for="view_count">
+                <input class="form-check-input" type="hidden" id="id_latest" name="latest">
+                <input class="form-check-input" type="checkbox" id="id_view_count" name="view_count">
+                <label class="form-check-label" for="id_view_count">
                   View count
                 </label>
               </div>
               <div class="check-item">
-                <input class="form-check-input" type="checkbox" id="rating">
-                <label class="form-check-label" for="rating">
+                <input class="form-check-input" type="checkbox" id="id_rating" name="rating">
+                <label class="form-check-label" for="id_rating">
                   Rating
                 </label>
               </div>
+              <div class="check-item">
+                <input class="form-check-input" type="checkbox" id="id_sub_count" name="sub_count">
+                <label class="form-check-label" for="id_sub_count">
+                  Subscriber count
+                </label>
+              </div>
             </div>
-            <h4>Advanced Search</h4>
-            <div id="advancedForm">
+            <div>
+              <a id="showAdvancedFormBtn" class="float-right btn btn-sm btn-secondary" href="javascript:void(0)">Advanced search</a>
+            </div>
+            <div id="advancedForm" style="display: none;">
+              <h4>Advanced Search</h4>
               <div class="form-row mb-1">
                 <div class="col-12 input-group">
                   <input class="form-control py-2 border-right-0 border" type="search" placeholder="Channel name" id="search-input" name="channel_name">
                   <span class="input-group-append">
-                    <button class="btn btn-outline-secondary border-left-0 border" type="button">
+                    <button class="btn btn-outline-secondary border-left-0 border" type="submit">
                           <i class="fa fa-search"></i>
                     </button>
                   </span>
@@ -65,7 +77,7 @@
                       </small>
                     </div>
                     <div class="col-6">
-                      <input type="text" id="viewCountMax" class="form-control" placeholder="100" aria-describedby="subCountMaxHelp" name="subCountMax">
+                      <input type="text" class="form-control" placeholder="100" aria-describedby="subCountMaxHelp" name="subCountMax">
                       <small id="subCountMaxHelp" class="form-text text-muted">
                         Maximum number of subscribers
                       </small>
@@ -81,7 +93,7 @@
                       </small>
                     </div>
                     <div class="col-6">
-                      <input type="text" id="viewCountMax" class="form-control" placeholder="25" aria-describedby="articleCountMaxHelp" name="articleCountMax">
+                      <input type="text" class="form-control" placeholder="25" aria-describedby="articleCountMaxHelp" name="articleCountMax">
                       <small id="articleCountMaxHelp" class="form-text text-muted">
                         Maximum number of articles
                       </small>
@@ -116,46 +128,39 @@
               </div>
             </div>
             <button type="submit" class="btn btn-primary btn-sm">
-              <span class="fa fa-search"></span> Search
+              <span class="fa fa-search"></span> Filter
             </button>
           </div>
           </form>
         </div>
       </div>
 
+      <hr />
+
       {% for channel in queryset %}
         <div class="row">
-          <a class="text-muted" href="{{ channel.get_absolute_url }}"><h3>{{ channel.name }}</h3></a>
+          <a class="text-muted" href="{{ channel.get_absolute_url }}">
+            <h5>{{ channel.name }}</h5>
+            <span>{{ channel.subscriber_count }} subscribers</span> 
+            | <span>{{ channel.article_count }} articles</span> 
+            | <span>
+            {% if channel.channel_rating != None %}
+              {{ channel.channel_rating }}/10
+            {% else %}
+            No
+            {% endif %}
+            rating</span>
+            | <span>
+            {% if channel.view_count == None %}
+            0
+            {% else %}
+            {{ channel.view_count }} 
+            {% endif %}
+            views
+            </span>
+          </a>
         </div>
-        <div class="row mb-4">
-          {% for article in channel.get_latest_articles %}
-          <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
-            <div class="mt-2">
-                <div class="card">
-                <img class="card-img-top" src="{{ article.thumbnail.url }}" style="max-height: 154.36px;" alt="Article thumbnail">
-                <div class="card-body">
-                    <strong class="d-inline-block mb-2 text-primary">
-                    {% for cat in article.categories.all %}
-                    {{ cat }} {% if article.categories.count > 1 %} | {% endif %} 
-                    {% endfor %}
-                    </strong>
-                    <h3 class="mb-0">
-                      <a class="text-dark" href="{{ article.get_absolute_url }}">{{ article.title }}</a>
-                    </h3>
-                    <div class="mb-1 text-muted">
-                    {{ article.published_date|timesince }} ago
-                    <span>({{ article.view_count }} views)</span>
-                    </div>
-                    <p class="card-text">{{ article.description|truncatechars:50 }}</p>
-                    <a href="{{ article.get_absolute_url }}">Get informed..</a>
-                </div>
-                </div>
-            </div>
-          </div>
-          {% empty %}
-          This channel has not created any articles yet
-          {% endfor %}
-        </div>
+          <hr />
 
       {% empty %}
         There are currently no channels to subscribe to
@@ -183,4 +188,16 @@
         });
     });
 </script>
+<script>
+const advancedForm = document.getElementById('advancedForm');
+document.getElementById("showAdvancedFormBtn").addEventListener("click", () => {
+  if (advancedForm.style.display === 'none') {
+    advancedForm.style.display = 'block';
+  } else {
+    advancedForm.style.display = 'none'
+  }
+});
+</script>
+<script src="{% static 'js/selectCheckboxChannel.js' %}"></script>
+
 {% endblock scripts %}

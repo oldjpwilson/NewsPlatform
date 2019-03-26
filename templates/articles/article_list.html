@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
 
   <style>
@@ -69,43 +69,8 @@
 
   </main>
 
-  <script>
-
-    // these come from django forms by default
-    const LATEST_ID = 'id_latest';
-    const VIEW_COUNT_ID = 'id_view_count';
-    const RATING_ID = 'id_rating';
-
-    const latest = document.getElementById(LATEST_ID);
-    const view_count = document.getElementById(VIEW_COUNT_ID);
-    const rating = document.getElementById(RATING_ID);
-
-    function switchEnabled(formElement) {
-      const checked = formElement.checked;
-      if (checked) formElement.checked = false;
-        // otherwise do nothing because it's already false
-    }
-
-    /* 
-      listen for changes on the selected field and 
-      make sure only one field can be selected at a time
-    */
-
-    latest.addEventListener('change', e => {
-      switchEnabled(view_count);
-      switchEnabled(rating);
-    });
-
-    view_count.addEventListener('change', e => {
-      switchEnabled(latest);
-      switchEnabled(rating);
-    });
-
-    rating.addEventListener('change', e => {
-      switchEnabled(latest);
-      switchEnabled(view_count);
-    });
-
-  </script>
-
 {% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'js/selectCheckboxArticle' %}"></script>
+{% endblock scripts %}
