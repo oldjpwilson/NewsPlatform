@@ -57,14 +57,17 @@ class Channel(models.Model):
     def get_latest_articles(self):
         return self.articles.all().order_by('published_date')[:3]
 
-    def get_total_article_views(self):
-        return self.articles.all().values('view_count').aggregate(Sum('view_count'))
+    @property
+    def view_count(self):
+        v = self.articles.all().values('view_count').aggregate(Sum('view_count'))
+        return v['view_count__sum']
 
     @property
     def channel_rating(self):
-        return self.articles \
+        r = self.articles \
             .filter(rating__isnull=False, rating__count__gt=0) \
             .aggregate(Avg('rating__average'))
+        return r['rating__average__avg']
 
     @property
     def subscriber_count(self):

@@ -98,10 +98,10 @@
                 {% endif %}
                 <tr>
                     <td>Channel rating</td>
-                    {% if channel.channel_rating.rating__average__avg == None %}
+                    {% if channel.channel_rating == None %}
                         <td>No ratings yet</td>
                     {% else %}
-                        <td>{{ channel.channel_rating.rating__average__avg }}</td>
+                        <td>{{ channel.channel_rating }}</td>
                     {% endif %}
                 </tr>
             </tbody>

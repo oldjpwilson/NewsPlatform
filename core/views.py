@@ -193,8 +193,9 @@ def change_selected_channel(request, name):
 
 def channel_list(request):
     channels = Channel.objects.all()
-    queryset, page_request_var = paginate_queryset(request, channels)
-    channel_filter = ChannelFilter(request, queryset=queryset)
+    filtered_channels = ChannelFilter(request, channels)
+    queryset, page_request_var = paginate_queryset(request, filtered_channels)
+    print(queryset)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
@@ -204,7 +205,6 @@ def channel_list(request):
         'most_viewed': most_viewed,
         'most_recent': most_recent,
         'cats': most_popular_cats,
-        'filter': channel_filter,
         'categories': Category.objects.all()
     }
     return render(request, 'core/channel_list.html', context)
@@ -253,7 +253,7 @@ def channel_stats(request):
     context = {
         'name': channel.name,
         'display': 'stats',
-        'total_article_views': channel.get_total_article_views(),
+        'total_article_views': channel.view_count,
         'queryset': queryset,
         'current_billing_revenue': current_billing_revenue,
         'alltime_billing_revenue': alltime_billing_revenue,
