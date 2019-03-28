@@ -156,7 +156,7 @@ def article_explore(request):
     articles = Article.objects.all()
     filtered_articles = ArticleFilter(request, articles)
     queryset, page_request_var = paginate_queryset(
-        request, filtered_articles, 12)
+        request, filtered_articles, 20)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
