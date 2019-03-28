@@ -1,10 +1,10 @@
-const LATEST_ID = "id_latest";
-const VIEW_COUNT_ID = "id_view_count";
+const ALPHABETICAL_ID = "id_alphabetical";
+const ARTICLE_COUNT_ID = "id_article_count";
 const RATING_ID = "id_rating";
 const SUB_COUNT_ID = "id_sub_count";
 
-const latest = document.getElementById(LATEST_ID);
-const view_count = document.getElementById(VIEW_COUNT_ID);
+const alphabetical = document.getElementById(ALPHABETICAL_ID);
+const article_count = document.getElementById(ARTICLE_COUNT_ID);
 const rating = document.getElementById(RATING_ID);
 const sub_count = document.getElementById(SUB_COUNT_ID);
 
@@ -13,26 +13,26 @@ function switchEnabled(formElement) {
   if (checked) formElement.checked = false;
 }
 
-latest.addEventListener("change", e => {
-  switchEnabled(view_count);
+alphabetical.addEventListener("change", e => {
+  switchEnabled(article_count);
   switchEnabled(rating);
   switchEnabled(sub_count);
 });
 
-view_count.addEventListener("change", e => {
-  switchEnabled(latest);
+article_count.addEventListener("change", e => {
+  switchEnabled(alphabetical);
   switchEnabled(rating);
   switchEnabled(sub_count);
 });
 
 rating.addEventListener("change", e => {
-  switchEnabled(latest);
-  switchEnabled(view_count);
+  switchEnabled(alphabetical);
+  switchEnabled(article_count);
   switchEnabled(sub_count);
 });
 
 sub_count.addEventListener("change", e => {
-  switchEnabled(latest);
-  switchEnabled(view_count);
+  switchEnabled(alphabetical);
+  switchEnabled(article_count);
   switchEnabled(rating);
 });

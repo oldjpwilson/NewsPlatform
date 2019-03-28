@@ -12,6 +12,7 @@ from core.models import Channel, Profile
 from core.views import check_user_is_journalist, check_channel_has_stripe_account, is_article_creator
 from categories.models import Category
 from categories.views import get_todays_most_popular_article_categories
+from .filters import ArticleFilter
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView, FreeView
 
@@ -149,6 +150,24 @@ def article_list(request):
         'form': form
     }
     return render(request, 'articles/article_list.html', context)
+
+
+def article_explore(request):
+    articles = Article.objects.all()
+    filtered_articles = ArticleFilter(request, articles)
+    queryset, page_request_var = paginate_queryset(request, filtered_articles)
+    most_viewed = Article.objects.get_todays_most_viewed_channels(3)
+    most_recent = Article.objects.get_todays_most_recent(3)
+    most_popular_cats = get_todays_most_popular_article_categories()
+    context = {
+        'queryset': queryset,
+        'page_request_var': page_request_var,
+        'most_viewed': most_viewed,
+        'most_recent': most_recent,
+        'cats': most_popular_cats,
+        'categories': Category.objects.all()
+    }
+    return render(request, 'articles/article_explore.html', context)
 
 
 @login_required

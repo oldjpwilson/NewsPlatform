@@ -9,7 +9,8 @@ def channelObj(c):
         "subscriber_count": c.subscriber_count,
         "article_count": c.article_count,
         "channel_rating": c.channel_rating if c.channel_rating is not None else -1,
-        "get_absolute_url": c.get_absolute_url()
+        "get_absolute_url": c.get_absolute_url(),
+        "categories": [cat.name for cat in c.categories.all()]
     }
 
 
@@ -21,20 +22,25 @@ def ChannelFilter(request, queryset):
     articleCountMax = request.GET.get('articleCountMax')
     viewCountMin = request.GET.get('viewCountMin')
     viewCountMax = request.GET.get('viewCountMax')
-    order_by_view_count = request.GET.get('view_count')
+    order_by_article_count = request.GET.get('article_count')
     order_by_rating = request.GET.get('rating')
     order_by_sub_count = request.GET.get('sub_count')
+    order_by_alphabetical = request.GET.get('alphabetical')
+    categories = request.GET.getlist('categories')
 
+    # start with all channels and manipulate the queryset depending on form input
     qs = Channel.objects.all()
 
-    # first check if rating, view_count or channel name were searched
+    # check if channel name was searched
     if channel_name != '' and channel_name is not None:
         qs = qs.filter(
-            Q(name__iexact=channel_name)
+            Q(name__icontains=channel_name)
         ).distinct()
-    elif order_by_view_count == 'on':
+
+    # then check if any of the checkboxes for ordering were selected
+    elif order_by_article_count == 'on':
         channels = [channelObj(c) for c in qs]
-        qs = sorted(channels, key=lambda i: i['view_count'], reverse=True)
+        qs = sorted(channels, key=lambda i: i['article_count'], reverse=True)
     elif order_by_sub_count == 'on':
         channels = [channelObj(c) for c in qs]
         qs = sorted(
@@ -43,7 +49,11 @@ def ChannelFilter(request, queryset):
         channels = [channelObj(c) for c in qs]
         qs = sorted(
             channels, key=lambda i: i['channel_rating'], reverse=True)
+    elif order_by_alphabetical == 'on':
+        channels = [channelObj(c) for c in qs]
+        qs = sorted(channels, key=lambda i: i['name'])
 
+    # then check if any of the inputs were used
     if subCountMin != '' and subCountMin is not None:
         qs = [c for c in qs if c.subscriber_count > int(subCountMin)]
 
@@ -63,5 +73,11 @@ def ChannelFilter(request, queryset):
     if viewCountMax != '' and viewCountMax is not None:
         qs = [c for c in qs if c.view_count is not None]
         qs = [c for c in qs if c.view_count < int(viewCountMax)]
+
+    # if there were categories selected
+    if len(categories) > 0:
+        for cat in categories:
+            qs = [channelObj(c) for c in qs]
+            qs = [c for c in qs if cat in c['categories']]
 
     return qs

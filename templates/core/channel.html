@@ -101,7 +101,7 @@
                     {% if channel.channel_rating == None %}
                         <td>No ratings yet</td>
                     {% else %}
-                        <td>{{ channel.channel_rating }}</td>
+                        <td>{{ channel.channel_rating|floatformat:"2" }}</td>
                     {% endif %}
                 </tr>
             </tbody>

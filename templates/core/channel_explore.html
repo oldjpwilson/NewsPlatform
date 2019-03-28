@@ -26,17 +26,17 @@
 <main role="main" class="container">
   <div class="row">
     <div class="col-md-8 blog-main">
-      <div class="row mb-5">
-        <div class="col-12">
+      <div class="row">
+        <div style="width: 100%">
           <form method="GET">
           <div class="well">
             <h4>Order by</h4>
             <div class="form-row mb-4 mr-sm-2 form-check">
               <div class="check-item">
                 <input class="form-check-input" type="hidden" id="id_latest" name="latest">
-                <input class="form-check-input" type="checkbox" id="id_view_count" name="view_count">
-                <label class="form-check-label" for="id_view_count">
-                  View count
+                <input class="form-check-input" type="checkbox" id="id_article_count" name="article_count">
+                <label class="form-check-label" for="id_article_count">
+                  Article count
                 </label>
               </div>
               <div class="check-item">
@@ -51,9 +51,15 @@
                   Subscriber count
                 </label>
               </div>
+              <div class="check-item">
+                <input class="form-check-input" type="checkbox" id="id_alphabetical" name="alphabetical">
+                <label class="form-check-label" for="id_alphabetical">
+                  Alphabetical
+                </label>
+              </div>
             </div>
             <div>
-              <a id="showAdvancedFormBtn" class="float-right btn btn-sm btn-secondary" href="javascript:void(0)">Advanced search</a>
+              <a class="float-right btn btn-sm btn-default" href="{% url 'article-explore' %}">Explore articles</a>
             </div>
             <div id="advancedForm" style="display: none;">
               <h4>Advanced Search</h4>
@@ -71,13 +77,13 @@
                 <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-row">
                     <div class="col-6">
-                      <input type="text" class="form-control" placeholder="0" aria-describedby="subCountMinHelp" name="subCountMin">
+                      <input type="number" min="0" class="form-control" placeholder="0" aria-describedby="subCountMinHelp" name="subCountMin">
                       <small id="subCountMinHelp" class="form-text text-muted">
                         Minimum number of subscribers
                       </small>
                     </div>
                     <div class="col-6">
-                      <input type="text" class="form-control" placeholder="100" aria-describedby="subCountMaxHelp" name="subCountMax">
+                      <input type="number" min="0" class="form-control" placeholder="100" aria-describedby="subCountMaxHelp" name="subCountMax">
                       <small id="subCountMaxHelp" class="form-text text-muted">
                         Maximum number of subscribers
                       </small>
@@ -87,13 +93,13 @@
                 <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-row">
                     <div class="col-6">
-                      <input type="text" class="form-control" placeholder="0" aria-describedby="articleCountMinHelp" name="articleCountMin">
+                      <input type="number" min="0" class="form-control" placeholder="0" aria-describedby="articleCountMinHelp" name="articleCountMin">
                       <small id="articleCountMinHelp" class="form-text text-muted">
                         Minimum number of articles
                       </small>
                     </div>
                     <div class="col-6">
-                      <input type="text" class="form-control" placeholder="25" aria-describedby="articleCountMaxHelp" name="articleCountMax">
+                      <input type="number" min="0" class="form-control" placeholder="25" aria-describedby="articleCountMaxHelp" name="articleCountMax">
                       <small id="articleCountMaxHelp" class="form-text text-muted">
                         Maximum number of articles
                       </small>
@@ -112,13 +118,13 @@
                 <div class="col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
                   <div class="form-row">
                     <div class="col-6">
-                      <input type="text" class="form-control" placeholder="0" aria-describedby="viewCountMinHelp" name="viewCountMin">
+                      <input type="number" min="0" class="form-control" placeholder="0" aria-describedby="viewCountMinHelp" name="viewCountMin">
                       <small id="viewCountMinHelp" class="form-text text-muted">
                         Minimum number of views
                       </small>
                     </div>
                     <div class="col-6">
-                      <input type="text" id="viewCountMax" class="form-control" placeholder="10000" aria-describedby="viewCountMaxHelp" name="viewCountMax">
+                      <input type="number" min="0" id="viewCountMax" class="form-control" placeholder="10000" aria-describedby="viewCountMaxHelp" name="viewCountMax">
                       <small id="viewCountMaxHelp" class="form-text text-muted">
                         Maximum number of views
                       </small>
@@ -130,6 +136,7 @@
             <button type="submit" class="btn btn-primary btn-sm">
               <span class="fa fa-search"></span> Filter
             </button>
+            <a id="showAdvancedFormBtn" class="btn btn-sm btn-secondary" href="javascript:void(0)">Toggle advanced search</a>            
           </div>
           </form>
         </div>
@@ -144,8 +151,8 @@
             <span>{{ channel.subscriber_count }} subscribers</span> 
             | <span>{{ channel.article_count }} articles</span> 
             | <span>
-            {% if channel.channel_rating != None %}
-              {{ channel.channel_rating }}/10
+            {% if channel.channel_rating != None and channel.channel_rating != -1 %}
+              {{ channel.channel_rating|floatformat:"2" }}/10
             {% else %}
             No
             {% endif %}

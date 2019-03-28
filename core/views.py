@@ -195,7 +195,6 @@ def channel_list(request):
     channels = Channel.objects.all()
     filtered_channels = ChannelFilter(request, channels)
     queryset, page_request_var = paginate_queryset(request, filtered_channels)
-    print(queryset)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
@@ -207,7 +206,7 @@ def channel_list(request):
         'cats': most_popular_cats,
         'categories': Category.objects.all()
     }
-    return render(request, 'core/channel_list.html', context)
+    return render(request, 'core/channel_explore.html', context)
 
 
 def channel_public(request, name):

@@ -9,6 +9,7 @@ from articles.views import (
     home,
     search,
     article_list,
+    article_explore,
     article_detail,
     article_create,
     article_update,
@@ -55,6 +56,7 @@ urlpatterns = [
     # article views
     path('news-feed/', article_list, name='article-list'),
     path('articles/<id>/', article_detail, name='article-detail'),
+    path('explore-articles/', article_explore, name='article-explore'),
     path('create/', article_create, name='article-create'),
     path('articles/<id>/update/', article_update, name='article-update'),
     path('articles/<id>/delete/', article_delete, name='article-delete'),
@@ -78,7 +80,7 @@ urlpatterns = [
          name='remove-credit-card'),
 
     # channel views
-    path('explore/', channel_list, name='channel-list'),
+    path('explore-channels/', channel_list, name='channel-list'),
     path('become-a-journalist/', channel_create, name='channel-create'),
     path('my-channel/', my_channel, name='my-channel'),
     path('my-channel/stats/', channel_stats, name='channel-stats'),

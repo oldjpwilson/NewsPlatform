@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/bootstrap-multiselect.css' %}" type="text/css"/>
+{% endblock %}
+
+{% block content %}
+
+<style>
+.text-muted:hover {
+  text-decoration: none;
+  color: #6c757d !important;
+}
+.check-item {
+  margin-left: 35px;
+  display: inline;
+}
+.check-item:nth-child(1) {
+  margin-left: 6px;
+  display: inline;
+}
+</style>
+
+<main role="main" class="container">
+  <div class="row">
+    <div class="col-md-8 blog-main">
+      <div class="row">
+        <div style="width: 100%">
+          <form method="GET">
+          <div class="well">
+            <h4>Order by</h4>
+            <div class="form-row mb-4 mr-sm-2 form-check">
+              <div class="check-item">
+                <input class="form-check-input" type="hidden" id="id_latest" name="latest">
+                <input class="form-check-input" type="checkbox" id="id_view_count" name="view_count">
+                <label class="form-check-label" for="id_view_count">
+                  View count
+                </label>
+              </div>
+              <div class="check-item">
+                <input class="form-check-input" type="checkbox" id="id_rating" name="rating">
+                <label class="form-check-label" for="id_rating">
+                  Rating
+                </label>
+              </div>
+              <div class="check-item">
+                <input class="form-check-input" type="checkbox" id="id_latest" name="publish_date">
+                <label class="form-check-label" for="id_latest">
+                  Publish date
+                </label>
+              </div>
+            </div>
+            <div>
+                <a class="float-right btn btn-sm btn-default" href="{% url 'channel-list' %}">Explore channels</a>
+            </div>
+            
+            <div id="advancedForm" style="display: none;">
+              <h4>Advanced Search</h4>
+              <div class="form-row mb-1">
+                <div class="col-12 input-group">
+                  <input class="form-control py-2 border-right-0 border" type="search" placeholder="Article title" id="search-input" name="article_title">
+                  <span class="input-group-append">
+                    <button class="btn btn-outline-secondary border-left-0 border" type="submit">
+                          <i class="fa fa-search"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="form-row mb-1">
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                  <div class="form-row">
+                    <div class="col-6">
+                      <input type="number" min="0" class="form-control" placeholder="0" aria-describedby="ratingMinHelp" name="ratingMin" id="ratingMin">
+                      <small id="ratingMinHelp" class="form-text text-muted">
+                        Minimum rating
+                      </small>
+                    </div>
+                    <div class="col-6">
+                      <input type="number" min="0" max="10" class="form-control" placeholder="10" aria-describedby="ratingMaxHelp" name="ratingMax" id="ratingMax">
+                      <small id="ratingMaxHelp" class="form-text text-muted">
+                        Maximum rating
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                  <div class="form-row">
+                    <div class="col-6">
+                      <input type="number" min="0" class="form-control" placeholder="0" aria-describedby="viewCountMinHelp" name="viewCountMin" id="viewCountMin">
+                      <small id="viewCountMinHelp" class="form-text text-muted">
+                        Minimum number of views
+                      </small>
+                    </div>
+                    <div class="col-6">
+                      <input type="number" min="0" class="form-control" placeholder="10000" aria-describedby="viewCountMaxHelp" name="viewCountMax" id="viewCountMax">
+                      <small id="viewCountMaxHelp" class="form-text text-muted">
+                        Maximum number of views
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row mb-1">
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
+                  <select class="custom-select" id="categories" multiple="multiple" name="categories">
+                    {% for c in categories %}
+                      <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+                  <div class="form-row">
+                    <div class="col-6">
+                      <input type="date" class="form-control" aria-describedby="publishDateMinHelp" name="publishDateMin">
+                      <small id="publishDateMinHelp" class="form-text text-muted">
+                        Posted after this date
+                      </small>
+                    </div>
+                    <div class="col-6">
+                      <input type="date" class="form-control" aria-describedby="publishDateMaxHelp" name="publishDateMax">
+                      <small id="publishDateMaxHelp" class="form-text text-muted">
+                        Posted before this date
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">
+              <span class="fa fa-search"></span> Filter
+            </button>
+            <a id="showAdvancedFormBtn" class="btn btn-sm btn-secondary" href="javascript:void(0)">Toggle advanced search</a>
+          </div>
+          </form>
+        </div>
+      </div>
+
+      <hr />
+
+      {% for article in queryset %}
+        <div class="row">
+          <a class="text-muted" href="{{ article.get_absolute_url }}">
+            <h5>{{ article.title }}</h5>
+            <span>{{ article.view_count }} views</span> 
+            | <span>
+            {% if article.rating.count < 1 or article.rating == None %}
+            No
+            {% else %}
+            {{ article.rating.average|floatformat:"2" }}/10
+            {% endif %}
+            rating
+            </span>
+            | <span>{{ article.publish_date|timesince }} ago</span>
+          </a>
+        </div>
+        <hr />
+      {% empty %}
+        There are currently no articles to view
+      {% endfor %}
+
+      <div class="row mt-5">
+        {% include "nav/paginator.html" with queryset=queryset page_request_var=page_request_var %}
+      </div>
+
+    </div>
+
+    {% include 'core/channel_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}    
+
+  </div> 
+</main>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'js/bootstrap-multiselect.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#categories').multiselect({
+            nonSelectedText: 'Select a category(s)'
+        });
+    });
+</script>
+<script>
+const advancedForm = document.getElementById('advancedForm');
+document.getElementById("showAdvancedFormBtn").addEventListener("click", () => {
+  if (advancedForm.style.display === 'none') {
+    advancedForm.style.display = 'block';
+  } else {
+    advancedForm.style.display = 'none'
+  }
+});
+</script>
+<script src="{% static 'js/selectCheckboxArticle.js' %}"></script>
+
+{% endblock scripts %}

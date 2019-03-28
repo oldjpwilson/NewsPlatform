@@ -66,7 +66,7 @@ USE_TZ = True
 
 # Auth settings
 
-LOGIN_REDIRECT_URL = '/explore/'
+LOGIN_REDIRECT_URL = '/explore-channels/'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_AUTHENTICATION_METHOD = "username"

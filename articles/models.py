@@ -71,11 +71,17 @@ class Article(models.Model):
         return reverse('article-delete', kwargs={'id': self.id})
 
     def get_view_count(self):
-        return ArticleView.objects.filter(article=self).count()
+        qs = ArticleView.objects.filter(article=self)
+        if qs.exists():
+            return qs.count()
+        return 0
 
     @property
     def get_rating(self):
-        return Rating.objects.get(object_id=self.id)
+        qs = Rating.objects.filter(object_id=self.id)
+        if qs.exists():
+            return qs.first()
+        return None
 
 
 class ArticleView(models.Model):
