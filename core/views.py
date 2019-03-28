@@ -195,7 +195,7 @@ def channel_list(request):
     channels = Channel.objects.all()
     filtered_channels = ChannelFilter(request, channels)
     queryset, page_request_var = paginate_queryset(
-        request, filtered_channels, 12)
+        request, filtered_channels, 20)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
