@@ -73,12 +73,13 @@
         </div>
       {% endif %}
 
-{% include "socialaccount/snippets/login_extra.html" %}
+      {% include "socialaccount/snippets/login_extra.html" %}
       <form method="POST" action=".">
         {% csrf_token %}
         {{ form|crispy }}
         <button type="submit" class="btn btn-primary">Login</button>
-        <a href="{% url 'account_signup' %}">signup</a>
+        <a class="btn btn-secondary" href="{% url 'account_signup' %}">signup</a>
+        <a class="btn btn-default" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
       </form>
     </aside>
 

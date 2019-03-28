@@ -10,7 +10,8 @@ def channelObj(c):
         "article_count": c.article_count,
         "channel_rating": c.channel_rating if c.channel_rating is not None else -1,
         "get_absolute_url": c.get_absolute_url(),
-        "categories": [cat.name for cat in c.categories.all()]
+        "categories": [cat.name for cat in c.categories.all()],
+        "description": c.description
     }
 
 
