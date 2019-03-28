@@ -78,7 +78,7 @@ def is_article_creator(request, article_being_viewed):
 def my_profile(request):
     profile = get_object_or_404(Profile, user=request.user)
     articles = Article.objects.get_highest_rated(3)
-    queryset, page_request_var = paginate_queryset(request, articles)
+    queryset, page_request_var = paginate_queryset(request, articles, 4)
     channels = profile.subscriptions.all()
     sub_count = profile.subscriptions.count()
     total_article_views = ArticleView.objects.filter(user=request.user).count()
@@ -169,7 +169,7 @@ def my_channel(request):
     articles = channel.articles.all().order_by('-published_date')
     highest_rated_article = get_highest_rated_article(channel)
     most_viewed_article = get_most_viewed_article(channel)
-    queryset, page_request_var = paginate_queryset(request, articles)
+    queryset, page_request_var = paginate_queryset(request, articles, 4)
     current_billing_revenue = get_channel_current_billing_revenue(channel)
     alltime_billing_revenue = get_channel_alltime_billing_revenue(channel)
     next_payout_date = get_next_date(15)
@@ -194,7 +194,8 @@ def change_selected_channel(request, name):
 def channel_list(request):
     channels = Channel.objects.all()
     filtered_channels = ChannelFilter(request, channels)
-    queryset, page_request_var = paginate_queryset(request, filtered_channels)
+    queryset, page_request_var = paginate_queryset(
+        request, filtered_channels, 12)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
@@ -212,7 +213,7 @@ def channel_list(request):
 def channel_public(request, name):
     channel = get_channel_or_404(request, name)
     articles = channel.articles.all().order_by('-published_date')
-    queryset, page_request_var = paginate_queryset(request, articles)
+    queryset, page_request_var = paginate_queryset(request, articles, 4)
     context = {
         'channel': channel,
         'queryset': queryset,
@@ -247,7 +248,7 @@ def channel_stats(request):
     current_billing_revenue = get_channel_current_billing_revenue(channel)
     alltime_billing_revenue = get_channel_alltime_billing_revenue(channel)
     queryset, page_request_var = paginate_queryset(
-        request, channel.articles.all())
+        request, channel.articles.all(), 4)
     next_payout_date = get_next_date(15)
     context = {
         'name': channel.name,

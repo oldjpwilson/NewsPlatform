@@ -113,8 +113,8 @@ def get_profile_current_billing_total(profile):
     return amount
 
 
-def paginate_queryset(request, queryset):
-    paginator = Paginator(queryset, 4)
+def paginate_queryset(request, queryset, count=4):
+    paginator = Paginator(queryset, count)
     page_request_var = 'page'
     page = request.GET.get('page')
     try:

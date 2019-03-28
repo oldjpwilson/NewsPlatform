@@ -23,7 +23,7 @@ def category_detail(request, name):
         .article_set \
         .distinct() \
         .order_by('-published_date')
-    queryset, page_request_var = paginate_queryset(request, articles)
+    queryset, page_request_var = paginate_queryset(request, articles, 12)
     context = {
         'queryset': queryset,
         'page_request_var': page_request_var,

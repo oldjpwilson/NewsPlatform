@@ -139,7 +139,7 @@ def article_list(request):
 
     # let user see only articles of subscribed channels
     final_articles = [a for a in articles if a.channel in subscriptions]
-    queryset, page_request_var = paginate_queryset(request, final_articles)
+    queryset, page_request_var = paginate_queryset(request, final_articles, 4)
 
     context = {
         'queryset': queryset,
@@ -155,7 +155,8 @@ def article_list(request):
 def article_explore(request):
     articles = Article.objects.all()
     filtered_articles = ArticleFilter(request, articles)
-    queryset, page_request_var = paginate_queryset(request, filtered_articles)
+    queryset, page_request_var = paginate_queryset(
+        request, filtered_articles, 12)
     most_viewed = Article.objects.get_todays_most_viewed_channels(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
