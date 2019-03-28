@@ -1,7 +1,7 @@
 {% extends "account/base.html" %}
 {% load crispy_forms_tags %}
-
 {% load i18n %}
+{% load account socialaccount %}
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
 
@@ -10,6 +10,17 @@
   <div class="col-lg-4 col-md-6 col-sm-8">
     <h1>{% trans "Sign Up" %}</h1>
     <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
+    {% get_providers as socialaccount_providers %}
+
+    {% if socialaccount_providers %}
+      <div class="socialaccount_ballot">
+
+        {% include "socialaccount/snippets/provider_list.html" with process="signup" %}
+
+        <div class="login-or">{% trans 'or' %}</div>
+
+      </div>
+    {% endif %}
     <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
       {% csrf_token %}
       {{ form|crispy }}

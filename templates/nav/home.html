@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load i18n %}
+{% load account socialaccount %}
 {% load crispy_forms_tags %}
 
 {% block header %}
@@ -63,6 +65,15 @@
 
     <aside class="col-md-4 blog-sidebar">
       <h2>Login</h2>
+      {% get_providers as socialaccount_providers %}
+
+      {% if socialaccount_providers %}
+        <div class="socialaccount_ballot">
+          {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+        </div>
+      {% endif %}
+
+{% include "socialaccount/snippets/login_extra.html" %}
       <form method="POST" action=".">
         {% csrf_token %}
         {{ form|crispy }}
