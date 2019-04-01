@@ -37,7 +37,7 @@ class Article(models.Model):
     channel = models.ForeignKey(
         Channel, related_name='articles', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, blank=False, null=False)
-    slug = models.SlugField()
+    slug = models.SlugField(blank=True)
     description = models.TextField()
     thumbnail = models.ImageField(blank=False, null=False)
     media_type = models.CharField(max_length=40, choices=MEDIA_CHOICES)
