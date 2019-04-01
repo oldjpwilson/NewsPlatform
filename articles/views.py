@@ -172,11 +172,11 @@ def article_explore(request):
 
 
 @login_required
-def article_detail(request, id):
+def article_detail(request, slug):
     most_viewed = Article.objects.get_todays_most_viewed(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
-    article = get_object_or_404(Article, id=id)
+    article = get_object_or_404(Article, slug=slug)
 
     # handle if the visitor is subscribed
     profile = get_object_or_404(Profile, user=request.user)
@@ -239,7 +239,7 @@ def article_create(request):
             article.save()
             form.save_m2m()
             return redirect(reverse('article-detail', kwargs={
-                'id': form.instance.id
+                'slug': form.instance.slug
             }))
     context = {
         'form': form
@@ -249,8 +249,8 @@ def article_create(request):
 
 @login_required
 @user_passes_test(check_user_is_journalist)
-def article_update(request, id):
-    instance = get_object_or_404(Article, id=id)
+def article_update(request, slug):
+    instance = get_object_or_404(Article, slug=slug)
     form = ArticleModelForm(request.POST or None,
                             request.FILES or None,
                             instance=instance)
@@ -258,7 +258,7 @@ def article_update(request, id):
         if form.is_valid():
             form.save()
             return redirect(reverse('article-detail', kwargs={
-                'id': form.instance.id
+                'slug': form.instance.slug
             }))
     context = {
         'form': form
@@ -268,7 +268,7 @@ def article_update(request, id):
 
 @login_required
 @user_passes_test(check_user_is_journalist)
-def article_delete(request, id):
-    article = get_object_or_404(Article, id=id)
+def article_delete(request, slug):
+    article = get_object_or_404(Article, slug=slug)
     article.delete()
     return redirect(reverse('home'))

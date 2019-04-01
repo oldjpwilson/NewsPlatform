@@ -142,7 +142,7 @@
       {% for article in queryset %}
         <div class="row">
           <a class="text-muted" href="{{ article.get_absolute_url }}">
-            <h5>{{ article.title }}</h5>
+            <h5>{{ article.title|truncatechars:80 }}</h5>
             <span>{{ article.view_count }} views</span> 
             | <span>
             {% if article.rating.count < 1 or article.rating == None %}

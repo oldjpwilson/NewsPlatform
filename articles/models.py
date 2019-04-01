@@ -1,11 +1,13 @@
 from django.db import models
-from django.urls import reverse
+from django.db.models.signals import pre_save
 from django.contrib.contenttypes.fields import GenericRelation
+from django.urls import reverse
 from star_ratings.models import Rating
 from tinymce import HTMLField
 from categories.models import Category
 from core.models import Channel, User
 from .managers import ArticleManager
+from .utils import create_slug
 
 MEDIA_CHOICES = (
     ('Text and Video', 'Text and Video'),
@@ -35,6 +37,7 @@ class Article(models.Model):
     channel = models.ForeignKey(
         Channel, related_name='articles', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, blank=False, null=False)
+    slug = models.SlugField()
     description = models.TextField()
     thumbnail = models.ImageField(blank=False, null=False)
     media_type = models.CharField(max_length=40, choices=MEDIA_CHOICES)
@@ -62,13 +65,13 @@ class Article(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('article-detail', kwargs={'id': self.id})
+        return reverse('article-detail', kwargs={'slug': self.slug})
 
     def get_update_url(self):
-        return reverse('article-update', kwargs={'id': self.id})
+        return reverse('article-update', kwargs={'slug': self.slug})
 
     def get_delete_url(self):
-        return reverse('article-delete', kwargs={'id': self.id})
+        return reverse('article-delete', kwargs={'slug': self.slug})
 
     def get_view_count(self):
         qs = ArticleView.objects.filter(article=self)
@@ -104,3 +107,11 @@ class FreeView(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+def pre_save_article_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = create_slug(instance)
+
+
+pre_save.connect(pre_save_article_receiver, sender=Article)

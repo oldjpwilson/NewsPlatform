@@ -55,11 +55,11 @@ urlpatterns = [
 
     # article views
     path('news-feed/', article_list, name='article-list'),
-    path('articles/<id>/', article_detail, name='article-detail'),
+    path('articles/<slug>/', article_detail, name='article-detail'),
     path('explore-articles/', article_explore, name='article-explore'),
     path('create/', article_create, name='article-create'),
-    path('articles/<id>/update/', article_update, name='article-update'),
-    path('articles/<id>/delete/', article_delete, name='article-delete'),
+    path('articles/<slug>/update/', article_update, name='article-update'),
+    path('articles/<slug>/delete/', article_delete, name='article-delete'),
 
     # category views
     path('categories/<name>/', category_detail, name='category-detail'),

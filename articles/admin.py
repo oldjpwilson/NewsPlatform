@@ -14,6 +14,7 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': (
                 'channel',
                 'title',
+                'slug',
                 'description',
                 'thumbnail',
                 'media_type',
