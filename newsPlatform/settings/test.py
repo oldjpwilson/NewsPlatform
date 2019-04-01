@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['np-test.us-west-2.elasticbeanstalk.com']
 WSGI_APPLICATION = 'newsPlatform.wsgi.application'
 
