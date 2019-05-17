@@ -39,7 +39,9 @@
             {% include "articles/share_links_snippet.html" %}
           </h2>
         </div>
+        {% if article.thumbnail %}
         <img style="width: 100%;" src="{{ article.thumbnail.url }}" alt="Article thumbnail" />
+        {% endif %}
         
         <div id="content">
           {{ article.content | safe }}
