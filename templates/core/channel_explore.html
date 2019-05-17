@@ -149,8 +149,8 @@
           <a class="text-muted" href="{{ channel.get_absolute_url }}">
             <h5>{{ channel.name }}</h5>
             <p>{{ channel.description|truncatechars:80 }}</p>
-            <span>{{ channel.subscriber_count }} subscribers</span> 
-            | <span>{{ channel.article_count }} articles</span> 
+            {% comment %} <span>{{ channel.subscriber_count }} subscribers</span>  {% endcomment %}
+            <span>{{ channel.article_count }} articles</span> 
             | <span>
             {% if channel.channel_rating != None and channel.channel_rating != -1 %}
               {{ channel.channel_rating|floatformat:"2" }}/10
