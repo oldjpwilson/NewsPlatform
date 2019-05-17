@@ -15,7 +15,11 @@ class ArticleModelForm(forms.ModelForm):
         )
     )
     description = forms.CharField(
-        widget=forms.Textarea(attrs={'cols': 40, 'rows': 3}))
+        widget=forms.Textarea(attrs={'cols': 40, 'rows': 3}), help_text='This is a summary of the article and helps with SEO. This should be filled in')
+
+    thumbnail = forms.ImageField(
+        help_text='This image will display at the top of page and also in WhatsApp share links'
+    )
 
     class Meta:
         model = Article
