@@ -2,8 +2,6 @@
 {% load static %}
 {% load ratings %}
 
-{% comment %} Good resource: https://stackoverflow.com/questions/19778620/provide-an-image-for-whatsapp-link-sharing {% endcomment %}
-
 {% block extra_head %}
   <title>{{ article.title|truncatechars:65 }}</title>
   <meta property="og:title" content="{{ article.title|truncatechars:35 }}" />
@@ -30,7 +28,6 @@
 <main role="main" class="container">
   <div class="row mt-5">
     <div class="col-md-8">
-      {% if allowed_to_view or request.user == article.channel.user %}
         <div>
           <h2>{{ article.title }} 
             <small style="font-size: 50%;">
@@ -44,29 +41,15 @@
         {% endif %}
         
         <div id="content">
-          {{ article.content | safe }}
+          {{ article.description }}
         </div>
-        {% if article.channel.user == request.user %}
-          <a class="btn btn-secondary" href="{{ article.get_update_url }}">Update</a>
-          <a class="btn btn-warning" href="{{ article.get_delete_url }}">Delete</a>
-          <br />
-          <p class="mt-3">Average Rating: {{ article.get_rating.average }}</p>
-          <p>Number of Ratings: {{ article.get_rating.count }}</p>
-        {% else %}
-          {% ratings article %}
-        {% endif %}
-        <hr />
-        {% include "nav/disqus.html" with article_id=article.id article_url=request.build_absolute_uri %}
-
-      {% else %}
-        <h4>To view this article, subscribe to this channel</h4>
-        <a href="{% url 'subscribe' name=article.channel.name %}" style="width: 100%;" class="btn btn-warning btn-large">Subscribe</a>
-      {% endif %}
-
+        
+        <h4>To continue reading, start by <a href="{% url 'account_login' %}">logging in</a></h4>
     </div>
 
     {% include 'articles/article_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
   </div>
 
 </main>
+
 {% endblock content %}

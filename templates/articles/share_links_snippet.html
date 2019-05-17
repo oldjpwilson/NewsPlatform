@@ -1,0 +1,37 @@
+<style>
+.fab {
+  padding: 10px;
+  font-size: 20px;
+  width: 40px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 2px;
+  border-radius: 50%;
+}
+
+.fab:hover {
+  opacity: 0.7;
+  color: white;
+  text-decoration: none;
+}
+
+.fa-facebook-f {
+  background: #3B5998;
+  color: white;
+}
+
+.fa-twitter {
+  background: #55ACEE;
+  color: white;
+}
+
+.fa-whatsapp {
+  background: #25D366;
+  color: white;
+}
+
+</style>
+
+{% for share_link in share_links %}
+  <a href="{{ share_link.link }}" target="_blank" class="{{ share_link.icon_class }} float-right"></a>
+{% endfor %}

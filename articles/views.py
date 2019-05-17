@@ -15,6 +15,11 @@ from categories.views import get_todays_most_popular_article_categories
 from .filters import ArticleFilter
 from .forms import ArticleFilterForm, ArticleModelForm, ContactForm
 from .models import Article, ArticleView, FreeView
+from .utils import generate_share_links
+
+
+def faq(request):
+    return render(request, "nav/faq.html")
 
 
 def search(request):
@@ -171,12 +176,25 @@ def article_explore(request):
     return render(request, 'articles/article_explore.html', context)
 
 
-@login_required
+# @login_required
 def article_detail(request, slug):
     most_viewed = Article.objects.get_todays_most_viewed(3)
     most_recent = Article.objects.get_todays_most_recent(3)
     most_popular_cats = get_todays_most_popular_article_categories()
     article = get_object_or_404(Article, slug=slug)
+
+    # generate share links
+    share_links = generate_share_links(request, article)
+
+    if not request.user.is_authenticated:
+        context = {
+            'article': article,
+            'most_viewed': most_viewed,
+            'most_recent': most_recent,
+            'cats': most_popular_cats,
+            'share_links': share_links
+        }
+        return render(request, "articles/article_detail_unauthenticated.html", context)
 
     # handle if the visitor is subscribed
     profile = get_object_or_404(Profile, user=request.user)
@@ -221,7 +239,8 @@ def article_detail(request, slug):
         'most_viewed': most_viewed,
         'most_recent': most_recent,
         'cats': most_popular_cats,
-        'allowed_to_view': allowed_to_view
+        'allowed_to_view': allowed_to_view,
+        'share_links': share_links
     }
     return render(request, 'articles/article_detail.html', context)
 
