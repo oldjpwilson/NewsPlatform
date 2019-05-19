@@ -1,9 +1,9 @@
 branch-defaults:
   default:
-    environment: test
+    environment: prod
     group_suffix: null
   master:
-    environment: test
+    environment: prod
 global:
   application_name: src
   branch: null
