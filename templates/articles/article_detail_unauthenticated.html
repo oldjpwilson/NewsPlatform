@@ -43,10 +43,11 @@
         <div id="content">
           {{ article.description }}
         </div>
-
+<br>
         <h4>To continue reading, start by <a href="{% url 'account_login' %}">logging in</a></h4>
-        <p>Its free for the first 10 articles, per channel (and then on $0.50 per channel per month).
-        No credit card or payment details when signing in! </p>
+        <br>
+        <p>Its free for the first 10 articles per channel (and then only $0.50 per channel per month)!!
+        No asking for credit card or payment details signing up! </p>
     </div>
 
     {% include 'articles/article_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
