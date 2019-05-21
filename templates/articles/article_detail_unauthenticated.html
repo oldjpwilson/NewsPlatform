@@ -29,7 +29,7 @@
   <div class="row mt-5">
     <div class="col-md-8">
         <div>
-          <h2>{{ article.title }} 
+          <h2>{{ article.title }}
             <small style="font-size: 50%;">
               Posted by <a href="{{ article.channel.get_absolute_url }}">{{ article.channel }}</a>
             </small>
@@ -39,12 +39,14 @@
         {% if article.thumbnail %}
         <img style="width: 100%;" src="{{ article.thumbnail.url }}" alt="Article thumbnail" />
         {% endif %}
-        
+
         <div id="content">
           {{ article.description }}
         </div>
-        
+
         <h4>To continue reading, start by <a href="{% url 'account_login' %}">logging in</a></h4>
+        <p>Its free for the first 10 articles, per channel (and then on $0.50 per channel per month).
+        No credit card or payment details when signing in! </p>
     </div>
 
     {% include 'articles/article_sidebar.html' with most_viewed=most_viewed most_recent=most_recent cats=cats %}
