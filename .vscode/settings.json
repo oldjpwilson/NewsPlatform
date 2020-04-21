@@ -1,5 +1,5 @@
 {
-  "python.pythonPath": "/home/jp/Documents/Practice/5Apr_learningNP/prac_again/np_venv/bin/python",
+  "python.pythonPath": "/home/jp/xNPMon20AprilPrac/env/bin/python",
   "editor.formatOnSave": true,
   "python.linting.pycodestyleEnabled": true,
   "python.linting.pylintPath": "pylint",
