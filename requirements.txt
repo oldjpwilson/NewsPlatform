@@ -37,7 +37,7 @@ mccabe==0.6.1
 oauthlib==3.0.0
 pathspec==0.5.5
 pep8==1.7.1
-Pillow==5.4.1
+Pillow==8.2.0
 psycopg2==2.7.7
 pyasn1==0.4.5
 pycodestyle==2.4.0
