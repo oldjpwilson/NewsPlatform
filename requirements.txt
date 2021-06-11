@@ -1,10 +1,10 @@
 astroid==2.1.0
 autopep8==1.4.3
-awscli==1.16.111
-awsebcli==3.14.10
-blessed==1.15.0
-boto3==1.9.101
-botocore==1.12.101
+#awscli==1.16.111
+#awsebcli>=3.14.10
+#blessed==1.15.0
+#boto3==1.9.101
+#botocore==1.12.101
 cached-property==1.5.1
 cement==2.8.2
 certifi==2018.11.29
@@ -24,7 +24,7 @@ docker==3.7.0
 docker-compose==1.23.2
 docker-pycreds==0.4.0
 dockerpty==0.4.1
-docopt==0.6.2
+docopt>=0.6.2
 docutils==0.14
 idna==2.7
 isort==4.3.4
@@ -32,7 +32,7 @@ jmespath==0.9.3
 jsmin==2.2.2
 jsonschema==2.6.0
 lazy-object-proxy==1.3.1
-mailchimp==2.0.9
+#mailchimp==2.0.9
 mccabe==0.6.1
 oauthlib==3.0.0
 pathspec==0.5.5
@@ -52,7 +52,7 @@ requests-oauthlib==1.2.0
 rsa==3.4.2
 s3transfer==0.2.0
 semantic-version==2.5.0
-six==1.12.0
+six>=1.12.0
 sqlparse==0.2.4
 stripe==2.21.0
 swapper==1.1.0
