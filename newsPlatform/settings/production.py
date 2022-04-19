@@ -1,7 +1,7 @@
 from .base import *
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https", "http")
+SECURE_SSL_REDIRECT = False  # True
 DEBUG = False
 ALLOWED_HOSTS = [
     "newsplatform-prod.us-west-2.elasticbeanstalk.com",
