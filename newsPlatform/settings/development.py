@@ -1,7 +1,7 @@
 from .base import *
 
 DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "1f656cab.ngrok.io", "localhost", "54.204.74.191:8000"]
+ALLOWED_HOSTS = ["127.0.0.1", "1f656cab.ngrok.io", "localhost", "54.204.74.191"]
 
 
 WSGI_APPLICATION = "newsPlatform.wsgi.application"

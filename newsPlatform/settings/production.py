@@ -8,7 +8,7 @@ ALLOWED_HOSTS = [
     "newsplatform.org",
     "www.newsplatform.org",
     "localhost",
-    "54.204.74.191:8000",
+    "54.204.74.191",
 ]
 WSGI_APPLICATION = "newsPlatform.wsgi.application"
 
